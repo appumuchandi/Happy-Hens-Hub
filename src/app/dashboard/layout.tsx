@@ -11,19 +11,24 @@ function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // If context is loaded and user is not authenticated, redirect to login
-    if (auth !== undefined && !auth.isAuthenticated) {
+    // If context is no longer loading and user is not authenticated, redirect
+    if (auth && auth.isLoaded && !auth.isAuthenticated) {
       router.push('/');
     }
   }, [auth, router]);
 
-  if (!auth || !auth.isAuthenticated) {
-    // Render a loading state or null while checking auth
+  // Render a loading state while the auth status is being determined.
+  if (!auth || !auth.isLoaded) {
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-background">
-            <div className="text-foreground">Loading...</div>
-        </div>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="text-foreground">Loading...</div>
+      </div>
     );
+  }
+
+  // If loaded and not authenticated, we'll be redirecting, so render nothing to avoid flicker.
+  if (!auth.isAuthenticated) {
+    return null;
   }
 
   return (

@@ -6,6 +6,7 @@ import type { User, Role } from '@/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isLoaded: boolean; // To track if the initial auth check is complete
   user: User | null;
   login: (role: Role) => void;
   logout: () => void;
@@ -21,6 +22,7 @@ const mockUsers: Record<Role, User> = {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false); // New state to track loading
 
   useEffect(() => {
     try {
@@ -31,6 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Failed to parse user from localStorage', error);
       localStorage.removeItem('user');
+    } finally {
+      setIsLoaded(true); // Mark as loaded after checking localStorage
     }
   }, []);
 
@@ -47,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, isLoaded, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

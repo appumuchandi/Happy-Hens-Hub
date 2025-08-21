@@ -10,13 +10,13 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { salesData } from '@/lib/placeholder-data';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 
 const salesSchema = z.object({
   buyerName: z.string().min(1, 'Buyer name is required.'),
   quantity: z.coerce.number().int().positive('Quantity must be a positive number.'),
-  revenue: z.coerce.number().positive('Revenue must be a positive number.'),
+  pricePerPiece: z.coerce.number().positive('Price must be a positive number.'),
 });
 
 type SalesFormValues = z.infer<typeof salesSchema>;
@@ -32,9 +32,19 @@ export default function SalesPage() {
     defaultValues: {
       buyerName: '',
       quantity: 30,
-      revenue: 0.0,
+      pricePerPiece: 0.35,
     },
   });
+
+  const { watch, setValue } = form;
+  const quantity = watch('quantity');
+  const pricePerPiece = watch('pricePerPiece');
+  const [totalRevenue, setTotalRevenue] = useState(0);
+
+  useEffect(() => {
+    const revenue = (quantity || 0) * (pricePerPiece || 0);
+    setTotalRevenue(revenue);
+  }, [quantity, pricePerPiece]);
 
   if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
@@ -43,7 +53,7 @@ export default function SalesPage() {
   function onSubmit(data: SalesFormValues) {
     toast({
       title: 'Sale Recorded!',
-      description: `Sale to ${data.buyerName} for ₹${data.revenue} has been recorded.`,
+      description: `Sale to ${data.buyerName} for ₹${totalRevenue.toFixed(2)} has been recorded.`,
     });
     form.reset();
   }
@@ -52,7 +62,10 @@ export default function SalesPage() {
   const paginatedData = salesData.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
     currentPage * RECORDS_PER_PAGE
-  );
+  ).map(sale => ({
+    ...sale,
+    pricePerPiece: (parseFloat(sale.revenue) / sale.quantity).toFixed(2),
+  }));
 
   return (
     <div className="space-y-6">
@@ -94,17 +107,23 @@ export default function SalesPage() {
                 />
                 <FormField
                   control={form.control}
-                  name="revenue"
+                  name="pricePerPiece"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Total Revenue (₹)</FormLabel>
+                      <FormLabel>Price Per Piece (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="e.g., 10.50" {...field} />
+                        <Input type="number" step="0.01" placeholder="e.g., 0.35" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                 <div className="space-y-2 rounded-lg bg-muted p-3">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Total Revenue</span>
+                        <span className="font-bold text-foreground">₹{totalRevenue.toFixed(2)}</span>
+                    </div>
+                </div>
                 <Button type="submit" className="w-full">Record Sale</Button>
               </form>
             </Form>
@@ -123,6 +142,7 @@ export default function SalesPage() {
                         <TableHead>Date</TableHead>
                         <TableHead>Buyer</TableHead>
                         <TableHead>Quantity</TableHead>
+                        <TableHead>Price/pcs (₹)</TableHead>
                         <TableHead>Revenue (₹)</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -132,6 +152,7 @@ export default function SalesPage() {
                             <TableCell>{sale.date}</TableCell>
                             <TableCell>{sale.buyerName}</TableCell>
                             <TableCell>{sale.quantity}</TableCell>
+                            <TableCell>₹{sale.pricePerPiece}</TableCell>
                             <TableCell>₹{sale.revenue}</TableCell>
                         </TableRow>
                         ))}

@@ -33,3 +33,38 @@ export const feedData = Array.from({ length: 30 }, (_, i) => ({
     date: format(subDays(today, i), 'yyyy-MM-dd'),
     feedConsumption: Math.floor(70 + Math.random() * 10),
 }));
+
+export const workersData = [
+  {
+    id: 'WORKER001',
+    name: 'Worker 1',
+    mobile: '+91 9876543210',
+    workingDays: 28,
+    nonWorkingDays: 2,
+    salary: '15,000'
+  },
+  {
+    id: 'WORKER002',
+    name: 'Worker 2',
+    mobile: '+91 9876543211',
+    workingDays: 29,
+    nonWorkingDays: 1,
+    salary: '15,500'
+  },
+   {
+    id: 'WORKER003',
+    name: 'Worker 3',
+    mobile: '+91 9876543212',
+    workingDays: 25,
+    nonWorkingDays: 5,
+    salary: '14,000'
+  },
+   {
+    id: 'WORKER004',
+    name: 'Worker 4',
+    mobile: '+91 9876543213',
+    workingDays: 30,
+    nonWorkingDays: 0,
+    salary: '16,000'
+  }
+];

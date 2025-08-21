@@ -31,7 +31,7 @@ export default function DashboardPage() {
           Here's a snapshot of your farm's performance.
         </p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title="Daily Egg Collection"
           value={dailyEggCount.toLocaleString()}
@@ -44,6 +44,12 @@ export default function DashboardPage() {
           icon={Egg}
           description="Total eggs this week"
           color="sky"
+        />
+        <StatCard
+            title="Monthly Egg Count"
+            value={monthlyEggCount.toLocaleString()}
+            icon={Egg}
+            description="Total eggs this month"
         />
 
         {(user?.role === 'OWNER' || user?.role === 'WORKER') && (
@@ -80,15 +86,6 @@ export default function DashboardPage() {
           color="sky"
         />
         
-        {user?.role === 'OWNER' && (
-          <StatCard
-            title="Monthly Egg Count"
-            value={monthlyEggCount.toLocaleString()}
-            icon={Egg}
-            description="Total eggs this month"
-          />
-        )}
-
         {user?.role === 'OWNER' && (
            <StatCard
             title="System Alert"

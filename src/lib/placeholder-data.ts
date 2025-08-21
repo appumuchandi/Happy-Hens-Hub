@@ -68,3 +68,13 @@ export const workersData = [
     salary: '16,000'
   }
 ];
+
+export const batchData = Array.from({ length: 5 }, (_, i) => ({
+  id: `BATCH${101 + i}`,
+  name: `Batch B${101 + i}`,
+  vaccinationRecords: [
+    { vaccine: 'Newcastle Disease (NDV)', date: format(subDays(today, 45 - i*5), 'yyyy-MM-dd') },
+    { vaccine: 'Infectious Bronchitis (IBV)', date: format(subDays(today, 30 - i*5), 'yyyy-MM-dd') },
+    { vaccine: 'Fowl Pox', date: format(subDays(today, 15 - i*5), 'yyyy-MM-dd') },
+  ]
+}));

@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 export default function BatchRecordsPage() {
   const { user } = useAuth();
   
-  if (user?.role === 'VIEWER') {
+  if (user?.role !== 'OWNER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 

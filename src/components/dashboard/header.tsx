@@ -29,7 +29,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER', 'WORKER'] },
+  { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },

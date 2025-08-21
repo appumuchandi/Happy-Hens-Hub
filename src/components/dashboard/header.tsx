@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   Boxes,
+  Users,
 } from 'lucide-react';
 import type { Role } from '@/types';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'VIEWER'] },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
+  { href: '/dashboard/workers-optimization', label: 'AI Worker Optimizer', icon: Users, roles: ['OWNER'] },
 ];
 
 export default function AppHeader() {

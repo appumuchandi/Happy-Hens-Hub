@@ -35,6 +35,10 @@ const chartData = processChartData();
 
 export default function ReportsPage() {
   const { user } = useAuth();
+
+  if (user?.role === 'VIEWER') {
+    return <p className="text-destructive">You do not have permission to view this page.</p>;
+  }
   
   return (
     <div className="space-y-6">

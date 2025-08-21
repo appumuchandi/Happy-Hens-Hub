@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { eggCollectionData, salesData } from '@/lib/placeholder-data';
-import { subDays, format, parseISO } from 'date-fns';
+import { subDays, format } from 'date-fns';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ export default function ReportsPage() {
         </Card>
         <Card className="saffron-border">
           <CardHeader>
-            <CardTitle className="font-headline">Weekly Sales Revenue</CardTitle>
+            <CardTitle className="font-headline">Weekly Sales Revenue (₹)</CardTitle>
             <CardDescription>Total sales revenue over the last 7 days.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -81,8 +81,8 @@ export default function ReportsPage() {
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} />
-                  <Tooltip cursor={{ stroke: 'hsl(var(--accent))', strokeWidth: 2 }} content={<ChartTooltipContent />} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => `₹${value}`} />
+                  <Tooltip cursor={{ stroke: 'hsl(var(--accent))', strokeWidth: 2 }} content={<ChartTooltipContent formatter={(value, name) => [`₹${(value as number).toFixed(2)}`, name]} />} />
                   <Line type="monotone" dataKey="sales" stroke="hsl(var(--chart-2))" strokeWidth={3} dot={{ r: 5, fill: 'hsl(var(--chart-2))', strokeWidth: 2, stroke: 'hsl(var(--background))' }} />
                 </LineChart>
               </ResponsiveContainer>

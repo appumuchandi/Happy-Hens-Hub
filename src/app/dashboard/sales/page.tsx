@@ -43,7 +43,7 @@ export default function SalesPage() {
   function onSubmit(data: SalesFormValues) {
     toast({
       title: 'Sale Recorded!',
-      description: `Sale to ${data.buyerName} for $${data.revenue} has been recorded.`,
+      description: `Sale to ${data.buyerName} for ₹${data.revenue} has been recorded.`,
     });
     form.reset();
   }
@@ -97,7 +97,7 @@ export default function SalesPage() {
                   name="revenue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Total Revenue ($)</FormLabel>
+                      <FormLabel>Total Revenue (₹)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" placeholder="e.g., 10.50" {...field} />
                       </FormControl>
@@ -123,7 +123,7 @@ export default function SalesPage() {
                         <TableHead>Date</TableHead>
                         <TableHead>Buyer</TableHead>
                         <TableHead>Quantity</TableHead>
-                        <TableHead>Revenue</TableHead>
+                        <TableHead>Revenue (₹)</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -132,7 +132,7 @@ export default function SalesPage() {
                             <TableCell>{sale.date}</TableCell>
                             <TableCell>{sale.buyerName}</TableCell>
                             <TableCell>{sale.quantity}</TableCell>
-                            <TableCell>${sale.revenue}</TableCell>
+                            <TableCell>₹{sale.revenue}</TableCell>
                         </TableRow>
                         ))}
                     </TableBody>

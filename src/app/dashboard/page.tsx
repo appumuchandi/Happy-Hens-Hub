@@ -3,7 +3,28 @@
 import { useAuth } from '@/hooks/use-auth';
 import StatCard from '@/components/dashboard/stat-card';
 import { dashboardStats } from '@/lib/placeholder-data';
-import { Egg, DollarSign, Users, LineChart, AlertTriangle } from 'lucide-react';
+import { Egg, Users, LineChart, AlertTriangle } from 'lucide-react';
+
+// Using a simple component for the Rupee icon for consistency
+const RupeeIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+    >
+      <path d="M6 3h12" />
+      <path d="M6 8h12" />
+      <path d="m19 13-10 8" />
+      <path d="m6 13 10 8" />
+    </svg>
+  );
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -45,8 +66,8 @@ export default function DashboardPage() {
         {(user?.role === 'OWNER' || user?.role === 'WORKER') && (
           <StatCard
             title="Daily Sales Revenue"
-            value={`$${salesRevenue.toFixed(2)}`}
-            icon={DollarSign}
+            value={`₹${salesRevenue.toFixed(2)}`}
+            icon={RupeeIcon}
             description="Total revenue today"
           />
         )}
@@ -54,8 +75,8 @@ export default function DashboardPage() {
         {user?.role === 'OWNER' && (
           <StatCard
             title="Estimated Profit"
-            value={`$${profit.toFixed(2)}`}
-            icon={DollarSign}
+            value={`₹${profit.toFixed(2)}`}
+            icon={RupeeIcon}
             description="Today's estimated profit"
             color="sky"
           />

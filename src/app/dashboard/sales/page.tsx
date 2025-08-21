@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -12,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { salesData } from '@/lib/placeholder-data';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { format } from 'date-fns';
 
 const salesSchema = z.object({
   buyerName: z.string().min(1, 'Buyer name is required.'),
@@ -64,6 +66,8 @@ export default function SalesPage() {
     currentPage * RECORDS_PER_PAGE
   ).map(sale => ({
     ...sale,
+    // The `new Date()` is needed because the date from placeholder-data is a string
+    date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
     pricePerPiece: (parseFloat(sale.revenue) / sale.quantity).toFixed(2),
   }));
 

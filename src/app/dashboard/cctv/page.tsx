@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
@@ -168,17 +167,16 @@ export default function CctvPage() {
                         <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={otpSent}/>
                     </div>
 
-                    {otpSent && (
-                        <div className="space-y-2">
-                            <Label htmlFor="otp-change">Enter OTP</Label>
-                            <Input id="otp-change" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
-                        </div>
-                    )}
-                    
-                    {!otpSent ? (
-                        <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
+                    {otpSent ? (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="otp-change">Enter OTP</Label>
+                                <Input id="otp-change" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                            </div>
+                            <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
+                        </>
                     ) : (
-                        <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
+                        <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
                     )}
                 </div>
 

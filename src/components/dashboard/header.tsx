@@ -18,6 +18,7 @@ import {
   Archive,
   Video,
   ShoppingCart,
+  Package,
 } from 'lucide-react';
 import type { Role } from '@/types';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -33,6 +34,7 @@ const navItems = [
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/online-order', label: 'Online Order', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
+  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },

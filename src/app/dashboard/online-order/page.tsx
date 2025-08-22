@@ -283,28 +283,6 @@ export default function OnlineOrderPage() {
                     </Button>
                 </CardFooter>
             </Card>
-
-            <Card className="w-full max-w-2xl mx-auto">
-                <CardHeader>
-                    <CardTitle className="font-headline">My Recent Orders</CardTitle>
-                    <CardDescription>Track the status of your recent purchases.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {orders.filter(o => o.customer === user?.name).slice(0, 5).map(order => (
-                             <div key={order.id} className="flex items-center justify-between p-3 rounded-lg border">
-                                <div>
-                                    <p className="font-semibold">{order.quantity} Trays - <span className="font-normal text-muted-foreground">ID: {order.id}</span></p>
-                                    <p className="text-sm">Total: ₹{order.totalAmount.toFixed(2)}</p>
-                                </div>
-                                <Badge variant={order.status === 'pending' ? 'default' : order.status === 'delivered' ? 'secondary' : 'outline'}>
-                                    {order.status}
-                                </Badge>
-                             </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     </div>
   );

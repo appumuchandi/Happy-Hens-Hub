@@ -4,15 +4,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
 import { workersData } from '@/lib/placeholder-data';
-import { Users } from 'lucide-react';
+import { Users, Fingerprint } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 
 export default function WorkersPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   
   if (user?.role !== 'OWNER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
+
+  const handleBiometricSync = () => {
+    toast({
+      title: 'Biometric Sync',
+      description: 'Hardware not connected. Please configure your biometric device in the settings to enable automatic attendance tracking.',
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -23,6 +33,10 @@ export default function WorkersPage() {
               View and manage your worker records.
             </p>
         </div>
+        <Button onClick={handleBiometricSync}>
+          <Fingerprint className="mr-2 h-4 w-4" />
+          Sync with Biometrics
+        </Button>
       </div>
       
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

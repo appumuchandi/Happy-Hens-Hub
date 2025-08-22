@@ -2,7 +2,7 @@
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Video, CameraOff, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
@@ -57,17 +57,26 @@ export default function CctvPage() {
   const [cameraFeeds, setCameraFeeds] = useState<CameraFeed[]>([]);
 
   useEffect(() => {
-    const storedFeeds = localStorage.getItem('cameraFeeds');
-    if (storedFeeds) {
-      setCameraFeeds(JSON.parse(storedFeeds));
-    } else {
-      setCameraFeeds(initialFeeds);
+    try {
+        const storedFeeds = localStorage.getItem('cameraFeeds');
+        if (storedFeeds) {
+            setCameraFeeds(JSON.parse(storedFeeds));
+        } else {
+            setCameraFeeds(initialFeeds);
+        }
+    } catch (error) {
+        console.error("Failed to parse camera feeds from localStorage", error);
+        setCameraFeeds(initialFeeds);
     }
   }, []);
 
   useEffect(() => {
     if (cameraFeeds.length > 0) {
-        localStorage.setItem('cameraFeeds', JSON.stringify(cameraFeeds));
+        try {
+            localStorage.setItem('cameraFeeds', JSON.stringify(cameraFeeds));
+        } catch (error) {
+            console.error("Failed to save camera feeds to localStorage", error);
+        }
     }
   }, [cameraFeeds]);
 
@@ -161,7 +170,7 @@ export default function CctvPage() {
                         data-ai-hint={feed.hint}
                     />
                  ) : (
-                    <div className="flex flex-col items-center text-muted-foreground">
+                    <div className="flex flex-col items-center text-muted-foreground p-4">
                         <CameraOff className="w-16 h-16" />
                         <p className="mt-2">Camera Offline</p>
                         <Dialog open={openConnectDialog === feed.id} onOpenChange={(isOpen) => !isOpen && setOpenConnectDialog(null)}>

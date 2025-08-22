@@ -57,12 +57,17 @@ export default function CctvPage() {
 
   useEffect(() => {
     try {
+        const sessionAuth = sessionStorage.getItem('cctvAuthenticated');
+        if (sessionAuth === 'true') {
+            setIsAuthenticated(true);
+        }
+
         const storedPassword = localStorage.getItem('cctvPassword');
         if (storedPassword) {
             setCctvPassword(storedPassword);
         }
     } catch (error) {
-        console.error("Failed to parse password from localStorage", error);
+        console.error("Failed to access storage", error);
     }
      setCameraFeeds(initialFeeds);
   }, []);
@@ -74,6 +79,7 @@ export default function CctvPage() {
   
   const handlePasswordSubmit = () => {
     if (password === cctvPassword) {
+        sessionStorage.setItem('cctvAuthenticated', 'true');
         setIsAuthenticated(true);
         toast({ title: 'Access Granted' });
     } else {

@@ -91,33 +91,8 @@ export default function CctvPage() {
   }
 
   const CctvSettingsDialog = () => {
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [otp, setOtp] = useState('');
-    const [otpSent, setOtpSent] = useState(false);
-
     const [newCameraName, setNewCameraName] = useState('');
     const [newCameraLocation, setNewCameraLocation] = useState('');
-
-    const handleSendOtp = () => {
-        setOtpSent(true);
-        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to ${user?.email}` });
-    };
-
-    const handlePasswordChange = () => {
-        if (otp !== '123456') { 
-            toast({ variant: 'destructive', title: 'Invalid OTP' });
-            return;
-        }
-        localStorage.setItem('cctvPassword', newPassword);
-        setCctvPassword(newPassword);
-        setOpenSettings(false);
-        setOtpSent(false);
-        setNewPassword('');
-        setConfirmPassword('');
-        setOtp('');
-        toast({ title: 'Success', description: 'CCTV password has been updated.' });
-    };
 
     const handleAddCamera = () => {
         if (!newCameraName || !newCameraLocation) {
@@ -137,45 +112,15 @@ export default function CctvPage() {
         toast({ title: 'Camera Added', description: `${newCamera.name} has been added to the list.` });
     }
 
-    const canContinue = newPassword.length >= 4 && newPassword === confirmPassword;
-
     return (
         <Dialog open={openSettings} onOpenChange={setOpenSettings}>
             <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle>CCTV Settings</DialogTitle>
                     <DialogDescription>
-                        Manage CCTV password and add new cameras.
+                        Manage and add new cameras.
                     </DialogDescription>
                 </DialogHeader>
-                
-                <div className="space-y-4 py-2">
-                    <h3 className="font-semibold text-lg">Change Password</h3>
-                    {!otpSent ? (
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="new-password">New Password</Label>
-                                <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                            </div>
-                             <div className="space-y-2">
-                                <Label htmlFor="confirm-password">Confirm New Password</Label>
-                                <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-                            </div>
-                            <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="otp-change">Enter OTP</Label>
-                                <p className="text-sm text-muted-foreground">An OTP has been sent to {user?.email}. Please enter it below.</p>
-                                <Input id="otp-change" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
-                            </div>
-                            <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
-                        </div>
-                    )}
-                </div>
-
-                <Separator />
 
                 <div className="space-y-4 py-2">
                      <h3 className="font-semibold text-lg">Add New Camera</h3>
@@ -376,5 +321,7 @@ export default function CctvPage() {
     </div>
   );
 }
+
+    
 
     

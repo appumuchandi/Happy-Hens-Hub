@@ -81,7 +81,13 @@ export default function OnlineOrderPage() {
 
   const handleQuantityChange = (change: number) => {
     const currentQuantity = Number(quantity) || 0;
-    setValidatedQuantity((currentQuantity + change).toString());
+    const newQuantity = currentQuantity + change;
+    
+    if (newQuantity < 1) {
+        setValidatedQuantity('1');
+    } else {
+        setValidatedQuantity(newQuantity.toString());
+    }
   }
   
   const handlePlaceOrder = (paymentMethod: 'cod' | 'online') => {
@@ -101,8 +107,8 @@ export default function OnlineOrderPage() {
 
       setOrders(prev => [newOrder, ...prev]);
       
-      // Simulate stock reservation only for online payments before they are "verified" by owner
       if(paymentMethod === 'online'){
+        // Simulate stock reservation for online payments
         setProduct(p => ({...p, availableQty: p.availableQty - (quantity * 30)}));
       }
 
@@ -157,7 +163,7 @@ export default function OnlineOrderPage() {
                    toast({ title: 'Order Approved!', description: 'Stock has been updated.' });
                 } else if (status === 'rejected') {
                     // Restore stock if a pending online order is rejected before verification
-                    if(o.paymentMethod === 'online') {
+                    if(o.paymentMethod === 'online' && o.status === 'pending') {
                         setProduct(p => ({...p, availableQty: p.availableQty + (o.quantity * 30)}));
                     }
                     toast({ title: 'Order Rejected', description: 'Stock has been restored.' });
@@ -189,7 +195,7 @@ export default function OnlineOrderPage() {
                             <TableCell className="font-medium">{order.id}</TableCell>
                             <TableCell>{order.customer}</TableCell>
                             <TableCell>{order.quantity}</TableCell>
-                            <TableCell>₹{order.totalAmount}</TableCell>
+                            <TableCell>₹{order.totalAmount.toFixed(2)}</TableCell>
                             <TableCell>
                                 <Badge variant={order.paymentMethod === 'online' ? 'default' : 'secondary'}>
                                   {order.paymentMethod}
@@ -233,47 +239,42 @@ export default function OnlineOrderPage() {
     return (
         <div className="space-y-6">
         <div>
-            <h1 className="text-3xl font-bold font-headline">Online Orders</h1>
+            <h1 className="text-3xl font-bold font-headline">Orders</h1>
             <p className="text-muted-foreground">
             Manage your e-commerce store settings and track incoming orders.
             </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="font-headline text-lg">Store Status</CardTitle>
-                <Switch
-                    id="store-status"
-                    checked={isStoreActive}
-                    onCheckedChange={setIsStoreActive}
-                />
-                </CardHeader>
-                <CardContent>
-                <Label htmlFor="store-status" className="text-sm text-muted-foreground">
-                    {isStoreActive ? 'Your online store is active and accepting orders.' : 'Your store is offline. Customers cannot place new orders.'}
-                </Label>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                <CardTitle className="font-headline text-lg flex items-center gap-2"><DollarSign className="w-5 h-5"/>Set Price</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">Price and Stock Settings</CardTitle>
+                <CardDescription>Control your online store status, product pricing, and inventory.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-2">
+                    <Label>Store Status</Label>
+                    <div className="flex items-center space-x-2">
+                        <Switch
+                            id="store-status"
+                            checked={isStoreActive}
+                            onCheckedChange={setIsStoreActive}
+                        />
+                        <Label htmlFor="store-status" className="text-sm text-muted-foreground">
+                            {isStoreActive ? 'Active' : 'Inactive'}
+                        </Label>
+                    </div>
+                     <p className="text-xs text-muted-foreground">Toggle your online store on or off.</p>
+                </div>
+                 <div className="space-y-2">
                     <Label htmlFor="price">Price per Tray (₹)</Label>
                     <Input id="price" type="number" defaultValue={product.pricePerTray} onChange={(e) => handleUpdatePrice(Number(e.target.value))} />
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                <CardTitle className="font-headline text-lg flex items-center gap-2"><Package className="w-5 h-5"/>Set Stock</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
+                </div>
+                <div className="space-y-2">
                     <Label htmlFor="stock">Available Eggs (pcs)</Label>
                     <Input id="stock" type="number" defaultValue={product.availableQty} onChange={(e) => handleUpdateStock(Number(e.target.value))} />
-                </CardContent>
-            </Card>
-        </div>
+                </div>
+            </CardContent>
+        </Card>
 
         <Card>
             <CardHeader>
@@ -442,3 +443,5 @@ export default function OnlineOrderPage() {
     </div>
   );
 }
+
+    

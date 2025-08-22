@@ -86,7 +86,7 @@ export const productData = {
   id: 'PROD_EGGS_01',
   name: 'Egg Tray',
   pricePerTray: 150,
-  availableQty: 15000, // in pieces
+  availableQty: 1500, // in pieces
   lastUpdated: subDays(today, 1).toISOString(),
   updatedBy: 'Farm Owner',
 };
@@ -158,6 +158,17 @@ export const onlineOrdersData: OnlineOrder[] = [
     paymentStatus: 'pending_payment',
     paymentMethod: 'online',
     createdAt: subDays(today, 0).toISOString()
+  },
+   { 
+    id: 'ORD7006', 
+    customer: 'Online Customer F',
+    quantity: 1,
+    price: 150,
+    totalAmount: 150,
+    status: 'rejected',
+    paymentStatus: 'cod',
+    paymentMethod: 'cod',
+    createdAt: subDays(today, 1).toISOString()
   },
 ];
 

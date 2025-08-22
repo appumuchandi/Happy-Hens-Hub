@@ -18,6 +18,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 
 export default function OnlineOrderPage() {
   const { user } = useAuth();
@@ -136,6 +138,15 @@ export default function OnlineOrderPage() {
     }
 
     const handleOrderStatusChange = (orderId: string, status: 'accepted' | 'rejected') => {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+
+        // Prevent accepting unpaid online orders
+        if (status === 'accepted' && order.paymentMethod === 'online' && order.paymentStatus === 'pending_payment') {
+            toast({ variant: 'destructive', title: 'Action Required', description: 'Cannot accept until payment is confirmed by the customer.' });
+            return;
+        }
+
         setOrders(orders.map(o => {
             if (o.id === orderId) {
                 if(status === 'accepted' && o.status === 'pending') {
@@ -156,6 +167,68 @@ export default function OnlineOrderPage() {
             return o;
         }));
     }
+    
+    const OrderTable = ({ ordersToShow }: { ordersToShow: OnlineOrder[] }) => (
+         <div className="border rounded-md">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Order ID</TableHead>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Quantity (Trays)</TableHead>
+                        <TableHead>Total (₹)</TableHead>
+                        <TableHead>Payment Method</TableHead>
+                        <TableHead>Payment Status</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {ordersToShow.length > 0 ? ordersToShow.map(order => (
+                        <TableRow key={order.id}>
+                            <TableCell className="font-medium">{order.id}</TableCell>
+                            <TableCell>{order.customer}</TableCell>
+                            <TableCell>{order.quantity}</TableCell>
+                            <TableCell>₹{order.totalAmount}</TableCell>
+                            <TableCell>
+                                <Badge variant={order.paymentMethod === 'online' ? 'default' : 'secondary'}>
+                                  {order.paymentMethod}
+                                </Badge>
+                            </TableCell>
+                            <TableCell>
+                                <Badge variant={order.paymentStatus === 'paid' || order.paymentStatus === 'cod' ? 'secondary' : 'outline'} className={(order.paymentStatus === 'paid' || order.paymentStatus === 'cod') ? 'bg-green-700' : ''}>
+                                    {order.paymentStatus}
+                                </Badge>
+                            </TableCell>
+                            <TableCell>
+                                <Badge variant={order.status === 'pending' ? 'default' : order.status === 'delivered' ? 'secondary' : 'outline'}>
+                                    {order.status}
+                                </Badge>
+                            </TableCell>
+                            <TableCell className="text-right space-x-2">
+                                {order.status === 'pending' && (
+                                    <>
+                                    <Button size="sm" variant="outline" onClick={() => handleOrderStatusChange(order.id, 'rejected')}>
+                                        <PackageX className="mr-2"/> Reject
+                                    </Button>
+                                    <Button size="sm" onClick={() => handleOrderStatusChange(order.id, 'accepted')}>
+                                        <PackageCheck className="mr-2"/> Approve
+                                    </Button>
+                                    </>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    )) : (
+                        <TableRow>
+                           <TableCell colSpan={8} className="h-24 text-center">
+                                No orders in this category.
+                            </TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+        </div>
+    );
 
     return (
         <div className="space-y-6">
@@ -204,63 +277,26 @@ export default function OnlineOrderPage() {
 
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline">Incoming Orders</CardTitle>
+                <CardTitle className="font-headline">Order Management</CardTitle>
                 <CardDescription>Review and manage incoming online sales. Approve an order to deduct stock.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="border rounded-md">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Order ID</TableHead>
-                                <TableHead>Customer</TableHead>
-                                <TableHead>Quantity (Trays)</TableHead>
-                                <TableHead>Total (₹)</TableHead>
-                                <TableHead>Payment Method</TableHead>
-                                <TableHead>Payment Status</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {orders.map(order => (
-                                <TableRow key={order.id}>
-                                    <TableCell className="font-medium">{order.id}</TableCell>
-                                    <TableCell>{order.customer}</TableCell>
-                                    <TableCell>{order.quantity}</TableCell>
-                                    <TableCell>₹{order.totalAmount}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={order.paymentMethod === 'online' ? 'default' : 'secondary'}>
-                                          {order.paymentMethod}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={order.paymentStatus === 'paid' || order.paymentStatus === 'cod' ? 'secondary' : 'outline'} className={(order.paymentStatus === 'paid' || order.paymentStatus === 'cod') ? 'bg-green-700' : ''}>
-                                            {order.paymentStatus}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={order.status === 'pending' ? 'default' : order.status === 'delivered' ? 'secondary' : 'outline'}>
-                                            {order.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right space-x-2">
-                                        {order.status === 'pending' && (
-                                            <>
-                                            <Button size="sm" variant="outline" onClick={() => handleOrderStatusChange(order.id, 'rejected')}>
-                                                <PackageX className="mr-2"/> Reject
-                                            </Button>
-                                            <Button size="sm" onClick={() => handleOrderStatusChange(order.id, 'accepted')}>
-                                                <PackageCheck className="mr-2"/> Approve
-                                            </Button>
-                                            </>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                <Tabs defaultValue="pending">
+                    <TabsList>
+                        <TabsTrigger value="pending">Pending</TabsTrigger>
+                        <TabsTrigger value="accepted">Accepted</TabsTrigger>
+                        <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="pending" className="mt-4">
+                        <OrderTable ordersToShow={orders.filter(o => o.status === 'pending')} />
+                    </TabsContent>
+                    <TabsContent value="accepted" className="mt-4">
+                         <OrderTable ordersToShow={orders.filter(o => o.status === 'accepted')} />
+                    </TabsContent>
+                     <TabsContent value="rejected" className="mt-4">
+                         <OrderTable ordersToShow={orders.filter(o => o.status === 'rejected')} />
+                    </TabsContent>
+                </Tabs>
             </CardContent>
         </Card>
         </div>
@@ -359,7 +395,7 @@ export default function OnlineOrderPage() {
                     <div className="space-y-2">
                         <Label className="text-lg font-semibold block text-center">Select Quantity (Trays)</Label>
                         <div className="flex items-center justify-center gap-4">
-                            <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={isOutOfStock || Number(quantity) <= 1}>
+                            <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={isOutOfStock || !quantity || quantity <= 1}>
                                 <ChevronDown className="w-6 h-6"/>
                             </Button>
                             <Input 
@@ -397,7 +433,7 @@ export default function OnlineOrderPage() {
                         <span className="font-semibold text-lg">Total</span>
                         <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
                     </div>
-                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock || !quantity || showNotifyMe}>
+                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock || !quantity || quantity < 1 || showNotifyMe}>
                         <ShoppingCart className="mr-2"/> Place Order
                     </Button>
                 </CardFooter>
@@ -406,5 +442,3 @@ export default function OnlineOrderPage() {
     </div>
   );
 }
-
-    

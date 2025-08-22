@@ -93,7 +93,7 @@ export function LoginForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="OWNER">Owner / Manager</SelectItem>
+                      <SelectItem value="OWNER">Manager</SelectItem>
                       <SelectItem value="WORKER">Worker</SelectItem>
                       <SelectItem value="VIEWER">Customer</SelectItem>
                     </SelectContent>

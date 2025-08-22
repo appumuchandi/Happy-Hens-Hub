@@ -152,7 +152,7 @@ export default function CctvPage() {
                 <div className="space-y-4 py-2">
                     <h3 className="font-semibold text-lg">Change Password</h3>
                     {!otpSent ? (
-                        <>
+                        <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="new-password">New Password</Label>
                                 <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
@@ -162,16 +162,16 @@ export default function CctvPage() {
                                 <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                             </div>
                             <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
-                        </>
+                        </div>
                     ) : (
-                        <>
+                        <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="otp-change">Enter OTP</Label>
                                 <p className="text-sm text-muted-foreground">An OTP has been sent to {user?.email}. Please enter it below.</p>
                                 <Input id="otp-change" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
                             </div>
                             <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
-                        </>
+                        </div>
                     )}
                 </div>
 
@@ -245,22 +245,25 @@ export default function CctvPage() {
                     </DialogDescription>
                 </DialogHeader>
                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Owner's Email</Label>
-                        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={step === 2}/>
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="new-password-reset">New Password</Label>
-                        <Input id="new-password-reset" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={step === 2} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="confirm-new-password-reset">Confirm New Password</Label>
-                        <Input id="confirm-new-password-reset" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} disabled={step === 2} />
-                    </div>
-
-                    {step === 2 && (
-                        <div className="space-y-2">
+                    {step === 1 ? (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Owner's Email</Label>
+                                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="new-password-reset">New Password</Label>
+                                <Input id="new-password-reset" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="confirm-new-password-reset">Confirm New Password</Label>
+                                <Input id="confirm-new-password-reset" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} />
+                            </div>
+                        </>
+                    ) : (
+                         <div className="space-y-2">
                             <Label htmlFor="otp">Enter OTP</Label>
+                            <p className="text-sm text-muted-foreground">An OTP has been sent to {email}. Please enter it below.</p>
                             <Input id="otp" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
                         </div>
                     )}
@@ -373,3 +376,5 @@ export default function CctvPage() {
     </div>
   );
 }
+
+    

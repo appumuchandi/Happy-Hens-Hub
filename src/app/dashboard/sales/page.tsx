@@ -50,13 +50,7 @@ const RECORDS_PER_PAGE = 10;
 export default function SalesPage() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [salesHistory, setSalesHistory] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const savedData = localStorage.getItem('salesHistory');
-        return savedData ? JSON.parse(savedData) : salesData;
-    }
-    return salesData;
-  });
+  const [salesHistory, setSalesHistory] = useState(salesData);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('monthly');
@@ -72,6 +66,15 @@ export default function SalesPage() {
       pricePerPiece: 0.35,
     },
   });
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const savedData = localStorage.getItem('salesHistory');
+        if (savedData) {
+            setSalesHistory(JSON.parse(savedData));
+        }
+    }
+  }, []);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -341,3 +344,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

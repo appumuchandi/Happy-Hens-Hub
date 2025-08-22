@@ -49,13 +49,7 @@ const RECORDS_PER_PAGE = 10;
 export default function EggCollectionPage() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [collectionHistory, setCollectionHistory] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const savedData = localStorage.getItem('eggCollectionHistory');
-        return savedData ? JSON.parse(savedData) : eggCollectionData;
-    }
-    return eggCollectionData;
-  });
+  const [collectionHistory, setCollectionHistory] = useState(eggCollectionData);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('monthly');
@@ -70,6 +64,15 @@ export default function EggCollectionPage() {
       batch: '',
     },
   });
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const savedData = localStorage.getItem('eggCollectionHistory');
+        if (savedData) {
+            setCollectionHistory(JSON.parse(savedData));
+        }
+    }
+  }, []);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -305,3 +308,5 @@ export default function EggCollectionPage() {
     </div>
   );
 }
+
+    

@@ -57,11 +57,6 @@ export default function CctvPage() {
 
   useEffect(() => {
     try {
-        const sessionAuth = sessionStorage.getItem('cctvAuthenticated');
-        if (sessionAuth === 'true') {
-            setIsAuthenticated(true);
-        }
-
         const storedPassword = localStorage.getItem('cctvPassword');
         if (storedPassword) {
             setCctvPassword(storedPassword);
@@ -79,7 +74,6 @@ export default function CctvPage() {
   
   const handlePasswordSubmit = () => {
     if (password === cctvPassword) {
-        sessionStorage.setItem('cctvAuthenticated', 'true');
         setIsAuthenticated(true);
         toast({ title: 'Access Granted' });
     } else {

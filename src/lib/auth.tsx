@@ -17,7 +17,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 const mockUsers: Record<Role, User> = {
   OWNER: { name: 'Farm Owner', email: 'owner@henshub.com', role: 'OWNER' },
   WORKER: { name: 'Farm Worker', email: 'worker@henshub.com', role: 'WORKER' },
-  VIEWER: { name: 'Farm Viewer', email: 'viewer@henshub.com', role: 'VIEWER' },
+  VIEWER: { name: 'Customer', email: 'customer@henshub.com', role: 'VIEWER' },
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

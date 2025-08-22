@@ -34,13 +34,20 @@ const navItems = [
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Online Order', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
+  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER', 'OWNER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video, roles: ['OWNER'] },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
 ];
+
+const customerNavItems = [
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['VIEWER'] },
+  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
+  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER'] },
+];
+
 
 export default function AppHeader() {
   const { user, logout } = useAuth();
@@ -58,6 +65,8 @@ export default function AppHeader() {
     sessionStorage.removeItem('cctvAuthenticated');
     logout();
   }
+  
+  const itemsToDisplay = user?.role === 'VIEWER' ? customerNavItems : navItems;
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
@@ -75,7 +84,7 @@ export default function AppHeader() {
                  <Boxes className="h-6 w-6 text-primary" />
                  <span className="font-headline">HEN's HUB</span>
               </Link>
-              {navItems.map((item) =>
+              {itemsToDisplay.map((item) =>
                 item.roles.includes(user?.role as Role) ? (
                   <SheetClose asChild key={item.href}>
                     <Link
@@ -110,7 +119,7 @@ export default function AppHeader() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>{user?.name} ({user?.role})</DropdownMenuItem>
+            <DropdownMenuItem disabled>{user?.name} ({user?.role === 'VIEWER' ? 'Customer' : user?.role})</DropdownMenuItem>
             <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/20 focus:text-destructive">Logout</DropdownMenuItem>

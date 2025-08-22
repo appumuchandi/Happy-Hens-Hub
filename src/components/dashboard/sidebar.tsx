@@ -30,12 +30,18 @@ const navItems = [
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Online Order', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
+  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER', 'OWNER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video, roles: ['OWNER'] },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
+];
+
+const customerNavItems = [
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['VIEWER'] },
+  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
+  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER'] },
 ];
 
 export default function AppSidebar() {
@@ -59,6 +65,8 @@ export default function AppSidebar() {
     logout();
   }
 
+  const itemsToDisplay = userRole === 'VIEWER' ? customerNavItems : navItems;
+
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border p-4">
@@ -67,7 +75,7 @@ export default function AppSidebar() {
         <h1 className="text-2xl font-bold font-headline text-foreground">HEN's HUB</h1>
       </div>
       <nav className="flex flex-col space-y-2 flex-1">
-        {navItems.map((item) =>
+        {itemsToDisplay.map((item) =>
           item.roles.includes(userRole as Role) ? (
             <Button
               key={item.href}

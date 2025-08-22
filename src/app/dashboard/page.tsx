@@ -2,9 +2,11 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import StatCard from '@/components/dashboard/stat-card';
-import { dashboardStats } from '@/lib/placeholder-data';
-import { Egg, Users, LineChart, AlertTriangle } from 'lucide-react';
+import { dashboardStats, productData } from '@/lib/placeholder-data';
+import { Egg, Users, LineChart, AlertTriangle, ShoppingCart } from 'lucide-react';
 import type { Role } from '@/types';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 const RupeeIcon = () => (
     <span className="h-5 w-5 font-bold">₹</span>
@@ -17,6 +19,7 @@ const userHasAccess = (role: Role | undefined, allowedRoles: Role[]) => {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const {
     dailyEggCount,
     weeklyEggCount,
@@ -30,7 +33,46 @@ export default function DashboardPage() {
   if (!userHasAccess(user?.role, ['OWNER', 'WORKER', 'VIEWER'])) {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
+  
+  // --- Customer (Viewer) Dashboard ---
+  if (user?.role === 'VIEWER') {
+    return (
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold font-headline">
+                Welcome, {user?.name}!
+                </h1>
+                <p className="text-muted-foreground">
+                Fresh eggs, straight from the farm to you.
+                </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+                 <StatCard
+                    title="Current Price"
+                    value={`₹${productData.pricePerTray}`}
+                    icon={RupeeIcon}
+                    description="per tray (30 eggs)"
+                    color="saffron"
+                />
+                 <StatCard
+                    title="Available Stock"
+                    value={`${Math.floor(productData.stock / 30)} trays`}
+                    icon={Egg}
+                    description={`${productData.stock} eggs available`}
+                    color="sky"
+                />
+            </div>
+             <div className="text-center">
+                <Button size="lg" onClick={() => router.push('/dashboard/online-order')}>
+                    <ShoppingCart className="mr-2"/>
+                    Order Now
+                </Button>
+            </div>
+        </div>
+    )
+  }
 
+  // --- Owner & Worker Dashboard ---
   return (
     <div className="space-y-6">
       <div>

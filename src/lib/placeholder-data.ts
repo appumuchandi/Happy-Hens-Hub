@@ -106,7 +106,7 @@ export type OnlineOrder = {
 export const onlineOrdersData: OnlineOrder[] = [
   { 
     id: 'ORD7001', 
-    customer: 'Farm Viewer',
+    customer: 'Customer',
     quantity: 2,
     price: 150,
     totalAmount: 300,
@@ -128,7 +128,7 @@ export const onlineOrdersData: OnlineOrder[] = [
   },
   { 
     id: 'ORD7003',
-    customer: 'Farm Viewer',
+    customer: 'Customer',
     quantity: 1,
     price: 145,
     totalAmount: 145,

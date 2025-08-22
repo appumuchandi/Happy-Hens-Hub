@@ -98,7 +98,7 @@ export type OnlineOrder = {
   price: number; // price per tray at time of order
   totalAmount: number;
   status: 'pending' | 'accepted' | 'rejected' | 'delivered';
-  paymentStatus: 'paid' | 'pending' | 'cod' | 'pending_payment';
+  paymentStatus: 'paid' | 'cod' | 'pending_payment';
   paymentMethod: 'online' | 'cod';
   createdAt: string;
 };

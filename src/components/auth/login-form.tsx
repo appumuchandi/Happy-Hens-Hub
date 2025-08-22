@@ -9,14 +9,12 @@ import type { Role } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
-  role: z.enum(['OWNER', 'WORKER', 'VIEWER']),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -30,12 +28,12 @@ export function LoginForm() {
     defaultValues: {
       email: '',
       password: '',
-      role: 'OWNER',
     },
   });
 
   function onSubmit(data: LoginFormValues) {
-    login(data.role as Role);
+    // Defaulting to OWNER role as the selection is removed
+    login('OWNER');
     router.push('/dashboard');
   }
 
@@ -69,28 +67,6 @@ export function LoginForm() {
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role (for demo)</FormLabel>
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a role to login as" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="OWNER">Owner</SelectItem>
-                      <SelectItem value="WORKER">Worker</SelectItem>
-                      <SelectItem value="VIEWER">Viewer</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

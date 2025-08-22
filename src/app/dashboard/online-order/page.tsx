@@ -236,8 +236,8 @@ export default function OnlineOrderPage() {
 
 
         {/* --- Storefront UI --- */}
-        <div className="grid md:grid-cols-2 gap-8 items-start">
-            <Card className="saffron-border shadow-lg">
+        <div className="flex flex-col gap-8">
+            <Card className="saffron-border shadow-lg w-full max-w-2xl mx-auto">
                 <CardHeader>
                     <CardTitle className="font-headline text-3xl">Buy Farm-Fresh Eggs</CardTitle>
                     <CardDescription>Place your order directly from our farm.</CardDescription>
@@ -260,7 +260,7 @@ export default function OnlineOrderPage() {
                     <Separator/>
 
                     <div className="space-y-4">
-                        <Label className="text-lg font-semibold">Select Quantity (Trays)</Label>
+                        <Label className="text-lg font-semibold block text-center">Select Quantity (Trays)</Label>
                         <div className="flex items-center justify-center gap-4">
                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
                                 <ChevronDown className="w-6 h-6"/>
@@ -284,7 +284,7 @@ export default function OnlineOrderPage() {
                 </CardFooter>
             </Card>
 
-            <Card>
+            <Card className="w-full max-w-2xl mx-auto">
                 <CardHeader>
                     <CardTitle className="font-headline">My Recent Orders</CardTitle>
                     <CardDescription>Track the status of your recent purchases.</CardDescription>

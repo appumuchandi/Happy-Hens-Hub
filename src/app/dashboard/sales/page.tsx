@@ -43,7 +43,6 @@ const salesSchema = z.object({
 });
 
 type SalesFormValues = z.infer<typeof salesSchema>;
-
 type ReportType = 'daily' | 'monthly' | 'yearly';
 
 const RECORDS_PER_PAGE = 10;
@@ -51,6 +50,13 @@ const RECORDS_PER_PAGE = 10;
 export default function SalesPage() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [salesHistory, setSalesHistory] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const savedData = localStorage.getItem('salesHistory');
+        return savedData ? JSON.parse(savedData) : salesData;
+    }
+    return salesData;
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('monthly');
@@ -66,6 +72,13 @@ export default function SalesPage() {
       pricePerPiece: 0.35,
     },
   });
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
+    }
+  }, [salesHistory]);
+
 
   const { watch, setValue } = form;
   const quantity = watch('quantity');
@@ -82,6 +95,16 @@ export default function SalesPage() {
   }
 
   function onSubmit(data: SalesFormValues) {
+    const newSale = {
+        id: `SALE${Date.now()}`,
+        date: new Date().toISOString(),
+        buyerName: data.buyerName,
+        quantity: data.quantity,
+        revenue: totalRevenue.toFixed(2),
+    };
+    
+    setSalesHistory((prev: any) => [newSale, ...prev]);
+
     toast({
       title: 'Sale Recorded!',
       description: `Sale to ${data.buyerName} for ₹${totalRevenue.toFixed(2)} has been recorded.`,
@@ -97,13 +120,12 @@ export default function SalesPage() {
     setOpenDownloadDialog(false);
   }
 
-  const totalPages = Math.ceil(salesData.length / RECORDS_PER_PAGE);
-  const paginatedData = salesData.slice(
+  const totalPages = Math.ceil(salesHistory.length / RECORDS_PER_PAGE);
+  const paginatedData = salesHistory.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
     currentPage * RECORDS_PER_PAGE
-  ).map(sale => ({
+  ).map((sale: any) => ({
     ...sale,
-    // The `new Date()` is needed because the date from placeholder-data is a string
     date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
     pricePerPiece: (parseFloat(sale.revenue) / sale.quantity).toFixed(2),
   }));

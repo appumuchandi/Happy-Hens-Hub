@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { eggCollectionData } from '@/lib/placeholder-data';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
 import { Download } from 'lucide-react';
@@ -49,7 +49,13 @@ const RECORDS_PER_PAGE = 10;
 export default function EggCollectionPage() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [collectionHistory, setCollectionHistory] = useState(eggCollectionData);
+  const [collectionHistory, setCollectionHistory] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const savedData = localStorage.getItem('eggCollectionHistory');
+        return savedData ? JSON.parse(savedData) : eggCollectionData;
+    }
+    return eggCollectionData;
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('monthly');
@@ -64,6 +70,13 @@ export default function EggCollectionPage() {
       batch: '',
     },
   });
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('eggCollectionHistory', JSON.stringify(collectionHistory));
+    }
+  }, [collectionHistory]);
+
 
   if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
@@ -78,7 +91,7 @@ export default function EggCollectionPage() {
         batch: data.batch || 'N/A',
     };
 
-    setCollectionHistory(prev => [newRecord, ...prev]);
+    setCollectionHistory((prev: any) => [newRecord, ...prev]);
     
     toast({
       title: 'Success!',
@@ -256,7 +269,7 @@ export default function EggCollectionPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedData.map((record) => (
+                  {paginatedData.map((record: any) => (
                     <TableRow key={record.id}>
                       <TableCell>{record.date}</TableCell>
                       <TableCell>{record.quantity}</TableCell>

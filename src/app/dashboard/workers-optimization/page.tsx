@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,22 +7,16 @@ import { useAuth } from '@/hooks/use-auth';
 import { workersData } from '@/lib/placeholder-data';
 import { Users, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-
 
 export default function WorkersPage() {
   const { user } = useAuth();
-  const { toast } = useToast();
   
   if (user?.role !== 'OWNER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 
   const handleBiometricSync = () => {
-    toast({
-      title: 'Biometric Sync',
-      description: 'Hardware not connected. Please configure your biometric device in the settings to enable automatic attendance tracking.',
-    });
+    window.open('/dashboard/kiosk-setup', '_blank');
   };
 
   return (

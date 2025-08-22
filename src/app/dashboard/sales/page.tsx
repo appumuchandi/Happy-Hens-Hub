@@ -113,7 +113,98 @@ export default function SalesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">Record Sales</h1>
+       <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold font-headline">Record Sales</h1>
+        <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
+            <DialogTrigger asChild>
+                <Button>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Report
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Download Sales Report</DialogTitle>
+                <DialogDescription>
+                Select the time range for your sales report.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>Report Type</Label>
+                        <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="daily">Daily</SelectItem>
+                                <SelectItem value="monthly">Monthly</SelectItem>
+                                <SelectItem value="yearly">Yearly</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Year</Label>
+                        <Select value={selectedYear} onValueChange={setSelectedYear}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {years.map(year => (
+                                    <SelectItem key={year} value={year}>{year}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                {reportType === 'monthly' && (
+                    <div className="space-y-2">
+                        <Label>Month</Label>
+                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {months.map(month => (
+                                    <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+                {reportType === 'daily' && (
+                    <div className="space-y-2">
+                        <Label>Date</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start font-normal">
+                                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={selectedDate}
+                                    onSelect={setSelectedDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                )}
+            </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+                <Button onClick={handleDownload}>
+                    <Download className="mr-2"/>
+                    Download
+                </Button>
+            </DialogFooter>
+            </DialogContent>
+        </Dialog>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="lg:col-span-1 saffron-border">
           <CardHeader>
@@ -225,99 +316,6 @@ export default function SalesPage() {
           </CardContent>
         </Card>
       </div>
-
-       <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
-        <DialogTrigger asChild>
-            <Button
-                variant="default"
-                className="fixed bottom-8 right-8 h-16 w-16 rounded-full shadow-lg"
-                size="icon"
-            >
-                <Download className="h-8 w-8" />
-                <span className="sr-only">Download Sales Report</span>
-            </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Download Sales Report</DialogTitle>
-            <DialogDescription>
-              Select the time range for your sales report.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label>Report Type</Label>
-                    <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="daily">Daily</SelectItem>
-                            <SelectItem value="monthly">Monthly</SelectItem>
-                            <SelectItem value="yearly">Yearly</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label>Year</Label>
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {years.map(year => (
-                                <SelectItem key={year} value={year}>{year}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
-            {reportType === 'monthly' && (
-                <div className="space-y-2">
-                     <Label>Month</Label>
-                     <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                             {months.map(month => (
-                                <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            )}
-            {reportType === 'daily' && (
-                <div className="space-y-2">
-                     <Label>Date</Label>
-                     <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start font-normal">
-                                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={selectedDate}
-                                onSelect={setSelectedDate}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
-                </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-            <Button onClick={handleDownload}>
-                <Download className="mr-2"/>
-                Download
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+
 import { subDays, format } from 'date-fns';
 
 export const dashboardStats = {
@@ -78,3 +79,73 @@ export const batchData = Array.from({ length: 5 }, (_, i) => ({
     { vaccine: 'Fowl Pox', date: format(subDays(today, 15 - i*5), 'yyyy-MM-dd') },
   ]
 }));
+
+// --- New Data for Online Ordering ---
+
+export const productData = {
+  id: 'PROD_EGGS_01',
+  name: 'Egg Tray',
+  pricePerTray: 150,
+  stock: 15000, // in pieces
+  lastUpdated: subDays(today, 1).toISOString(),
+  updatedBy: 'Farm Owner',
+};
+
+export type OnlineOrder = {
+  id: string;
+  customer: string;
+  quantity: number; // in trays
+  price: number; // price per tray at time of order
+  totalAmount: number;
+  status: 'pending' | 'accepted' | 'rejected' | 'delivered';
+  paymentStatus: 'paid' | 'pending';
+  paymentMethod: 'online' | 'cod';
+  createdAt: string;
+};
+
+export const onlineOrdersData: OnlineOrder[] = [
+  { 
+    id: 'ORD7001', 
+    customer: 'Farm Viewer',
+    quantity: 2,
+    price: 150,
+    totalAmount: 300,
+    status: 'pending',
+    paymentStatus: 'paid',
+    paymentMethod: 'online',
+    createdAt: subDays(today, 0).toISOString()
+  },
+  { 
+    id: 'ORD7002', 
+    customer: 'Online Customer B',
+    quantity: 5,
+    price: 150,
+    totalAmount: 750,
+    status: 'pending',
+    paymentStatus: 'pending',
+    paymentMethod: 'cod',
+    createdAt: subDays(today, 1).toISOString()
+  },
+  { 
+    id: 'ORD7003',
+    customer: 'Farm Viewer',
+    quantity: 1,
+    price: 145,
+    totalAmount: 145,
+    status: 'accepted',
+    paymentStatus: 'paid',
+    paymentMethod: 'online',
+    createdAt: subDays(today, 2).toISOString()
+  },
+    { 
+    id: 'ORD7004',
+    customer: 'Online Customer D',
+    quantity: 10,
+    price: 145,
+    totalAmount: 1450,
+    status: 'delivered',
+    paymentStatus: 'paid',
+    paymentMethod: 'online',
+    createdAt: subDays(today, 3).toISOString()
+  },
+];

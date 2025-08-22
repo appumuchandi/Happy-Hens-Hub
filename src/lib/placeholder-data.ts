@@ -86,7 +86,7 @@ export const productData = {
   id: 'PROD_EGGS_01',
   name: 'Egg Tray',
   pricePerTray: 150,
-  stock: 15000, // in pieces
+  availableQty: 15000, // in pieces
   lastUpdated: subDays(today, 1).toISOString(),
   updatedBy: 'Farm Owner',
 };

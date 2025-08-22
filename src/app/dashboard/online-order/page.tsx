@@ -35,9 +35,10 @@ export default function OnlineOrderPage() {
   const [openCheckout, setOpenCheckout] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'initial' | 'qr'>('initial');
   
+  const availableTrays = Math.floor(product.availableQty / 30);
+  const isOutOfStock = availableTrays <= 0;
+
   useEffect(() => {
-    // In a real app, product data would be fetched from Firestore
-    // and updated in real-time.
     setTotal(quantity * product.pricePerTray);
   }, [quantity, product.pricePerTray]);
 
@@ -51,10 +52,10 @@ export default function OnlineOrderPage() {
       setQuantity(1);
       return;
     }
-    const maxQuantity = Math.floor(product.stock / 30);
-    if (newQuantity > maxQuantity) {
-      toast({ variant: 'destructive', title: `Maximum stock is ${maxQuantity} trays` });
-      setQuantity(maxQuantity);
+    
+    if (newQuantity > availableTrays) {
+      toast({ variant: 'destructive', title: `Maximum stock is ${availableTrays} trays` });
+      setQuantity(availableTrays);
       return;
     }
     setQuantity(newQuantity);
@@ -65,19 +66,29 @@ export default function OnlineOrderPage() {
   }
   
   const handlePlaceOrder = (paymentMethod: 'cod' | 'online') => {
-      const baseToast = {
-          title: 'Order Placed!',
-          description: `Your order for ${quantity} tray(s) has been placed.`
+      const newOrder: OnlineOrder = {
+          id: `ORD${Math.floor(Math.random() * 1000) + 7000}`,
+          customer: user?.name || 'Customer',
+          quantity: quantity,
+          price: product.pricePerTray,
+          totalAmount: total,
+          status: 'pending',
+          paymentStatus: paymentMethod === 'cod' ? 'cod' : 'pending_payment',
+          paymentMethod: paymentMethod,
+          createdAt: new Date().toISOString()
       };
+
+      setOrders(prev => [newOrder, ...prev]);
       
-      if (paymentMethod === 'cod') {
-          toast(baseToast);
-      } else {
-           toast({
-                ...baseToast,
-                description: 'Your order is placed and awaiting payment verification from the owner.'
-            });
+      // Simulate stock reservation
+      if(paymentMethod === 'online'){
+        setProduct(p => ({...p, availableQty: p.availableQty - (quantity * 30)}));
       }
+
+      toast({
+          title: 'Order Placed!',
+          description: `Your order for ${quantity} tray(s) has been received and is pending approval.`
+      });
       
       setOpenCheckout(false);
       setCheckoutStep('initial');
@@ -87,7 +98,7 @@ export default function OnlineOrderPage() {
   // --- OWNER VIEW ---
   if (user?.role === 'OWNER') {
     const handleUpdateStock = (newStock: number) => {
-        setProduct(p => ({...p, stock: newStock, lastUpdated: new Date().toISOString()}));
+        setProduct(p => ({...p, availableQty: newStock, lastUpdated: new Date().toISOString()}));
         toast({ title: 'Stock Updated' });
     }
     const handleUpdatePrice = (newPrice: number) => {
@@ -99,14 +110,17 @@ export default function OnlineOrderPage() {
         setOrders(orders.map(o => {
             if (o.id === orderId) {
                 if(status === 'accepted' && o.status === 'pending') {
-                   // Deduct stock
-                   setProduct(p => ({...p, stock: p.stock - (o.quantity * 30)}));
+                   // For COD orders, deduct stock on approval
+                   if(o.paymentMethod === 'cod') {
+                     setProduct(p => ({...p, availableQty: p.availableQty - (o.quantity * 30)}));
+                   }
                    toast({ title: 'Order Approved!', description: 'Stock has been updated.' });
-                }
-                if (status === 'rejected' && o.paymentStatus === 'paid') {
-                    toast({ title: 'Order Rejected', description: 'Refund process initiated for paid order.' });
                 } else if (status === 'rejected') {
-                     toast({ title: 'Order Rejected' });
+                    // Restore stock if a pending order is rejected
+                    if(o.paymentStatus !== 'cod') {
+                        setProduct(p => ({...p, availableQty: p.availableQty + (o.quantity * 30)}));
+                    }
+                    toast({ title: 'Order Rejected', description: 'Stock has been restored.' });
                 }
                 return { ...o, status };
             }
@@ -154,7 +168,7 @@ export default function OnlineOrderPage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                     <Label htmlFor="stock">Available Eggs (pcs)</Label>
-                    <Input id="stock" type="number" defaultValue={product.stock} onChange={(e) => handleUpdateStock(Number(e.target.value))} />
+                    <Input id="stock" type="number" defaultValue={product.availableQty} onChange={(e) => handleUpdateStock(Number(e.target.value))} />
                 </CardContent>
             </Card>
         </div>
@@ -192,7 +206,7 @@ export default function OnlineOrderPage() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={order.paymentStatus === 'paid' ? 'secondary' : 'outline'} className={order.paymentStatus === 'paid' ? 'bg-green-700' : ''}>
+                                        <Badge variant={order.paymentStatus === 'paid' || o.paymentStatus === 'cod' ? 'secondary' : 'outline'} className={(order.paymentStatus === 'paid' || order.paymentStatus === 'cod') ? 'bg-green-700' : ''}>
                                             {order.paymentStatus}
                                         </Badge>
                                     </TableCell>
@@ -300,7 +314,11 @@ export default function OnlineOrderPage() {
                         </div>
                         <div className="p-4 bg-card rounded-lg border">
                             <p className="text-sm text-muted-foreground">Available Trays</p>
-                            <p className="text-2xl font-bold text-accent">{Math.floor(product.stock / 30)}</p>
+                             {isOutOfStock ? (
+                                <Badge variant="destructive" className="text-lg">Out of Stock</Badge>
+                            ) : (
+                               <p className="text-2xl font-bold text-accent">{availableTrays}</p>
+                            )}
                         </div>
                     </div>
                      <p className="text-xs text-center text-muted-foreground">
@@ -312,7 +330,7 @@ export default function OnlineOrderPage() {
                     <div className="space-y-2">
                         <Label className="text-lg font-semibold block text-center">Select Quantity (Trays)</Label>
                         <div className="flex items-center justify-center gap-4">
-                            <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
+                            <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1 || isOutOfStock}>
                                 <ChevronDown className="w-6 h-6"/>
                             </Button>
                             <Input 
@@ -321,8 +339,9 @@ export default function OnlineOrderPage() {
                                 value={quantity}
                                 onChange={(e) => setValidatedQuantity(parseInt(e.target.value, 10))}
                                 min="1"
+                                disabled={isOutOfStock}
                             />
-                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
+                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)} disabled={isOutOfStock || quantity >= availableTrays}>
                                 <ChevronUp className="w-6 h-6"/>
                             </Button>
                         </div>
@@ -337,7 +356,7 @@ export default function OnlineOrderPage() {
                         <span className="font-semibold text-lg">Total</span>
                         <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
                     </div>
-                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)}>
+                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock}>
                         <ShoppingCart className="mr-2"/> Place Order
                     </Button>
                 </CardFooter>

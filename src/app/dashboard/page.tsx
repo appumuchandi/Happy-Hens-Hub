@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
@@ -36,6 +37,7 @@ export default function DashboardPage() {
   
   // --- Customer (Viewer) Dashboard ---
   if (user?.role === 'VIEWER') {
+    const availableTrays = Math.floor(productData.availableQty / 30);
     return (
         <div className="space-y-6">
             <div>
@@ -56,9 +58,9 @@ export default function DashboardPage() {
                 />
                  <StatCard
                     title="Available Stock"
-                    value={`${Math.floor(productData.stock / 30)} trays`}
+                    value={`${availableTrays} trays`}
                     icon={Egg}
-                    description={`${productData.stock} eggs available`}
+                    description={`${productData.availableQty} eggs available`}
                     color="sky"
                 />
             </div>

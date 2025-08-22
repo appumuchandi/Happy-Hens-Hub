@@ -31,7 +31,7 @@ const navItems = [
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER', 'OWNER'] },
+  { href: '/dashboard/online-order', label: 'Place Order', dynamicLabel: {OWNER: 'Orders'}, icon: ShoppingCart, roles: ['VIEWER', 'OWNER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
@@ -93,7 +93,7 @@ export default function AppSidebar() {
                 )}
                 >
                 <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
+                <span>{item.dynamicLabel && userRole && item.dynamicLabel[userRole] ? item.dynamicLabel[userRole] : item.label}</span>
                 </Button>
             ) : null
             )}

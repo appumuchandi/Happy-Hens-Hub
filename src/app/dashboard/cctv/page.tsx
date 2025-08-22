@@ -93,10 +93,13 @@ export default function CctvPage() {
   const CctvSettingsDialog = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [otp, setOtp] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
+
     const [newCameraName, setNewCameraName] = useState('');
     const [newCameraLocation, setNewCameraLocation] = useState('');
 
-    const handlePasswordChange = () => {
+    const handleSendOtp = () => {
         if (newPassword.length < 4) {
             toast({ variant: 'destructive', title: 'Error', description: 'Password must be at least 4 characters.' });
             return;
@@ -105,9 +108,22 @@ export default function CctvPage() {
             toast({ variant: 'destructive', title: 'Error', description: 'Passwords do not match.' });
             return;
         }
+        setOtpSent(true);
+        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent to ${user?.email}` });
+    };
+
+    const handlePasswordChange = () => {
+        if (otp !== '123456') { 
+            toast({ variant: 'destructive', title: 'Invalid OTP' });
+            return;
+        }
         localStorage.setItem('cctvPassword', newPassword);
         setCctvPassword(newPassword);
         setOpenSettings(false);
+        setOtpSent(false);
+        setNewPassword('');
+        setConfirmPassword('');
+        setOtp('');
         toast({ title: 'Success', description: 'CCTV password has been updated.' });
     };
 
@@ -129,6 +145,8 @@ export default function CctvPage() {
         toast({ title: 'Camera Added', description: `${newCamera.name} has been added to the list.` });
     }
 
+    const canSendOtp = newPassword.length >= 4 && newPassword === confirmPassword;
+
     return (
         <Dialog open={openSettings} onOpenChange={setOpenSettings}>
             <DialogContent className="max-w-md">
@@ -143,13 +161,25 @@ export default function CctvPage() {
                     <h3 className="font-semibold text-lg">Change Password</h3>
                     <div className="space-y-2">
                         <Label htmlFor="new-password">New Password</Label>
-                        <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                        <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={otpSent}/>
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="confirm-password">Confirm New Password</Label>
-                        <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                        <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={otpSent}/>
                     </div>
-                     <Button onClick={handlePasswordChange}>Save New Password</Button>
+
+                    {otpSent && (
+                        <div className="space-y-2">
+                            <Label htmlFor="otp-change">Enter OTP</Label>
+                            <Input id="otp-change" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                        </div>
+                    )}
+                    
+                    {!otpSent ? (
+                        <Button onClick={handleSendOtp} disabled={!canSendOtp}>Send OTP</Button>
+                    ) : (
+                        <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
+                    )}
                 </div>
 
                 <Separator />
@@ -355,6 +385,3 @@ export default function CctvPage() {
   );
 }
 
-    
-
-    

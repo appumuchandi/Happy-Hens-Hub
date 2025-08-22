@@ -3,9 +3,9 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Video, CameraOff } from 'lucide-react';
+import { Video, CameraOff, Lock } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,7 +19,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface CameraFeed {
   id: number;
@@ -28,11 +38,15 @@ interface CameraFeed {
   isConnected: boolean;
 }
 
+const CCTV_PASSWORD = "1234";
+
 export default function CctvPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [openDialog, setOpenDialog] = useState<number | null>(null);
-
+  const [openConnectDialog, setOpenConnectDialog] = useState<number | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  
   const initialFeeds: CameraFeed[] = [
     { id: 1, name: 'Coop Entrance', hint: 'security camera', isConnected: false },
     { id: 2, name: 'Feeding Area', hint: 'farm animals', isConnected: false },
@@ -40,7 +54,22 @@ export default function CctvPage() {
     { id: 4, name: 'Storage Barn', hint: 'barn interior', isConnected: false },
   ];
 
-  const [cameraFeeds, setCameraFeeds] = useState<CameraFeed[]>(initialFeeds);
+  const [cameraFeeds, setCameraFeeds] = useState<CameraFeed[]>([]);
+
+  useEffect(() => {
+    const storedFeeds = localStorage.getItem('cameraFeeds');
+    if (storedFeeds) {
+      setCameraFeeds(JSON.parse(storedFeeds));
+    } else {
+      setCameraFeeds(initialFeeds);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (cameraFeeds.length > 0) {
+        localStorage.setItem('cameraFeeds', JSON.stringify(cameraFeeds));
+    }
+  }, [cameraFeeds]);
 
   if (user?.role !== 'OWNER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
@@ -52,13 +81,55 @@ export default function CctvPage() {
         feed.id === feedId ? { ...feed, isConnected: true } : feed
       )
     );
-    setOpenDialog(null);
+    setOpenConnectDialog(null);
     toast({
         title: 'Camera Connected!',
         description: 'Live feed is now available.',
     });
   };
 
+  const handlePasswordSubmit = () => {
+    if (password === CCTV_PASSWORD) {
+        setIsAuthenticated(true);
+        toast({ title: 'Access Granted' });
+    } else {
+        toast({ variant: 'destructive', title: 'Access Denied', description: 'Incorrect password.' });
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle className="text-center font-headline flex items-center justify-center gap-2">
+                        <Lock /> Secure Area
+                    </CardTitle>
+                    <CardDescription className="text-center">
+                        Please enter the password to access CCTV feeds.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="cctv-password">Password</Label>
+                        <Input 
+                            id="cctv-password" 
+                            type="password" 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                        />
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button className="w-full" onClick={handlePasswordSubmit}>
+                        Unlock
+                    </Button>
+                </CardFooter>
+            </Card>
+        </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -93,9 +164,9 @@ export default function CctvPage() {
                     <div className="flex flex-col items-center text-muted-foreground">
                         <CameraOff className="w-16 h-16" />
                         <p className="mt-2">Camera Offline</p>
-                        <Dialog open={openDialog === feed.id} onOpenChange={(isOpen) => !isOpen && setOpenDialog(null)}>
+                        <Dialog open={openConnectDialog === feed.id} onOpenChange={(isOpen) => !isOpen && setOpenConnectDialog(null)}>
                             <DialogTrigger asChild>
-                                <Button variant="outline" className="mt-4" onClick={() => setOpenDialog(feed.id)}>
+                                <Button variant="outline" className="mt-4" onClick={() => setOpenConnectDialog(feed.id)}>
                                     Connect Camera
                                 </Button>
                             </DialogTrigger>

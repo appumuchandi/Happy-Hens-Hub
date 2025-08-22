@@ -2,11 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, ChevronDown, ChevronUp, QrCode, BellRing, Info } from 'lucide-react';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ShoppingCart, PackageX, PackageCheck, QrCode, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +16,9 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 
 export default function OnlineOrderPage() {
@@ -28,9 +28,6 @@ export default function OnlineOrderPage() {
   // --- State for both Owner and Viewer ---
   const [orders, setOrders] = useState<OnlineOrder[]>(onlineOrdersData);
   const [product, setProduct] = useState(productData);
-  
-  // --- Owner specific state ---
-  const [isStoreActive, setIsStoreActive] = useState(true);
   
   // --- Viewer specific state ---
   const [quantity, setQuantity] = useState<number | ''>('');
@@ -134,15 +131,6 @@ export default function OnlineOrderPage() {
 
   // --- OWNER VIEW ---
   if (user?.role === 'OWNER') {
-    const handleUpdateStock = (newStock: number) => {
-        setProduct(p => ({...p, availableQty: newStock, lastUpdated: new Date().toISOString()}));
-        toast({ title: 'Stock Updated' });
-    }
-    const handleUpdatePrice = (newPrice: number) => {
-        setProduct(p => ({...p, pricePerTray: newPrice, lastUpdated: new Date().toISOString()}));
-        toast({ title: 'Price Updated' });
-    }
-
     const handleOrderStatusChange = (orderId: string, status: 'accepted' | 'rejected') => {
         const order = orders.find(o => o.id === orderId);
         if (!order) return;
@@ -238,68 +226,36 @@ export default function OnlineOrderPage() {
 
     return (
         <div className="space-y-6">
-        <div>
-            <h1 className="text-3xl font-bold font-headline">Orders</h1>
-            <p className="text-muted-foreground">
-            Manage your e-commerce store settings and track incoming orders.
-            </p>
-        </div>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">Price and Stock Settings</CardTitle>
-                <CardDescription>Control your online store status, product pricing, and inventory.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <div className="space-y-2">
-                    <Label>Store Status</Label>
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            id="store-status"
-                            checked={isStoreActive}
-                            onCheckedChange={setIsStoreActive}
-                        />
-                        <Label htmlFor="store-status" className="text-sm text-muted-foreground">
-                            {isStoreActive ? 'Active' : 'Inactive'}
-                        </Label>
-                    </div>
-                     <p className="text-xs text-muted-foreground">Toggle your online store on or off.</p>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="price">Price per Tray (₹)</Label>
-                    <Input id="price" type="number" defaultValue={product.pricePerTray} onChange={(e) => handleUpdatePrice(Number(e.target.value))} />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="stock">Available Eggs (pcs)</Label>
-                    <Input id="stock" type="number" defaultValue={product.availableQty} onChange={(e) => handleUpdateStock(Number(e.target.value))} />
-                </div>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">Order Management</CardTitle>
-                <CardDescription>Review and manage incoming online sales. Approve an order to deduct stock.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Tabs defaultValue="pending">
-                    <TabsList>
-                        <TabsTrigger value="pending">Pending</TabsTrigger>
-                        <TabsTrigger value="accepted">Accepted</TabsTrigger>
-                        <TabsTrigger value="rejected">Rejected</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="pending" className="mt-4">
-                        <OrderTable ordersToShow={orders.filter(o => o.status === 'pending')} />
-                    </TabsContent>
-                    <TabsContent value="accepted" className="mt-4">
-                         <OrderTable ordersToShow={orders.filter(o => o.status === 'accepted')} />
-                    </TabsContent>
-                     <TabsContent value="rejected" className="mt-4">
-                         <OrderTable ordersToShow={orders.filter(o => o.status === 'rejected')} />
-                    </TabsContent>
-                </Tabs>
-            </CardContent>
-        </Card>
+            <div>
+                <h1 className="text-3xl font-bold font-headline">Online Orders</h1>
+                <p className="text-muted-foreground">
+                Manage your e-commerce store settings and track incoming orders.
+                </p>
+            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Order Management</CardTitle>
+                    <CardDescription>Review and manage incoming online sales. Approve an order to deduct stock.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Tabs defaultValue="pending">
+                        <TabsList>
+                            <TabsTrigger value="pending">Pending</TabsTrigger>
+                            <TabsTrigger value="accepted">Accepted</TabsTrigger>
+                            <TabsTrigger value="rejected">Rejected</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="pending" className="mt-4">
+                            <OrderTable ordersToShow={orders.filter(o => o.status === 'pending')} />
+                        </TabsContent>
+                        <TabsContent value="accepted" className="mt-4">
+                            <OrderTable ordersToShow={orders.filter(o => o.status === 'accepted')} />
+                        </TabsContent>
+                        <TabsContent value="rejected" className="mt-4">
+                            <OrderTable ordersToShow={orders.filter(o => o.status === 'rejected')} />
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+            </Card>
         </div>
     );
   }
@@ -443,5 +399,3 @@ export default function OnlineOrderPage() {
     </div>
   );
 }
-
-    

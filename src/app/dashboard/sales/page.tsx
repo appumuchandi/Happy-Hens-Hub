@@ -50,7 +50,7 @@ const RECORDS_PER_PAGE = 10;
 export default function SalesPage() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [salesHistory, setSalesHistory] = useState(salesData);
+  const [salesHistory, setSalesHistory] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('monthly');
@@ -307,7 +307,7 @@ export default function SalesPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {paginatedData.map((sale) => (
+                        {paginatedData.length > 0 ? paginatedData.map((sale) => (
                         <TableRow key={sale.id}>
                             <TableCell>{sale.date}</TableCell>
                             <TableCell>{sale.buyerName}</TableCell>
@@ -315,7 +315,13 @@ export default function SalesPage() {
                             <TableCell>₹{sale.pricePerPiece}</TableCell>
                             <TableCell>₹{sale.revenue}</TableCell>
                         </TableRow>
-                        ))}
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={5} className="h-24 text-center">
+                                    No sales history found.
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </div>
@@ -328,12 +334,12 @@ export default function SalesPage() {
                 >
                     Previous
                 </Button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                <span className="text-sm">Page {currentPage} of {totalPages > 0 ? totalPages : 1}</span>
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
+                    disabled={currentPage === totalPages || totalPages === 0}
                 >
                     Next
                 </Button>
@@ -344,5 +350,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

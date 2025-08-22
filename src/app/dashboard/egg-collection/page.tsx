@@ -49,7 +49,7 @@ const RECORDS_PER_PAGE = 10;
 export default function EggCollectionPage() {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [collectionHistory, setCollectionHistory] = useState(eggCollectionData);
+  const [collectionHistory, setCollectionHistory] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [reportType, setReportType] = useState<ReportType>('monthly');
@@ -272,14 +272,20 @@ export default function EggCollectionPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedData.map((record: any) => (
+                  {paginatedData.length > 0 ? paginatedData.map((record: any) => (
                     <TableRow key={record.id}>
                       <TableCell>{record.date}</TableCell>
                       <TableCell>{record.quantity}</TableCell>
                       <TableCell>{record.batch}</TableCell>
                       <TableCell>{record.collector}</TableCell>
                     </TableRow>
-                  ))}
+                  )) : (
+                     <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center">
+                            No collection history found.
+                        </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -292,12 +298,12 @@ export default function EggCollectionPage() {
                 >
                     Previous
                 </Button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                <span className="text-sm">Page {currentPage} of {totalPages > 0 ? totalPages : 1}</span>
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
+                    disabled={currentPage === totalPages || totalPages === 0}
                 >
                     Next
                 </Button>
@@ -308,5 +314,3 @@ export default function EggCollectionPage() {
     </div>
   );
 }
-
-    

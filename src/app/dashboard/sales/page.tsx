@@ -14,6 +14,26 @@ import { salesData } from '@/lib/placeholder-data';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
+import { Download } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 
 const salesSchema = z.object({
   buyerName: z.string().min(1, 'Buyer name is required.'),
@@ -23,12 +43,20 @@ const salesSchema = z.object({
 
 type SalesFormValues = z.infer<typeof salesSchema>;
 
+type ReportType = 'daily' | 'monthly' | 'yearly';
+
 const RECORDS_PER_PAGE = 10;
 
 export default function SalesPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
+  const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
+  const [reportType, setReportType] = useState<ReportType>('monthly');
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+
   const form = useForm<SalesFormValues>({
     resolver: zodResolver(salesSchema),
     defaultValues: {
@@ -60,6 +88,14 @@ export default function SalesPage() {
     form.reset();
   }
 
+  const handleDownload = () => {
+    toast({
+      title: "Generating Report...",
+      description: `Your ${reportType} sales report for ${selectedYear} is being downloaded.`
+    });
+    setOpenDownloadDialog(false);
+  }
+
   const totalPages = Math.ceil(salesData.length / RECORDS_PER_PAGE);
   const paginatedData = salesData.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
@@ -70,6 +106,9 @@ export default function SalesPage() {
     date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
     pricePerPiece: (parseFloat(sale.revenue) / sale.quantity).toFixed(2),
   }));
+
+  const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
+  const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: format(new Date(0, i), 'MMMM') }));
 
   return (
     <div className="space-y-6">
@@ -185,6 +224,99 @@ export default function SalesPage() {
           </CardContent>
         </Card>
       </div>
+
+       <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
+        <DialogTrigger asChild>
+            <Button
+                variant="default"
+                className="fixed bottom-8 right-8 h-16 w-16 rounded-full shadow-lg"
+                size="icon"
+            >
+                <Download className="h-8 w-8" />
+                <span className="sr-only">Download Sales Report</span>
+            </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Download Sales Report</DialogTitle>
+            <DialogDescription>
+              Select the time range for your sales report.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Report Type</Label>
+                    <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="daily">Daily</SelectItem>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="yearly">Yearly</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label>Year</Label>
+                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {years.map(year => (
+                                <SelectItem key={year} value={year}>{year}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+            {reportType === 'monthly' && (
+                <div className="space-y-2">
+                     <Label>Month</Label>
+                     <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select month" />
+                        </SelectTrigger>
+                        <SelectContent>
+                             {months.map(month => (
+                                <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            )}
+            {reportType === 'daily' && (
+                <div className="space-y-2">
+                     <Label>Date</Label>
+                     <Popover>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start font-normal">
+                                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={setSelectedDate}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+            <Button onClick={handleDownload}>
+                <Download className="mr-2"/>
+                Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

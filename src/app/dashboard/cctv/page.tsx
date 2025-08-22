@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Video, CameraOff, Lock } from 'lucide-react';
+import { Video, CameraOff, Lock, Settings } from 'lucide-react';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ interface CameraFeed {
   isConnected: boolean;
 }
 
-const CCTV_PASSWORD = "1234";
+const DEFAULT_CCTV_PASSWORD = "1234";
 
 export default function CctvPage() {
   const { user } = useAuth();
@@ -46,6 +46,9 @@ export default function CctvPage() {
   const [openConnectDialog, setOpenConnectDialog] = useState<number | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [cctvPassword, setCctvPassword] = useState(DEFAULT_CCTV_PASSWORD);
+  const [openSettings, setOpenSettings] = useState(false);
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
   
   const initialFeeds: CameraFeed[] = [
     { id: 1, name: 'Coop Entrance', hint: 'security camera', isConnected: false },
@@ -68,6 +71,16 @@ export default function CctvPage() {
         console.error("Failed to parse camera feeds from localStorage", error);
         setCameraFeeds(initialFeeds);
     }
+    
+    try {
+        const storedPassword = localStorage.getItem('cctvPassword');
+        if (storedPassword) {
+            setCctvPassword(storedPassword);
+        }
+    } catch (error) {
+        console.error("Failed to parse password from localStorage", error);
+    }
+
   }, []);
 
   useEffect(() => {
@@ -98,7 +111,7 @@ export default function CctvPage() {
   };
 
   const handlePasswordSubmit = () => {
-    if (password === CCTV_PASSWORD) {
+    if (password === cctvPassword) {
         setIsAuthenticated(true);
         toast({ title: 'Access Granted' });
     } else {
@@ -106,9 +119,126 @@ export default function CctvPage() {
     }
   }
 
+  const PasswordSettingsDialog = () => {
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const handlePasswordChange = () => {
+        if (newPassword.length < 4) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Password must be at least 4 characters.' });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Passwords do not match.' });
+            return;
+        }
+        localStorage.setItem('cctvPassword', newPassword);
+        setCctvPassword(newPassword);
+        setOpenSettings(false);
+        toast({ title: 'Success', description: 'CCTV password has been updated.' });
+    };
+
+    return (
+        <Dialog open={openSettings} onOpenChange={setOpenSettings}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>CCTV Settings</DialogTitle>
+                    <DialogDescription>
+                        Update the password required to access the CCTV page.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="new-password">New Password</Label>
+                        <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirm New Password</Label>
+                        <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setOpenSettings(false)}>Cancel</Button>
+                    <Button onClick={handlePasswordChange}>Save Password</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+  }
+
+  const ForgotPasswordDialog = () => {
+    const [email, setEmail] = useState(user?.email || '');
+    const [otp, setOtp] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [step, setStep] = useState(1);
+
+    const handleSendOtp = () => {
+        // Simulate sending OTP
+        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent to ${email}` });
+        setStep(2);
+    }
+    
+    const handleResetPassword = () => {
+        if (otp !== '123456') { // Mock OTP
+            toast({ variant: 'destructive', title: 'Invalid OTP' });
+            return;
+        }
+        if (newPassword.length < 4) {
+            toast({ variant: 'destructive', title: 'Password is too short' });
+            return;
+        }
+        localStorage.setItem('cctvPassword', newPassword);
+        setCctvPassword(newPassword);
+        setOpenForgotPassword(false);
+        toast({ title: 'Password Reset Successfully' });
+    }
+
+    return (
+         <Dialog open={openForgotPassword} onOpenChange={setOpenForgotPassword}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Reset CCTV Password</DialogTitle>
+                    <DialogDescription>
+                        {step === 1 ? 'Enter your email to receive an OTP.' : 'Enter the OTP and your new password.'}
+                    </DialogDescription>
+                </DialogHeader>
+                 <div className="space-y-4 py-4">
+                    {step === 1 && (
+                         <div className="space-y-2">
+                            <Label htmlFor="email">Owner's Email</Label>
+                            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        </div>
+                    )}
+                    {step === 2 && (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="otp">Enter OTP</Label>
+                                <Input id="otp" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="new-password-reset">New Password</Label>
+                                <Input id="new-password-reset" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                            </div>
+                        </>
+                    )}
+                 </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setOpenForgotPassword(false)}>Cancel</Button>
+                    {step === 1 ? (
+                        <Button onClick={handleSendOtp}>Send OTP</Button>
+                    ) : (
+                        <Button onClick={handleResetPassword}>Reset Password</Button>
+                    )}
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+  }
+
   if (!isAuthenticated) {
     return (
         <div className="flex items-center justify-center h-full">
+            {openForgotPassword && <ForgotPasswordDialog />}
             <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle className="text-center font-headline flex items-center justify-center gap-2">
@@ -129,6 +259,9 @@ export default function CctvPage() {
                             onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
                         />
                     </div>
+                     <Button variant="link" className="p-0 h-auto text-xs" onClick={() => setOpenForgotPassword(true)}>
+                        Forgot Password?
+                    </Button>
                 </CardContent>
                 <CardFooter>
                     <Button className="w-full" onClick={handlePasswordSubmit}>
@@ -142,11 +275,18 @@ export default function CctvPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold font-headline">CCTV Monitoring</h1>
-        <p className="text-muted-foreground">
-          Live feed from your farm's security cameras.
-        </p>
+      {openSettings && <PasswordSettingsDialog />}
+      <div className="flex justify-between items-center">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">CCTV Monitoring</h1>
+            <p className="text-muted-foreground">
+            Live feed from your farm's security cameras.
+            </p>
+        </div>
+         <Button variant="outline" size="icon" onClick={() => setOpenSettings(true)}>
+            <Settings className="h-5 w-5" />
+            <span className="sr-only">CCTV Settings</span>
+        </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
@@ -215,3 +355,5 @@ export default function CctvPage() {
     </div>
   );
 }
+
+    

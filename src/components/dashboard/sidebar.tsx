@@ -56,7 +56,6 @@ export default function AppSidebar() {
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                     : 'hover:bg-accent/50 hover:text-foreground'
                 )}
-                 isActive={pathname.startsWith(item.href)}
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.label}</span>

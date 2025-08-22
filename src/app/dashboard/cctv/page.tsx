@@ -137,7 +137,7 @@ export default function CctvPage() {
             name: newCameraName,
             location: newCameraLocation,
             hint: 'security camera',
-            isConnected: false,
+            isConnected: Math.random() > 0.5, // Randomly set to online/offline for demo
         };
         setCameraFeeds(prev => [...prev, newCamera]);
         setNewCameraName('');
@@ -145,7 +145,7 @@ export default function CctvPage() {
         toast({ title: 'Camera Added', description: `${newCamera.name} has been added to the list.` });
     }
 
-    const canSendOtp = newPassword.length >= 4 && newPassword === confirmPassword;
+    const canContinue = newPassword.length >= 4 && newPassword === confirmPassword;
 
     return (
         <Dialog open={openSettings} onOpenChange={setOpenSettings}>
@@ -176,7 +176,7 @@ export default function CctvPage() {
                     )}
                     
                     {!otpSent ? (
-                        <Button onClick={handleSendOtp} disabled={!canSendOtp}>Continue</Button>
+                        <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
                     ) : (
                         <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
                     )}
@@ -216,7 +216,7 @@ export default function CctvPage() {
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [step, setStep] = useState(1);
     
-    const canContinue = newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4;
+    const canContinue = email && newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4;
 
     const handleSendOtp = () => {
         toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to ${email}` });
@@ -235,6 +235,10 @@ export default function CctvPage() {
         localStorage.setItem('cctvPassword', newPassword);
         setCctvPassword(newPassword);
         setOpenForgotPassword(false);
+        setStep(1);
+        setNewPassword('');
+        setConfirmNewPassword('');
+        setOtp('');
         toast({ title: 'Password Reset Successfully' });
     }
 
@@ -269,7 +273,7 @@ export default function CctvPage() {
                     )}
                  </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpenForgotPassword(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => { setOpenForgotPassword(false); setStep(1);}}>Cancel</Button>
                     {step === 1 ? (
                         <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
                     ) : (

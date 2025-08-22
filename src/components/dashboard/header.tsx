@@ -1,7 +1,8 @@
+
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,19 @@ const navItems = [
 export default function AppHeader() {
   const { user, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLinkClick = (href: string) => {
+    if (pathname.startsWith('/dashboard/cctv') && !href.startsWith('/dashboard/cctv')) {
+      sessionStorage.removeItem('cctvAuthenticated');
+    }
+    router.push(href);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('cctvAuthenticated');
+    logout();
+  }
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
@@ -64,6 +78,7 @@ export default function AppHeader() {
                   <SheetClose asChild key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={() => handleLinkClick(item.href)}
                       className={cn(
                         'flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary',
                         pathname === item.href && 'text-primary bg-muted'
@@ -96,7 +111,7 @@ export default function AppHeader() {
             <DropdownMenuItem disabled>{user?.name} ({user?.role})</DropdownMenuItem>
             <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout} className="text-destructive focus:bg-destructive/20 focus:text-destructive">Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/20 focus:text-destructive">Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

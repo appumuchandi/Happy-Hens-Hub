@@ -62,6 +62,12 @@ export default function CctvPage() {
         if (storedPassword) {
             setCctvPassword(storedPassword);
         }
+        
+        const sessionAuth = sessionStorage.getItem('cctvAuthenticated');
+        if (sessionAuth === 'true') {
+            setIsAuthenticated(true);
+        }
+
     } catch (error) {
         console.error("Failed to access storage", error);
     }
@@ -76,6 +82,7 @@ export default function CctvPage() {
   const handlePasswordSubmit = () => {
     if (password === cctvPassword) {
         setIsAuthenticated(true);
+        sessionStorage.setItem('cctvAuthenticated', 'true');
         toast({ title: 'Access Granted' });
     } else {
         toast({ variant: 'destructive', title: 'Access Denied', description: 'Incorrect password.' });

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Square, ArrowLeft, Video, CameraOff } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useToast } from '@/hooks/use-toast';
+import { Lock } from 'lucide-react';
 
 // Mock camera data - in a real app, this would be fetched
 const cameraFeeds = [
@@ -31,9 +32,19 @@ export default function SingleCctvPage() {
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isAllowed, setIsAllowed] = useState(false);
   
   const cameraId = params.id;
   const camera = cameraFeeds.find(c => c.id.toString() === cameraId);
+
+  useEffect(() => {
+    const sessionAuth = sessionStorage.getItem('cctvAuthenticated');
+    if (sessionAuth !== 'true') {
+        router.push('/dashboard/cctv');
+    } else {
+        setIsAllowed(true);
+    }
+  }, [router]);
 
   useEffect(() => {
     // This is a mock to start playing when the component loads if connected.
@@ -65,6 +76,16 @@ export default function SingleCctvPage() {
     // In a real app, you might tear down the stream connection here.
     toast({ title: 'Playback Stopped' });
   };
+  
+  if (!isAllowed) {
+    return (
+        <div className="flex h-screen w-full items-center justify-center bg-background">
+            <div className="text-foreground flex items-center gap-2">
+                <Lock /> Verifying access...
+            </div>
+      </div>
+    );
+  }
 
 
   if (!camera) {
@@ -151,4 +172,5 @@ export default function SingleCctvPage() {
     </div>
   );
 }
+
 

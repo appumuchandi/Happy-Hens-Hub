@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Video, CameraOff, Lock, Settings, ChevronRight } from 'lucide-react';
+import { Video, CameraOff, Lock, Settings, ChevronRight, PlusCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface CameraFeed {
   id: number;
@@ -81,9 +82,11 @@ export default function CctvPage() {
     }
   }
 
-  const PasswordSettingsDialog = () => {
+  const CctvSettingsDialog = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [newCameraName, setNewCameraName] = useState('');
+    const [newCameraLocation, setNewCameraLocation] = useState('');
 
     const handlePasswordChange = () => {
         if (newPassword.length < 4) {
@@ -100,16 +103,36 @@ export default function CctvPage() {
         toast({ title: 'Success', description: 'CCTV password has been updated.' });
     };
 
+    const handleAddCamera = () => {
+        if (!newCameraName || !newCameraLocation) {
+             toast({ variant: 'destructive', title: 'Error', description: 'Please fill in both camera name and location.' });
+            return;
+        }
+        const newCamera: CameraFeed = {
+            id: cameraFeeds.length + 1,
+            name: newCameraName,
+            location: newCameraLocation,
+            hint: 'security camera',
+            isConnected: false,
+        };
+        setCameraFeeds(prev => [...prev, newCamera]);
+        setNewCameraName('');
+        setNewCameraLocation('');
+        toast({ title: 'Camera Added', description: `${newCamera.name} has been added to the list.` });
+    }
+
     return (
         <Dialog open={openSettings} onOpenChange={setOpenSettings}>
-            <DialogContent>
+            <DialogContent className="max-w-md">
                 <DialogHeader>
                     <DialogTitle>CCTV Settings</DialogTitle>
                     <DialogDescription>
-                        Update the password required to access the CCTV page.
+                        Manage CCTV password and add new cameras.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
+                
+                <div className="space-y-4 py-2">
+                    <h3 className="font-semibold text-lg">Change Password</h3>
                     <div className="space-y-2">
                         <Label htmlFor="new-password">New Password</Label>
                         <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
@@ -118,10 +141,30 @@ export default function CctvPage() {
                         <Label htmlFor="confirm-password">Confirm New Password</Label>
                         <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                     </div>
+                     <Button onClick={handlePasswordChange}>Save New Password</Button>
                 </div>
+
+                <Separator />
+
+                <div className="space-y-4 py-2">
+                     <h3 className="font-semibold text-lg">Add New Camera</h3>
+                    <div className="space-y-2">
+                        <Label htmlFor="new-camera-name">Camera Name</Label>
+                        <Input id="new-camera-name" placeholder="e.g., Back Door" value={newCameraName} onChange={(e) => setNewCameraName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="new-camera-location">Camera Location</Label>
+                        <Input id="new-camera-location" placeholder="e.g., Main Building" value={newCameraLocation} onChange={(e) => setNewCameraLocation(e.target.value)} />
+                    </div>
+                    <Button variant="outline" onClick={handleAddCamera}>
+                        <PlusCircle className="mr-2"/>
+                        Add Camera
+                    </Button>
+                </div>
+
+
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => setOpenSettings(false)}>Cancel</Button>
-                    <Button onClick={handlePasswordChange}>Save Password</Button>
+                    <Button variant="secondary" onClick={() => setOpenSettings(false)}>Close</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -236,7 +279,7 @@ export default function CctvPage() {
 
   return (
     <div className="space-y-6">
-      {openSettings && <PasswordSettingsDialog />}
+      {openSettings && <CctvSettingsDialog />}
       <div className="flex justify-between items-center">
         <div>
             <h1 className="text-3xl font-bold font-headline">CCTV Monitoring</h1>
@@ -288,3 +331,5 @@ export default function CctvPage() {
     </div>
   );
 }
+
+    

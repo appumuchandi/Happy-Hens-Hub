@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 interface CameraFeed {
   id: number;
@@ -291,7 +292,7 @@ export default function CctvPage() {
         <div>
             <h1 className="text-3xl font-bold font-headline">CCTV Monitoring</h1>
             <p className="text-muted-foreground">
-              Select a camera to view its live feed.
+              Live feeds from all connected cameras.
             </p>
         </div>
          <Button variant="outline" size="icon" onClick={() => setOpenSettings(true)}>
@@ -300,41 +301,44 @@ export default function CctvPage() {
         </Button>
       </div>
 
-       <Card>
-        <CardHeader>
-          <CardTitle className="font-headline">Camera List</CardTitle>
-          <CardDescription>
-            List of all available security cameras on the farm.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="divide-y divide-border">
-            {cameraFeeds.map((feed) => (
-              <div
-                key={feed.id}
-                className="flex items-center justify-between p-4 hover:bg-muted/50 cursor-pointer"
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {cameraFeeds.map((feed) => (
+            <Card 
+                key={feed.id} 
+                className="overflow-hidden cursor-pointer group" 
                 onClick={() => router.push(`/dashboard/cctv/${feed.id}`)}
-              >
-                <div className="flex items-center gap-4">
-                  <div className={`p-2 rounded-full ${feed.isConnected ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}`}>
-                    {feed.isConnected ? <Video className="w-5 h-5" /> : <CameraOff className="w-5 h-5" />}
-                  </div>
-                  <div>
-                    <p className="font-semibold">{feed.name}</p>
-                    <p className="text-sm text-muted-foreground">{feed.location}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Badge variant={feed.isConnected ? 'default' : 'destructive'} className={feed.isConnected ? 'bg-green-700' : ''}>
-                    {feed.isConnected ? 'Online' : 'Offline'}
-                  </Badge>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            >
+                <CardContent className="p-0">
+                    <div className="aspect-video bg-card border-b rounded-t-md flex items-center justify-center relative">
+                        {feed.isConnected ? (
+                            <Image
+                                src={`https://placehold.co/600x400.png`}
+                                alt={`Live feed for ${feed.name}`}
+                                width={600}
+                                height={400}
+                                className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                                data-ai-hint={feed.hint}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center text-muted-foreground p-4 text-center">
+                                <CameraOff className="w-16 h-16" />
+                                <p className="mt-2 font-semibold">Offline</p>
+                            </div>
+                        )}
+                        <div className="absolute top-2 right-2">
+                             <Badge variant={feed.isConnected ? 'default' : 'destructive'} className={feed.isConnected ? 'bg-green-700' : ''}>
+                                {feed.isConnected ? 'Online' : 'Offline'}
+                            </Badge>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardHeader className="p-4">
+                    <CardTitle className="text-lg font-semibold">{feed.name}</CardTitle>
+                    <CardDescription className="text-sm">{feed.location}</CardDescription>
+                </CardHeader>
+            </Card>
+          ))}
+        </div>
     </div>
   );
 }

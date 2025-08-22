@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, ChevronDown, ChevronUp, QrCode } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -12,10 +12,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { productData, onlineOrdersData, type OnlineOrder } from '@/lib/placeholder-data';
+import { productData, onlineOrdersData, paymentSettings, type OnlineOrder } from '@/lib/placeholder-data';
 import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 export default function OnlineOrderPage() {
   const { user } = useAuth();
@@ -32,6 +33,7 @@ export default function OnlineOrderPage() {
   const [quantity, setQuantity] = useState(1);
   const [total, setTotal] = useState(product.pricePerTray);
   const [openCheckout, setOpenCheckout] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<'confirm' | 'pay'>('confirm');
   
   useEffect(() => {
     // In a real app, product data would be fetched from Firestore
@@ -63,12 +65,14 @@ export default function OnlineOrderPage() {
   }
   
   const handlePlaceOrder = (paymentMethod: 'cod' | 'online') => {
+    const paymentStatus = paymentMethod === 'cod' ? 'pending' : 'paid'; // 'paid' for online, but owner needs to verify
     toast({
         title: 'Order Placed!',
         description: 'Your order is now pending approval.'
     });
     setOpenCheckout(false);
     setQuantity(1);
+    setCheckoutStep('confirm'); // Reset dialog step
     // In a real app, this would create a new document in Firestore 'orders' collection
     // and trigger a notification for the owner.
   }
@@ -162,7 +166,8 @@ export default function OnlineOrderPage() {
                                 <TableHead>Customer</TableHead>
                                 <TableHead>Quantity (Trays)</TableHead>
                                 <TableHead>Total (₹)</TableHead>
-                                <TableHead>Payment</TableHead>
+                                <TableHead>Payment Method</TableHead>
+                                <TableHead>Payment Status</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -174,6 +179,11 @@ export default function OnlineOrderPage() {
                                     <TableCell>{order.customer}</TableCell>
                                     <TableCell>{order.quantity}</TableCell>
                                     <TableCell>₹{order.totalAmount}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={order.paymentMethod === 'online' ? 'default' : 'secondary'}>
+                                          {order.paymentMethod}
+                                        </Badge>
+                                    </TableCell>
                                     <TableCell>
                                         <Badge variant={order.paymentStatus === 'paid' ? 'secondary' : 'outline'} className={order.paymentStatus === 'paid' ? 'bg-green-700' : ''}>
                                             {order.paymentStatus}
@@ -212,30 +222,65 @@ export default function OnlineOrderPage() {
   return (
     <div className="space-y-8">
         {/* --- Checkout Dialog --- */}
-         <Dialog open={openCheckout} onOpenChange={setOpenCheckout}>
-            <DialogContent>
+         <Dialog open={openCheckout} onOpenChange={(isOpen) => {
+            setOpenCheckout(isOpen);
+            if (!isOpen) {
+                setTimeout(() => setCheckoutStep('confirm'), 200); // Delay reset to allow animation
+            }
+         }}>
+            <DialogContent className="max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Confirm Your Order</DialogTitle>
-                    <DialogDescription>Review your order details before checking out.</DialogDescription>
+                    <DialogTitle>{checkoutStep === 'confirm' ? 'Confirm Your Order' : 'Complete Online Payment'}</DialogTitle>
+                    <DialogDescription>
+                         {checkoutStep === 'confirm' 
+                            ? 'Review your order details before choosing a payment method.' 
+                            : 'Scan the QR code or use the UPI ID to pay. Click "Mark as Paid" once done.'}
+                    </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="flex justify-between items-center bg-muted p-4 rounded-lg">
-                        <span className="font-semibold text-lg">Total Amount</span>
-                        <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
+                
+                {checkoutStep === 'confirm' ? (
+                     <div className="space-y-4 py-4">
+                        <div className="flex justify-between items-center bg-muted p-4 rounded-lg">
+                            <span className="font-semibold text-lg">Total Amount</span>
+                            <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
+                        </div>
+                        <div className="text-sm">
+                            <p><span className="font-semibold">Quantity:</span> {quantity} tray(s) ({quantity * 30} eggs)</p>
+                            <p><span className="font-semibold">Price per Tray:</span> ₹{product.pricePerTray.toFixed(2)}</p>
+                        </div>
                     </div>
-                     <div className="text-sm">
-                        <p><span className="font-semibold">Quantity:</span> {quantity} tray(s) ({quantity * 30} eggs)</p>
-                        <p><span className="font-semibold">Price per Tray:</span> ₹{product.pricePerTray.toFixed(2)}</p>
+                ) : (
+                    <div className="space-y-4 py-4 text-center">
+                        <div className="w-48 h-48 mx-auto border-4 border-primary rounded-lg p-1">
+                            <Image 
+                                src={paymentSettings.qrCodeUrl} 
+                                alt="UPI QR Code" 
+                                width={200}
+                                height={200}
+                                className="object-contain w-full h-full"
+                                data-ai-hint="qr code"
+                            />
+                        </div>
+                        <div>
+                            <p className="text-muted-foreground">UPI ID: <span className="font-mono text-foreground">{paymentSettings.upiId}</span></p>
+                            <p className="text-muted-foreground">Mobile: <span className="font-mono text-foreground">{paymentSettings.mobile}</span></p>
+                        </div>
+                         <Button size="lg" className="w-full" onClick={() => handlePlaceOrder('online')}>
+                            <PackageCheck className="mr-2"/> Mark as Paid
+                        </Button>
                     </div>
-                </div>
-                <DialogFooter className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   <Button variant="outline" size="lg" onClick={() => handlePlaceOrder('cod')}>
-                        Cash on Delivery
-                    </Button>
-                    <Button size="lg" onClick={() => handlePlaceOrder('online')}>
-                        <DollarSign className="mr-2"/> Pay Online
-                    </Button>
-                </DialogFooter>
+                )}
+                
+                {checkoutStep === 'confirm' && (
+                    <DialogFooter className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <Button variant="outline" size="lg" onClick={() => handlePlaceOrder('cod')}>
+                            Cash on Delivery
+                        </Button>
+                        <Button size="lg" onClick={() => setCheckoutStep('pay')}>
+                            <QrCode className="mr-2"/> Pay Online
+                        </Button>
+                    </DialogFooter>
+                )}
             </DialogContent>
         </Dialog>
 

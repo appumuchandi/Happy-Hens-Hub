@@ -149,3 +149,10 @@ export const onlineOrdersData: OnlineOrder[] = [
     createdAt: subDays(today, 3).toISOString()
   },
 ];
+
+
+export const paymentSettings = {
+    upiId: 'owner@upi',
+    mobile: '+91 98765 43210',
+    qrCodeUrl: 'https://placehold.co/200x200.png',
+};

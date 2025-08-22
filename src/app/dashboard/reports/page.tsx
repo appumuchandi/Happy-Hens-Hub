@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { eggCollectionData, salesData } from '@/lib/placeholder-data';
-import { subDays, format, startOfMonth, getMonth, parseISO } from 'date-fns';
+import { subDays, format, getMonth, parseISO } from 'date-fns';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
@@ -10,10 +10,10 @@ import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-type TimeRange = 'daily' | 'monthly' | 'yearly';
+type TimeRange = 'daily' | 'monthly';
 
 const processChartData = (range: TimeRange) => {
-  if (range === 'yearly') {
+  if (range === 'monthly') {
     const monthlyData: { [key: string]: { eggs: number; sales: number } } = {};
     const monthLabels = Array.from({ length: 12 }, (_, i) => format(new Date(0, i), 'MMM'));
 
@@ -41,7 +41,8 @@ const processChartData = (range: TimeRange) => {
     }));
   }
 
-  const days = range === 'monthly' ? 30 : 7;
+  // Daily view (last 7 days)
+  const days = 7;
   const lastDays = Array.from({ length: days }, (_, i) => subDays(new Date(), i)).reverse();
 
   return lastDays.map(date => {
@@ -72,8 +73,7 @@ export default function ReportsPage() {
   
   const chartTitleSuffix = {
     daily: 'Last 7 Days',
-    monthly: 'Last 30 Days',
-    yearly: 'This Year'
+    monthly: 'This Year'
   }
 
   if (user?.role === 'VIEWER') {
@@ -92,7 +92,6 @@ export default function ReportsPage() {
                     <TabsList>
                         <TabsTrigger value="daily">Daily</TabsTrigger>
                         <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                        <TabsTrigger value="yearly">Yearly</TabsTrigger>
                     </TabsList>
                 </Tabs>
                 {user?.role === 'OWNER' && (

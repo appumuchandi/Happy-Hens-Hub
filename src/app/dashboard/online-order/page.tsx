@@ -30,8 +30,8 @@ export default function OnlineOrderPage() {
   const [isStoreActive, setIsStoreActive] = useState(true);
   
   // --- Viewer specific state ---
-  const [quantity, setQuantity] = useState(1);
-  const [total, setTotal] = useState(product.pricePerTray);
+  const [quantity, setQuantity] = useState<number | ''>('');
+  const [total, setTotal] = useState(0);
   const [openCheckout, setOpenCheckout] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'initial' | 'qr'>('initial');
   
@@ -39,7 +39,11 @@ export default function OnlineOrderPage() {
   const isOutOfStock = availableTrays <= 0;
 
   useEffect(() => {
-    setTotal(quantity * product.pricePerTray);
+    if (quantity) {
+        setTotal(quantity * product.pricePerTray);
+    } else {
+        setTotal(0);
+    }
   }, [quantity, product.pricePerTray]);
 
 
@@ -47,7 +51,13 @@ export default function OnlineOrderPage() {
      return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
   
-  const setValidatedQuantity = (newQuantity: number) => {
+  const setValidatedQuantity = (newQuantityStr: string) => {
+    if (newQuantityStr === '') {
+        setQuantity('');
+        return;
+    }
+    const newQuantity = parseInt(newQuantityStr, 10);
+
     if (isNaN(newQuantity) || newQuantity < 1) {
       setQuantity(1);
       return;
@@ -62,10 +72,13 @@ export default function OnlineOrderPage() {
   }
 
   const handleQuantityChange = (change: number) => {
-    setValidatedQuantity(quantity + change);
+    const currentQuantity = Number(quantity) || 0;
+    setValidatedQuantity((currentQuantity + change).toString());
   }
   
   const handlePlaceOrder = (paymentMethod: 'cod' | 'online') => {
+      if (!quantity) return;
+
       const newOrder: OnlineOrder = {
           id: `ORD${Math.floor(Math.random() * 1000) + 7000}`,
           customer: user?.name || 'Customer',
@@ -92,7 +105,7 @@ export default function OnlineOrderPage() {
       
       setOpenCheckout(false);
       setCheckoutStep('initial');
-      setQuantity(1);
+      setQuantity('');
   }
 
   // --- OWNER VIEW ---
@@ -206,7 +219,7 @@ export default function OnlineOrderPage() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={order.paymentStatus === 'paid' || o.paymentStatus === 'cod' ? 'secondary' : 'outline'} className={(order.paymentStatus === 'paid' || order.paymentStatus === 'cod') ? 'bg-green-700' : ''}>
+                                        <Badge variant={order.paymentStatus === 'paid' || order.paymentStatus === 'cod' ? 'secondary' : 'outline'} className={(order.paymentStatus === 'paid' || order.paymentStatus === 'cod') ? 'bg-green-700' : ''}>
                                             {order.paymentStatus}
                                         </Badge>
                                     </TableCell>
@@ -270,7 +283,7 @@ export default function OnlineOrderPage() {
                                 <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
                             </div>
                             <div className="text-sm">
-                                <p><span className="font-semibold">Quantity:</span> {quantity} tray(s) ({quantity * 30} eggs)</p>
+                                <p><span className="font-semibold">Quantity:</span> {quantity} tray(s) ({Number(quantity || 0) * 30} eggs)</p>
                                 <p><span className="font-semibold">Price per Tray:</span> ₹{product.pricePerTray.toFixed(2)}</p>
                             </div>
                         </div>
@@ -330,23 +343,24 @@ export default function OnlineOrderPage() {
                     <div className="space-y-2">
                         <Label className="text-lg font-semibold block text-center">Select Quantity (Trays)</Label>
                         <div className="flex items-center justify-center gap-4">
-                            <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1 || isOutOfStock}>
+                            <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={isOutOfStock || Number(quantity) <= 1}>
                                 <ChevronDown className="w-6 h-6"/>
                             </Button>
                             <Input 
                                 type="number"
                                 className="text-4xl font-bold w-24 h-auto text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 value={quantity}
-                                onChange={(e) => setValidatedQuantity(parseInt(e.target.value, 10))}
+                                onChange={(e) => setValidatedQuantity(e.target.value)}
                                 min="1"
+                                placeholder="0"
                                 disabled={isOutOfStock}
                             />
-                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)} disabled={isOutOfStock || quantity >= availableTrays}>
+                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)} disabled={isOutOfStock || Number(quantity) >= availableTrays}>
                                 <ChevronUp className="w-6 h-6"/>
                             </Button>
                         </div>
                         <p className="text-center text-muted-foreground text-sm">
-                            Total eggs: {quantity * 30}
+                            Total eggs: {Number(quantity || 0) * 30}
                         </p>
                     </div>
                     
@@ -356,7 +370,7 @@ export default function OnlineOrderPage() {
                         <span className="font-semibold text-lg">Total</span>
                         <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
                     </div>
-                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock}>
+                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock || !quantity}>
                         <ShoppingCart className="mr-2"/> Place Order
                     </Button>
                 </CardFooter>

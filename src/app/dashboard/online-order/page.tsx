@@ -44,19 +44,24 @@ export default function OnlineOrderPage() {
      return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
   
-  const handleQuantityChange = (change: number) => {
-    setQuantity(prev => {
-        const newQuantity = prev + change;
-        if (newQuantity < 1) return 1;
-        const maxQuantity = Math.floor(product.stock / 30);
-        if (newQuantity > maxQuantity) {
-            toast({ variant: 'destructive', title: `Maximum stock is ${maxQuantity} trays` });
-            return maxQuantity;
-        }
-        return newQuantity;
-    });
+  const setValidatedQuantity = (newQuantity: number) => {
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      setQuantity(1);
+      return;
+    }
+    const maxQuantity = Math.floor(product.stock / 30);
+    if (newQuantity > maxQuantity) {
+      toast({ variant: 'destructive', title: `Maximum stock is ${maxQuantity} trays` });
+      setQuantity(maxQuantity);
+      return;
+    }
+    setQuantity(newQuantity);
   }
 
+  const handleQuantityChange = (change: number) => {
+    setValidatedQuantity(quantity + change);
+  }
+  
   const handlePlaceOrder = (paymentMethod: 'cod' | 'online') => {
     toast({
         title: 'Order Placed!',
@@ -265,7 +270,13 @@ export default function OnlineOrderPage() {
                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
                                 <ChevronDown className="w-6 h-6"/>
                             </Button>
-                            <span className="text-4xl font-bold w-24 text-center">{quantity}</span>
+                            <Input 
+                                type="number"
+                                className="text-4xl font-bold w-24 h-auto text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                value={quantity}
+                                onChange={(e) => setValidatedQuantity(parseInt(e.target.value, 10))}
+                                min="1"
+                            />
                              <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
                                 <ChevronUp className="w-6 h-6"/>
                             </Button>

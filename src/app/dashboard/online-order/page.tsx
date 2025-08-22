@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'use-state';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart, Package, DollarSign, Zap } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';

@@ -224,7 +224,7 @@ export default function OnlineOrderPage() {
                         <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
                     </div>
                      <div className="text-sm">
-                        <p><span className="font-semibold">Quantity:</span> {quantity} tray(s) ({quantity * 30} pcs)</p>
+                        <p><span className="font-semibold">Quantity:</span> {quantity} tray(s) ({quantity * 30} eggs)</p>
                         <p><span className="font-semibold">Price per Tray:</span> ₹{product.pricePerTray.toFixed(2)}</p>
                     </div>
                 </div>
@@ -264,7 +264,7 @@ export default function OnlineOrderPage() {
 
                     <Separator/>
 
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                         <Label className="text-lg font-semibold block text-center">Select Quantity (Trays)</Label>
                         <div className="flex items-center justify-center gap-4">
                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
@@ -281,6 +281,9 @@ export default function OnlineOrderPage() {
                                 <ChevronUp className="w-6 h-6"/>
                             </Button>
                         </div>
+                        <p className="text-center text-muted-foreground text-sm">
+                            Total eggs: {quantity * 30}
+                        </p>
                     </div>
                     
                 </CardContent>

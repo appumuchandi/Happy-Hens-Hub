@@ -88,7 +88,7 @@ export default function PriceAndStockPage() {
                     <Input id="price-tray" type="number" value={product.pricePerTray.toFixed(2)} onChange={(e) => handleUpdate('pricePerTray', Number(e.target.value))} />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="stock">Available Eggs (pcs)</Label>
+                    <Label htmlFor="stock">Egg Stock (pcs)</Label>
                     <Input id="stock" type="number" defaultValue={product.availableQty} onChange={(e) => handleUpdate('availableQty', Number(e.target.value))} />
                 </div>
             </CardContent>

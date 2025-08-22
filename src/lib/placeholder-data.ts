@@ -98,7 +98,7 @@ export type OnlineOrder = {
   price: number; // price per tray at time of order
   totalAmount: number;
   status: 'pending' | 'accepted' | 'rejected' | 'delivered';
-  paymentStatus: 'paid' | 'pending';
+  paymentStatus: 'paid' | 'pending' | 'cod' | 'pending_payment';
   paymentMethod: 'online' | 'cod';
   createdAt: string;
 };
@@ -122,7 +122,7 @@ export const onlineOrdersData: OnlineOrder[] = [
     price: 150,
     totalAmount: 750,
     status: 'pending',
-    paymentStatus: 'pending',
+    paymentStatus: 'cod',
     paymentMethod: 'cod',
     createdAt: subDays(today, 1).toISOString()
   },
@@ -147,6 +147,17 @@ export const onlineOrdersData: OnlineOrder[] = [
     paymentStatus: 'paid',
     paymentMethod: 'online',
     createdAt: subDays(today, 3).toISOString()
+  },
+   { 
+    id: 'ORD7005', 
+    customer: 'Online Customer E',
+    quantity: 3,
+    price: 150,
+    totalAmount: 450,
+    status: 'pending',
+    paymentStatus: 'pending_payment',
+    paymentMethod: 'online',
+    createdAt: subDays(today, 0).toISOString()
   },
 ];
 

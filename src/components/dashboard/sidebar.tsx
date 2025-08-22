@@ -32,7 +32,7 @@ const navItems = [
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Place Order', dynamicLabel: {OWNER: 'Online Orders'}, icon: ShoppingCart, roles: ['VIEWER', 'OWNER'] },
+  { href: '/dashboard/online-order', label: 'Online Orders', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
   { href: '/dashboard/price-and-stock', label: 'Price & Stock', icon: Tag, roles: ['OWNER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
@@ -67,6 +67,13 @@ export default function AppSidebar() {
     sessionStorage.removeItem('cctvAuthenticated');
     logout();
   }
+  
+  const getLabel = (item: typeof navItems[0]) => {
+    if (userRole === 'VIEWER' && item.href === '/dashboard/online-order') {
+        return 'Place Order';
+    }
+    return item.label;
+  }
 
   const itemsToDisplay = userRole === 'VIEWER' ? customerNavItems : navItems;
 
@@ -95,7 +102,7 @@ export default function AppSidebar() {
                 )}
                 >
                 <item.icon className="h-5 w-5" />
-                <span>{item.dynamicLabel && userRole && item.dynamicLabel[userRole] ? item.dynamicLabel[userRole] : item.label}</span>
+                <span>{getLabel(item)}</span>
                 </Button>
             ) : null
             )}

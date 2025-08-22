@@ -20,11 +20,14 @@ import {
   ShoppingCart,
   Package,
   Tag,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import type { Role } from '@/types';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useTheme } from 'next-themes';
 
 const RupeeIcon = () => (
     <span className="h-4 w-4 font-bold">₹</span>
@@ -35,7 +38,7 @@ const navItems = [
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Place Order', dynamicLabel: {OWNER: 'Online Orders'}, icon: ShoppingCart, roles: ['VIEWER', 'OWNER'] },
+  { href: '/dashboard/online-order', label: 'Online Orders', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
   { href: '/dashboard/price-and-stock', label: 'Price & Stock', icon: Tag, roles: ['OWNER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
@@ -55,6 +58,7 @@ export default function AppHeader() {
   const { user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { setTheme, theme } = useTheme();
 
   const handleLinkClick = (href: string) => {
     if (pathname.startsWith('/dashboard/cctv') && !href.startsWith('/dashboard/cctv')) {
@@ -66,6 +70,13 @@ export default function AppHeader() {
   const handleLogout = () => {
     sessionStorage.removeItem('cctvAuthenticated');
     logout();
+  }
+  
+  const getLabel = (item: typeof navItems[0]) => {
+    if (user?.role === 'VIEWER' && item.href === '/dashboard/online-order') {
+        return 'Place Order';
+    }
+    return item.label;
   }
   
   const itemsToDisplay = user?.role === 'VIEWER' ? customerNavItems : navItems;
@@ -98,7 +109,7 @@ export default function AppHeader() {
                       )}
                     >
                       <item.icon className="h-4 w-4" />
-                      {item.dynamicLabel && user?.role && item.dynamicLabel[user.role] ? item.dynamicLabel[user.role] : item.label}
+                      {getLabel(item)}
                     </Link>
                   </SheetClose>
                 ) : null
@@ -108,6 +119,15 @@ export default function AppHeader() {
         </Sheet>
       </div>
       <div className="flex w-full items-center justify-end gap-4">
+        <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">

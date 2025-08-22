@@ -176,7 +176,7 @@ export default function CctvPage() {
                     )}
                     
                     {!otpSent ? (
-                        <Button onClick={handleSendOtp} disabled={!canSendOtp}>Send OTP</Button>
+                        <Button onClick={handleSendOtp} disabled={!canSendOtp}>Continue</Button>
                     ) : (
                         <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
                     )}
@@ -278,7 +278,7 @@ export default function CctvPage() {
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setOpenForgotPassword(false)}>Cancel</Button>
                     {step === 1 && showOtpButton && (
-                        <Button onClick={handleSendOtp}>Send OTP</Button>
+                        <Button onClick={handleSendOtp}>Continue</Button>
                     )}
                     {step === 2 && (
                         <Button onClick={handleResetPassword}>Reset Password</Button>
@@ -385,3 +385,4 @@ export default function CctvPage() {
   );
 }
 
+    

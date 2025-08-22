@@ -11,10 +11,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
+  role: z.enum(['OWNER', 'WORKER'], {
+    required_error: "You need to select a role.",
+  }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -32,8 +42,7 @@ export function LoginForm() {
   });
 
   function onSubmit(data: LoginFormValues) {
-    // Defaulting to OWNER role as the selection is removed
-    login('OWNER');
+    login(data.role);
     router.push('/dashboard');
   }
 
@@ -67,6 +76,27 @@ export function LoginForm() {
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a role to sign in" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="OWNER">Owner / Manager</SelectItem>
+                      <SelectItem value="WORKER">Worker</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

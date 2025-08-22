@@ -22,7 +22,7 @@ const RupeeIcon = () => (
   );
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
@@ -50,7 +50,7 @@ export default function AppSidebar() {
                 variant="ghost"
                 className={cn(
                   'w-full justify-start gap-2',
-                  pathname === item.href
+                  (pathname === item.href || (item.href === '/dashboard' && pathname.startsWith('/dashboard')))
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                     : 'hover:bg-accent/50 hover:text-foreground'
                 )}

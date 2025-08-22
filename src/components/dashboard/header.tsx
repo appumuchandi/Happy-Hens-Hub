@@ -26,7 +26,7 @@ const RupeeIcon = () => (
   );
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },

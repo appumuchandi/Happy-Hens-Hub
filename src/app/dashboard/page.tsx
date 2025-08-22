@@ -4,10 +4,16 @@ import { useAuth } from '@/hooks/use-auth';
 import StatCard from '@/components/dashboard/stat-card';
 import { dashboardStats } from '@/lib/placeholder-data';
 import { Egg, Users, LineChart, AlertTriangle } from 'lucide-react';
+import type { Role } from '@/types';
 
 const RupeeIcon = () => (
     <span className="h-5 w-5 font-bold">₹</span>
   );
+
+const userHasAccess = (role: Role | undefined, allowedRoles: Role[]) => {
+    if (!role) return false;
+    return allowedRoles.includes(role);
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -20,6 +26,10 @@ export default function DashboardPage() {
     salesRevenue,
     profit,
   } = dashboardStats;
+
+  if (!userHasAccess(user?.role, ['OWNER', 'WORKER', 'VIEWER'])) {
+    return <p className="text-destructive">You do not have permission to view this page.</p>;
+  }
 
   return (
     <div className="space-y-6">

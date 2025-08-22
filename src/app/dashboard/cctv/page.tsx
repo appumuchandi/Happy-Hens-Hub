@@ -109,7 +109,7 @@ export default function CctvPage() {
             return;
         }
         setOtpSent(true);
-        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent to ${user?.email}` });
+        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to ${user?.email}` });
     };
 
     const handlePasswordChange = () => {
@@ -215,18 +215,11 @@ export default function CctvPage() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [step, setStep] = useState(1);
-    const [showOtpButton, setShowOtpButton] = useState(false);
-
-    useEffect(() => {
-        if (newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4) {
-            setShowOtpButton(true);
-        } else {
-            setShowOtpButton(false);
-        }
-    }, [newPassword, confirmNewPassword]);
+    
+    const canContinue = newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4;
 
     const handleSendOtp = () => {
-        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent to ${email}` });
+        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to ${email}` });
         setStep(2);
     }
     
@@ -277,11 +270,10 @@ export default function CctvPage() {
                  </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setOpenForgotPassword(false)}>Cancel</Button>
-                    {step === 1 && showOtpButton && (
-                        <Button onClick={handleSendOtp}>Continue</Button>
-                    )}
-                    {step === 2 && (
-                        <Button onClick={handleResetPassword}>Reset Password</Button>
+                    {step === 1 ? (
+                        <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
+                    ) : (
+                        <Button onClick={handleResetPassword} disabled={otp.length < 6}>Reset Password</Button>
                     )}
                 </DialogFooter>
             </DialogContent>

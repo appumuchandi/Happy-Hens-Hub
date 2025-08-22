@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -12,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { eggCollectionData } from '@/lib/placeholder-data';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
+import { format } from 'date-fns';
 
 const eggCollectionSchema = z.object({
   quantity: z.coerce.number().int().positive('Quantity must be a positive number.'),
@@ -25,6 +27,7 @@ const RECORDS_PER_PAGE = 10;
 export default function EggCollectionPage() {
   const { toast } = useToast();
   const { user } = useAuth();
+  const [collectionHistory, setCollectionHistory] = useState(eggCollectionData);
   const [currentPage, setCurrentPage] = useState(1);
   const form = useForm<EggCollectionFormValues>({
     resolver: zodResolver(eggCollectionSchema),
@@ -39,6 +42,16 @@ export default function EggCollectionPage() {
   }
 
   function onSubmit(data: EggCollectionFormValues) {
+    const newRecord = {
+        id: `EGG${Date.now()}`,
+        date: format(new Date(), 'yyyy-MM-dd'),
+        quantity: data.quantity,
+        collector: user?.name || 'Unknown Worker',
+        batch: data.batch || 'N/A',
+    };
+
+    setCollectionHistory(prev => [newRecord, ...prev]);
+    
     toast({
       title: 'Success!',
       description: `Logged ${data.quantity} eggs.`,
@@ -46,8 +59,8 @@ export default function EggCollectionPage() {
     form.reset();
   }
 
-  const totalPages = Math.ceil(eggCollectionData.length / RECORDS_PER_PAGE);
-  const paginatedData = eggCollectionData.slice(
+  const totalPages = Math.ceil(collectionHistory.length / RECORDS_PER_PAGE);
+  const paginatedData = collectionHistory.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
     currentPage * RECORDS_PER_PAGE
   );

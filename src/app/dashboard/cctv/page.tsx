@@ -12,6 +12,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -99,14 +100,6 @@ export default function CctvPage() {
     const [newCameraLocation, setNewCameraLocation] = useState('');
 
     const handleSendOtp = () => {
-        if (newPassword.length < 4) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Password must be at least 4 characters.' });
-            return;
-        }
-        if (newPassword !== confirmPassword) {
-            toast({ variant: 'destructive', title: 'Error', description: 'Passwords do not match.' });
-            return;
-        }
         setOtpSent(true);
         toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to ${user?.email}` });
     };
@@ -158,25 +151,27 @@ export default function CctvPage() {
                 
                 <div className="space-y-4 py-2">
                     <h3 className="font-semibold text-lg">Change Password</h3>
-                    <div className="space-y-2">
-                        <Label htmlFor="new-password">New Password</Label>
-                        <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={otpSent}/>
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="confirm-password">Confirm New Password</Label>
-                        <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={otpSent}/>
-                    </div>
-
-                    {otpSent ? (
+                    {!otpSent ? (
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="new-password">New Password</Label>
+                                <Input id="new-password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                                <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                            </div>
+                            <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
+                        </>
+                    ) : (
                         <>
                             <div className="space-y-2">
                                 <Label htmlFor="otp-change">Enter OTP</Label>
+                                <p className="text-sm text-muted-foreground">An OTP has been sent to {user?.email}. Please enter it below.</p>
                                 <Input id="otp-change" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
                             </div>
                             <Button onClick={handlePasswordChange} disabled={otp.length < 6}>Save New Password</Button>
                         </>
-                    ) : (
-                        <Button onClick={handleSendOtp} disabled={!canContinue}>Continue</Button>
                     )}
                 </div>
 
@@ -378,5 +373,3 @@ export default function CctvPage() {
     </div>
   );
 }
-
-    

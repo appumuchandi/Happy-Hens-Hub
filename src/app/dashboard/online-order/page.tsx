@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, ChevronDown, ChevronUp } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';

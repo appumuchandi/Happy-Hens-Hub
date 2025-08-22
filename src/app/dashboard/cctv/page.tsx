@@ -183,7 +183,17 @@ export default function CctvPage() {
     const [email, setEmail] = useState(user?.email || '');
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [step, setStep] = useState(1);
+    const [showOtpButton, setShowOtpButton] = useState(false);
+
+    useEffect(() => {
+        if (newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4) {
+            setShowOtpButton(true);
+        } else {
+            setShowOtpButton(false);
+        }
+    }, [newPassword, confirmNewPassword]);
 
     const handleSendOtp = () => {
         toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent to ${email}` });
@@ -211,34 +221,36 @@ export default function CctvPage() {
                 <DialogHeader>
                     <DialogTitle>Reset CCTV Password</DialogTitle>
                     <DialogDescription>
-                        {step === 1 ? 'Enter your email to receive an OTP.' : 'Enter the OTP and your new password.'}
+                         {step === 1 ? 'Enter your email and new password to receive an OTP.' : 'Enter the OTP to finalize the reset.'}
                     </DialogDescription>
                 </DialogHeader>
                  <div className="space-y-4 py-4">
-                    {step === 1 && (
-                         <div className="space-y-2">
-                            <Label htmlFor="email">Owner's Email</Label>
-                            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        </div>
-                    )}
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Owner's Email</Label>
+                        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={step === 2}/>
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="new-password-reset">New Password</Label>
+                        <Input id="new-password-reset" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={step === 2} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="confirm-new-password-reset">Confirm New Password</Label>
+                        <Input id="confirm-new-password-reset" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} disabled={step === 2} />
+                    </div>
+
                     {step === 2 && (
-                        <>
-                            <div className="space-y-2">
-                                <Label htmlFor="otp">Enter OTP</Label>
-                                <Input id="otp" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="new-password-reset">New Password</Label>
-                                <Input id="new-password-reset" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                            </div>
-                        </>
+                        <div className="space-y-2">
+                            <Label htmlFor="otp">Enter OTP</Label>
+                            <Input id="otp" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                        </div>
                     )}
                  </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setOpenForgotPassword(false)}>Cancel</Button>
-                    {step === 1 ? (
+                    {step === 1 && showOtpButton && (
                         <Button onClick={handleSendOtp}>Send OTP</Button>
-                    ) : (
+                    )}
+                    {step === 2 && (
                         <Button onClick={handleResetPassword}>Reset Password</Button>
                     )}
                 </DialogFooter>
@@ -342,5 +354,7 @@ export default function CctvPage() {
     </div>
   );
 }
+
+    
 
     

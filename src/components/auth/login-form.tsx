@@ -22,7 +22,7 @@ import {
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
-  role: z.enum(['OWNER', 'WORKER'], {
+  role: z.enum(['OWNER', 'WORKER', 'VIEWER'], {
     required_error: "You need to select a role.",
   }),
 });
@@ -42,7 +42,7 @@ export function LoginForm() {
   });
 
   function onSubmit(data: LoginFormValues) {
-    login(data.role);
+    login(data.role as Role);
     router.push('/dashboard');
   }
 
@@ -51,7 +51,7 @@ export function LoginForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
-            <CardTitle className="font-headline text-2xl text-center">Welcome Back</CardTitle>
+            <CardTitle className="font-headline text-2xl text-center">Welcome</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <FormField
@@ -95,6 +95,7 @@ export function LoginForm() {
                     <SelectContent>
                       <SelectItem value="OWNER">Owner / Manager</SelectItem>
                       <SelectItem value="WORKER">Worker</SelectItem>
+                      <SelectItem value="VIEWER">Viewer</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

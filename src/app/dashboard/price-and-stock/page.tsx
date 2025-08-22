@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -51,7 +51,6 @@ export default function PriceAndStockPage() {
     });
   }
 
-
   return (
     <div className="space-y-6">
         <div>
@@ -62,24 +61,24 @@ export default function PriceAndStockPage() {
         </div>
         <Card>
             <CardHeader>
-                <CardTitle className="font-headline">Price and Stock Settings</CardTitle>
-                <CardDescription>Control your online store status, product pricing, and inventory.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <div className="space-y-2">
-                    <Label>Store Status</Label>
-                    <div className="flex items-center space-x-2">
+                <div className="flex justify-between items-center">
+                    <div>
+                        <CardTitle className="font-headline">Price and Stock Settings</CardTitle>
+                        <CardDescription>Control your online store status, product pricing, and inventory.</CardDescription>
+                    </div>
+                     <div className="flex items-center space-x-2">
                         <Switch
                             id="store-status"
                             checked={isStoreActive}
                             onCheckedChange={setIsStoreActive}
                         />
-                        <Label htmlFor="store-status" className="text-sm text-muted-foreground">
-                            {isStoreActive ? 'Active' : 'Inactive'}
+                        <Label htmlFor="store-status" className="text-sm">
+                            {isStoreActive ? 'Store Active' : 'Store Inactive'}
                         </Label>
                     </div>
-                    <p className="text-xs text-muted-foreground">Toggle your online store on or off.</p>
                 </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
                 <div className="space-y-2">
                     <Label htmlFor="price-egg">Price Per Egg (₹)</Label>
                     <Input id="price-egg" type="number" value={product.pricePerEgg.toFixed(2)} onChange={(e) => handleUpdate('pricePerEgg', Number(e.target.value))} />

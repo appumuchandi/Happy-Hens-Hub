@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, ChevronDown, ChevronUp, QrCode } from 'lucide-react';
+import { ShoppingCart, Package, DollarSign, PackageCheck, PackageX, ChevronDown, ChevronUp, QrCode, BellRing, Info } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export default function OnlineOrderPage() {
   const { user } = useAuth();
@@ -34,6 +35,7 @@ export default function OnlineOrderPage() {
   const [total, setTotal] = useState(0);
   const [openCheckout, setOpenCheckout] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'initial' | 'qr'>('initial');
+  const [showNotifyMe, setShowNotifyMe] = useState(false);
   
   const availableTrays = Math.floor(product.availableQty / 30);
   const isOutOfStock = availableTrays <= 0;
@@ -52,21 +54,25 @@ export default function OnlineOrderPage() {
   }
   
   const setValidatedQuantity = (newQuantityStr: string) => {
+    setShowNotifyMe(false);
     if (newQuantityStr === '') {
         setQuantity('');
         return;
     }
     const newQuantity = parseInt(newQuantityStr, 10);
 
-    if (isNaN(newQuantity) || newQuantity < 1) {
-      setQuantity(1);
-      return;
+    if (isNaN(newQuantity)) {
+        setQuantity('');
+        return;
+    }
+
+     if (newQuantity < 1) {
+        setQuantity(1);
+        return;
     }
     
     if (newQuantity > availableTrays) {
-      toast({ variant: 'destructive', title: `Maximum stock is ${availableTrays} trays` });
-      setQuantity(availableTrays);
-      return;
+      setShowNotifyMe(true);
     }
     setQuantity(newQuantity);
   }
@@ -93,7 +99,7 @@ export default function OnlineOrderPage() {
 
       setOrders(prev => [newOrder, ...prev]);
       
-      // Simulate stock reservation
+      // Simulate stock reservation only for online payments before they are "verified" by owner
       if(paymentMethod === 'online'){
         setProduct(p => ({...p, availableQty: p.availableQty - (quantity * 30)}));
       }
@@ -107,6 +113,16 @@ export default function OnlineOrderPage() {
       setCheckoutStep('initial');
       setQuantity('');
   }
+
+  const handleNotifyMe = () => {
+    toast({
+        title: 'Request Received!',
+        description: "We'll notify you when your requested stock is available."
+    });
+    setShowNotifyMe(false);
+    setQuantity('');
+  }
+
 
   // --- OWNER VIEW ---
   if (user?.role === 'OWNER') {
@@ -129,8 +145,8 @@ export default function OnlineOrderPage() {
                    }
                    toast({ title: 'Order Approved!', description: 'Stock has been updated.' });
                 } else if (status === 'rejected') {
-                    // Restore stock if a pending order is rejected
-                    if(o.paymentStatus !== 'cod') {
+                    // Restore stock if a pending online order is rejected before verification
+                    if(o.paymentMethod === 'online') {
                         setProduct(p => ({...p, availableQty: p.availableQty + (o.quantity * 30)}));
                     }
                     toast({ title: 'Order Rejected', description: 'Stock has been restored.' });
@@ -355,7 +371,7 @@ export default function OnlineOrderPage() {
                                 placeholder="0"
                                 disabled={isOutOfStock}
                             />
-                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)} disabled={isOutOfStock || Number(quantity) >= availableTrays}>
+                             <Button variant="outline" size="icon" onClick={() => handleQuantityChange(1)} disabled={isOutOfStock}>
                                 <ChevronUp className="w-6 h-6"/>
                             </Button>
                         </div>
@@ -363,6 +379,17 @@ export default function OnlineOrderPage() {
                             Total eggs: {Number(quantity || 0) * 30}
                         </p>
                     </div>
+
+                    {showNotifyMe && (
+                        <Alert variant="default" className="border-primary/50 text-primary">
+                            <Info className="h-4 w-4 !text-primary" />
+                            <AlertTitle>Low Stock!</AlertTitle>
+                            <AlertDescription className="text-primary/90">
+                                Only {availableTrays} trays are available. Would you like to be notified when more stock arrives?
+                                <Button variant="link" className="p-0 h-auto ml-2 text-primary" onClick={handleNotifyMe}>Notify Me</Button>
+                            </AlertDescription>
+                        </Alert>
+                    )}
                     
                 </CardContent>
                 <CardFooter className="flex-col gap-4">
@@ -370,7 +397,7 @@ export default function OnlineOrderPage() {
                         <span className="font-semibold text-lg">Total</span>
                         <span className="font-bold text-2xl text-primary">₹{total.toFixed(2)}</span>
                     </div>
-                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock || !quantity}>
+                    <Button size="lg" className="w-full" onClick={() => setOpenCheckout(true)} disabled={isOutOfStock || !quantity || showNotifyMe}>
                         <ShoppingCart className="mr-2"/> Place Order
                     </Button>
                 </CardFooter>
@@ -379,3 +406,5 @@ export default function OnlineOrderPage() {
     </div>
   );
 }
+
+    

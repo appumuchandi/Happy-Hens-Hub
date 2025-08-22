@@ -14,6 +14,7 @@ import {
   Boxes,
   Users,
   Archive,
+  Video,
 } from 'lucide-react';
 import type { Role } from '@/types';
 
@@ -28,6 +29,7 @@ const navItems = [
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
+  { href: '/dashboard/cctv', label: 'CCTV', icon: Video, roles: ['OWNER'] },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
 ];
 
@@ -50,10 +52,11 @@ export default function AppSidebar() {
                 variant="ghost"
                 className={cn(
                   'w-full justify-start gap-2',
-                  (pathname === item.href || (item.href === '/dashboard' && pathname.startsWith('/dashboard')))
+                  (pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/dashboard'))
                     ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
                     : 'hover:bg-accent/50 hover:text-foreground'
                 )}
+                 isActive={pathname.startsWith(item.href)}
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.label}</span>

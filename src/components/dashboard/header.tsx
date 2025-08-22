@@ -15,6 +15,7 @@ import {
   Boxes,
   Users,
   Archive,
+  Video,
 } from 'lucide-react';
 import type { Role } from '@/types';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -32,6 +33,7 @@ const navItems = [
   { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
+  { href: '/dashboard/cctv', label: 'CCTV', icon: Video, roles: ['OWNER'] },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
 ];
 

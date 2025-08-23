@@ -24,7 +24,7 @@ import {
   Sun,
 } from 'lucide-react';
 import type { Role } from '@/types';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
@@ -92,6 +92,9 @@ export default function AppHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="flex flex-col bg-card">
+            <SheetHeader>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            </SheetHeader>
             <nav className="grid gap-2 text-lg font-medium">
               <Link href="#" className="flex items-center gap-2 text-lg font-semibold mb-4">
                  <Boxes className="h-6 w-6 text-primary" />

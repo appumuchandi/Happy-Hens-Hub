@@ -29,7 +29,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 
 function LandingPageContent() {
-    const { isAuthenticated, login } = useAuth();
+    const { isAuthenticated, login, user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
@@ -59,7 +59,7 @@ function LandingPageContent() {
     
     function onLoginSubmit(data: LoginFormValues) {
         if (data.email === 'owner@henshub.com' && data.password === 'appu1234') {
-            login();
+            login({ name: 'appu_muchandi', email: 'owner@henshub.com', role: 'OWNER' });
             router.push('/dashboard');
         } else {
             toast({

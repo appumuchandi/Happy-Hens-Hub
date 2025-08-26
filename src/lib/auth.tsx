@@ -1,24 +1,19 @@
+
 'use client';
 
 import type { ReactNode } from 'react';
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import type { User, Role } from '@/types';
+import type { User } from '@/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoaded: boolean;
   user: User | null;
-  login: () => void;
+  login: (user: User) => void;
   logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const ownerUser: User = {
-  name: 'appu_muchandi',
-  email: 'owner@henshub.com',
-  role: 'OWNER',
-};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -38,9 +33,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = () => {
-    setUser(ownerUser);
-    localStorage.setItem('user', JSON.stringify(ownerUser));
+  const login = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    localStorage.setItem('user', JSON.stringify(loggedInUser));
   };
 
   const logout = () => {

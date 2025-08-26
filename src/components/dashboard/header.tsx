@@ -17,7 +17,6 @@ import {
   Users,
   Archive,
   Video,
-  ShoppingCart,
   Settings,
   Moon,
   Sun,
@@ -33,7 +32,6 @@ const RupeeIcon = () => (
 
 const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
-  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart },

@@ -23,6 +23,7 @@ export default function DashboardPage() {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
+  const [salesHistory, setSalesHistory] = useState<any[]>([]);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -37,13 +38,17 @@ export default function DashboardPage() {
         if (storedSettings) {
             setSettings(JSON.parse(storedSettings));
         }
+
+        const storedSales = localStorage.getItem('salesHistory');
+        if (storedSales) {
+            setSalesHistory(JSON.parse(storedSales));
+        }
     }
   }, []);
-
-  const pendingOrders = orders.filter(o => o.status === 'pending').length;
-  const todaysRevenue = orders
-    .filter(o => new Date(o.timestamp).toDateString() === new Date().toDateString() && (o.status === 'accepted' || o.status === 'delivered'))
-    .reduce((acc, o) => acc + o.qty * settings.pricePerEgg, 0);
+  
+  const todaysRevenue = salesHistory
+    .filter(o => new Date(o.date).toDateString() === new Date().toDateString())
+    .reduce((acc, o) => acc + parseFloat(o.revenue), 0);
 
 
   if (!user) {
@@ -61,17 +66,11 @@ export default function DashboardPage() {
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-         <StatCard
-          title="Pending Orders"
-          value={pendingOrders}
-          icon={ShoppingCart}
-          description="New orders awaiting confirmation"
-        />
         <StatCard
-          title="Today's Sales Revenue"
+          title="Today's Manual Sales Revenue"
           value={`₹${todaysRevenue.toFixed(2)}`}
           icon={RupeeIcon}
-          description="Total revenue from confirmed orders"
+          description="Total revenue from recorded manual sales"
           color="sky"
         />
         <StatCard

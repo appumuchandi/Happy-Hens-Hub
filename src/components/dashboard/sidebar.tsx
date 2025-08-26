@@ -17,10 +17,9 @@ import {
   Archive,
   Video,
   ShoppingCart,
-  Package,
+  Settings,
   Tag,
 } from 'lucide-react';
-import type { Role } from '@/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const RupeeIcon = () => (
@@ -28,36 +27,26 @@ const RupeeIcon = () => (
   );
 
 const navItems = [
-  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
-  { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Online Orders', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
-  { href: '/dashboard/price-and-stock', label: 'Price & Stock', icon: Tag, roles: ['OWNER'] },
-  { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
-  { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
-  { href: '/dashboard/cctv', label: 'CCTV', icon: Video, roles: ['OWNER'] },
-  { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
+  { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
+  { href: '/dashboard/reports', label: 'Reports', icon: LineChart },
+  { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users },
+  { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
+  { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
+  { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
+  { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
 ];
 
-const customerNavItems = [
-  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['VIEWER'] },
-  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER'] },
-];
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
-  const userRole = user?.role;
+  const { logout } = useAuth();
   
   const handleLinkClick = (href: string) => {
-    // If navigating away from the CCTV section, clear the session auth
-    if (!pathname.startsWith('/dashboard/cctv') && href.startsWith('/dashboard/cctv')) {
-      // This case is handled by the CCTV page itself on load
-    } else if (pathname.startsWith('/dashboard/cctv') && !href.startsWith('/dashboard/cctv')) {
+    if (pathname.startsWith('/dashboard/cctv') && !href.startsWith('/dashboard/cctv')) {
       sessionStorage.removeItem('cctvAuthenticated');
     }
     router.push(href);
@@ -67,29 +56,18 @@ export default function AppSidebar() {
     sessionStorage.removeItem('cctvAuthenticated');
     logout();
   }
-  
-  const getLabel = (item: typeof navItems[0]) => {
-    if (userRole === 'VIEWER' && item.href === '/dashboard/online-order') {
-        return 'Place Order';
-    }
-    return item.label;
-  }
-
-  const itemsToDisplay = userRole === 'VIEWER' ? customerNavItems : navItems;
-
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border">
        <div className="p-4">
-        <div className="flex items-center gap-2 mb-8">
+        <Link href="/dashboard" className="flex items-center gap-2 mb-8">
             <Boxes className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold font-headline text-foreground">HEN's HUB</h1>
-        </div>
+        </Link>
       </div>
       <ScrollArea className="flex-1 px-4">
         <nav className="flex flex-col space-y-2">
-            {itemsToDisplay.map((item) =>
-            item.roles.includes(userRole as Role) ? (
+            {navItems.map((item) =>
                 <Button
                 key={item.href}
                 variant="ghost"
@@ -102,9 +80,8 @@ export default function AppSidebar() {
                 )}
                 >
                 <item.icon className="h-5 w-5" />
-                <span>{getLabel(item)}</span>
+                <span>{item.label}</span>
                 </Button>
-            ) : null
             )}
         </nav>
       </ScrollArea>

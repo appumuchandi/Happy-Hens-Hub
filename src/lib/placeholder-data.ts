@@ -14,21 +14,9 @@ export const dashboardStats = {
 };
 
 const today = new Date();
-export const eggCollectionData = Array.from({ length: 30 }, (_, i) => ({
-  id: `EGG${1001 + i}`,
-  date: format(subDays(today, i), 'yyyy-MM-dd'),
-  quantity: Math.floor(400 + Math.random() * 100),
-  collector: i % 3 === 0 ? 'Worker 1' : 'Worker 2',
-  batch: `B${101 + (i % 5)}`,
-}));
+export const eggCollectionData: any[] = [];
 
-export const salesData = Array.from({ length: 50 }, (_, i) => ({
-  id: `SALE${2001 + i}`,
-  date: format(subDays(today, Math.floor(i / 2)), 'yyyy-MM-dd'),
-  buyerName: `Customer ${String.fromCharCode(65 + (i % 10))}`,
-  quantity: Math.floor(1 + Math.random() * 5) * 30, // in pieces (1-5 trays)
-  revenue: (Math.floor(1 + Math.random() * 5) * 30 * 0.35).toFixed(2),
-}));
+export const salesData: any[] = [];
 
 export const feedData = Array.from({ length: 30 }, (_, i) => ({
     date: format(subDays(today, i), 'yyyy-MM-dd'),
@@ -80,98 +68,93 @@ export const batchData = Array.from({ length: 5 }, (_, i) => ({
   ]
 }));
 
-// --- New Data for Online Ordering ---
+
+// --- New Firestore-like Structures ---
+
+export type SiteSettings = {
+    pricePerEgg: number;
+    availableStock: number;
+    qrCodeUrl: string;
+    upiId: string;
+    contactInfo: string;
+    address: string;
+    aboutFarm: string;
+};
+
+export const siteSettings: SiteSettings = {
+    pricePerEgg: 6,
+    availableStock: 5000,
+    qrCodeUrl: 'https://placehold.co/200x200.png',
+    upiId: 'owner@upi',
+    contactInfo: '+91 98765 43210',
+    address: 'Hens Hub Farm, Ruralville, Agri-State',
+    aboutFarm: `Welcome to HEN's HUB, a family-owned farm dedicated to ethical and sustainable poultry farming. 
+    Our hens are raised in a free-range environment, ensuring they lead happy, healthy lives. 
+    We believe that the quality of our eggs is a direct reflection of the care our hens receive. 
+    We avoid antibiotics and hormones, providing our flock with natural, high-quality feed. 
+    Thank you for supporting local farming and choosing eggs that are as wholesome as they are delicious.`
+};
+
+export type Order = {
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+  qty: number;
+  paymentMode: 'ONLINE' | 'COD';
+  paymentStatus: 'PAID' | 'PENDING';
+  status: 'pending' | 'accepted' | 'rejected' | 'delivered';
+  timestamp: string;
+};
+
+
+// Sample orders, this will now be managed in-app
+export const onlineOrdersData: Order[] = [
+    {
+        id: 'ORD1672531200000',
+        name: 'John Doe',
+        phone: '+1-202-555-0104',
+        address: '123 Farm Road, Countryside',
+        qty: 60,
+        paymentMode: 'ONLINE',
+        paymentStatus: 'PAID',
+        status: 'delivered',
+        timestamp: '2023-01-01T12:00:00Z',
+    },
+    {
+        id: 'ORD1675209600000',
+        name: 'Jane Smith',
+        phone: '+1-202-555-0182',
+        address: '456 Meadow Lane, Greenfield',
+        qty: 30,
+        paymentMode: 'COD',
+        paymentStatus: 'PENDING',
+        status: 'accepted',
+        timestamp: '2023-02-01T12:00:00Z',
+    },
+     {
+        id: 'ORD1677628800000',
+        name: 'Local Cafe',
+        phone: '+1-202-555-0153',
+        address: '789 Market St, Townsville',
+        qty: 300,
+        paymentMode: 'ONLINE',
+        paymentStatus: 'PAID',
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+    },
+];
+
+// Deprecated data structures below for reference, to be removed or updated.
 
 export const productData = {
   id: 'PROD_EGGS_01',
   name: 'Egg Tray',
-  pricePerTray: 150,
-  availableQty: 1500, // in pieces
+  pricePerTray: 180, // 30 eggs * 6
+  availableQty: 5000, // in pieces
   lastUpdated: subDays(today, 1).toISOString(),
   updatedBy: 'Farm Owner',
 };
-
-export type OnlineOrder = {
-  id: string;
-  customer: string;
-  quantity: number; // in trays
-  price: number; // price per tray at time of order
-  totalAmount: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'delivered';
-  paymentStatus: 'paid' | 'cod' | 'pending_payment';
-  paymentMethod: 'online' | 'cod';
-  createdAt: string;
-};
-
-export const onlineOrdersData: OnlineOrder[] = [
-  { 
-    id: 'ORD7001', 
-    customer: 'Customer',
-    quantity: 2,
-    price: 150,
-    totalAmount: 300,
-    status: 'pending',
-    paymentStatus: 'paid',
-    paymentMethod: 'online',
-    createdAt: subDays(today, 0).toISOString()
-  },
-  { 
-    id: 'ORD7002', 
-    customer: 'Online Customer B',
-    quantity: 5,
-    price: 150,
-    totalAmount: 750,
-    status: 'pending',
-    paymentStatus: 'cod',
-    paymentMethod: 'cod',
-    createdAt: subDays(today, 1).toISOString()
-  },
-  { 
-    id: 'ORD7003',
-    customer: 'Customer',
-    quantity: 1,
-    price: 145,
-    totalAmount: 145,
-    status: 'accepted',
-    paymentStatus: 'paid',
-    paymentMethod: 'online',
-    createdAt: subDays(today, 2).toISOString()
-  },
-    { 
-    id: 'ORD7004',
-    customer: 'Online Customer D',
-    quantity: 10,
-    price: 145,
-    totalAmount: 1450,
-    status: 'delivered',
-    paymentStatus: 'paid',
-    paymentMethod: 'online',
-    createdAt: subDays(today, 3).toISOString()
-  },
-   { 
-    id: 'ORD7005', 
-    customer: 'Online Customer E',
-    quantity: 3,
-    price: 150,
-    totalAmount: 450,
-    status: 'pending',
-    paymentStatus: 'pending_payment',
-    paymentMethod: 'online',
-    createdAt: subDays(today, 0).toISOString()
-  },
-   { 
-    id: 'ORD7006', 
-    customer: 'Online Customer F',
-    quantity: 1,
-    price: 150,
-    totalAmount: 150,
-    status: 'rejected',
-    paymentStatus: 'cod',
-    paymentMethod: 'cod',
-    createdAt: subDays(today, 1).toISOString()
-  },
-];
-
 
 export const paymentSettings = {
     upiId: 'owner@upi',

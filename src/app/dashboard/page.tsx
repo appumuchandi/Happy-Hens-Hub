@@ -3,78 +3,53 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import StatCard from '@/components/dashboard/stat-card';
-import { dashboardStats, productData } from '@/lib/placeholder-data';
+import { dashboardStats, siteSettings as defaultSettings, onlineOrdersData } from '@/lib/placeholder-data';
 import { Egg, Users, LineChart, AlertTriangle, ShoppingCart } from 'lucide-react';
-import type { Role } from '@/types';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import type { Role, Order, SiteSettings } from '@/types';
+import { useEffect, useState } from 'react';
 
 const RupeeIcon = () => (
     <span className="h-5 w-5 font-bold">₹</span>
   );
 
-const userHasAccess = (role: Role | undefined, allowedRoles: Role[]) => {
-    if (!role) return false;
-    return allowedRoles.includes(role);
-}
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const router = useRouter();
   const {
     dailyEggCount,
-    weeklyEggCount,
-    monthlyEggCount,
     henCount,
     feedConsumption,
-    salesRevenue,
-    profit,
   } = dashboardStats;
 
-  if (!userHasAccess(user?.role, ['OWNER', 'WORKER', 'VIEWER'])) {
-    return <p className="text-destructive">You do not have permission to view this page.</p>;
-  }
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   
-  // --- Customer (Viewer) Dashboard ---
-  if (user?.role === 'VIEWER') {
-    const availableTrays = Math.floor(productData.availableQty / 30);
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold font-headline">
-                Welcome, {user?.name}!
-                </h1>
-                <p className="text-muted-foreground">
-                Fresh eggs, straight from the farm to you.
-                </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-                 <StatCard
-                    title="Current Price"
-                    value={`₹${productData.pricePerTray}`}
-                    icon={RupeeIcon}
-                    description="per tray (30 eggs)"
-                    color="saffron"
-                />
-                 <StatCard
-                    title="Available Stock"
-                    value={`${availableTrays} trays`}
-                    icon={Egg}
-                    description={`${productData.availableQty} eggs available`}
-                    color="sky"
-                />
-            </div>
-             <div className="text-center">
-                <Button size="lg" onClick={() => router.push('/dashboard/online-order')}>
-                    <ShoppingCart className="mr-2"/>
-                    Order Now
-                </Button>
-            </div>
-        </div>
-    )
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const storedOrders = localStorage.getItem('orders');
+        if (storedOrders) {
+            setOrders(JSON.parse(storedOrders));
+        } else {
+            setOrders(onlineOrdersData);
+        }
+
+        const storedSettings = localStorage.getItem('siteSettings');
+        if (storedSettings) {
+            setSettings(JSON.parse(storedSettings));
+        }
+    }
+  }, []);
+
+  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+  const todaysRevenue = orders
+    .filter(o => new Date(o.timestamp).toDateString() === new Date().toDateString() && (o.status === 'accepted' || o.status === 'delivered'))
+    .reduce((acc, o) => acc + o.qty * settings.pricePerEgg, 0);
+
+
+  if (!user) {
+    return <p className="text-destructive">You must be logged in to view this page.</p>;
   }
 
-  // --- Owner & Worker Dashboard ---
   return (
     <div className="space-y-6">
       <div>
@@ -86,44 +61,25 @@ export default function DashboardPage() {
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          title="Daily Egg Collection"
-          value={dailyEggCount.toLocaleString()}
-          icon={Egg}
-          description="Total eggs collected today"
+         <StatCard
+          title="Pending Orders"
+          value={pendingOrders}
+          icon={ShoppingCart}
+          description="New orders awaiting confirmation"
         />
         <StatCard
-          title="Weekly Egg Collection"
-          value={weeklyEggCount.toLocaleString()}
-          icon={Egg}
-          description="Total eggs this week"
+          title="Today's Sales Revenue"
+          value={`₹${todaysRevenue.toFixed(2)}`}
+          icon={RupeeIcon}
+          description="Total revenue from confirmed orders"
           color="sky"
         />
         <StatCard
-            title="Monthly Egg Count"
-            value={monthlyEggCount.toLocaleString()}
+            title="Available Egg Stock"
+            value={settings.availableStock.toLocaleString()}
             icon={Egg}
-            description="Total eggs this month"
+            description="Total eggs available to sell"
         />
-
-        {(user?.role === 'OWNER' || user?.role === 'WORKER') && (
-          <StatCard
-            title="Daily Sales Revenue"
-            value={`₹${salesRevenue.toFixed(2)}`}
-            icon={RupeeIcon}
-            description="Total revenue today"
-          />
-        )}
-
-        {user?.role === 'OWNER' && (
-          <StatCard
-            title="Estimated Profit"
-            value={`₹${profit.toFixed(2)}`}
-            icon={RupeeIcon}
-            description="Today's estimated profit"
-            color="sky"
-          />
-        )}
 
         <StatCard
           title="Active Hen Count"
@@ -140,15 +96,13 @@ export default function DashboardPage() {
           color="sky"
         />
         
-        {user?.role === 'OWNER' && (
-           <StatCard
+        <StatCard
             title="System Alert"
             value="Low Feed Stock"
             icon={AlertTriangle}
             description="Feed level below 20%"
             color="red"
           />
-        )}
       </div>
     </div>
   );

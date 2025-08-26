@@ -7,16 +7,18 @@ import { useAuth } from '@/hooks/use-auth';
 import { workersData } from '@/lib/placeholder-data';
 import { Users, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function WorkersPage() {
   const { user } = useAuth();
+  const router = useRouter();
   
-  if (user?.role !== 'OWNER') {
-    return <p className="text-destructive">You do not have permission to view this page.</p>;
+  if (!user) {
+    return <p className="text-destructive">You must be logged in to view this page.</p>;
   }
 
   const handleBiometricSync = () => {
-    window.open('/dashboard/kiosk-setup', '_blank');
+    router.push('/dashboard/kiosk-setup');
   };
 
   return (
@@ -51,7 +53,7 @@ export default function WorkersPage() {
           <CardHeader>
             <CardTitle className="font-headline">Worker Records</CardTitle>
             <CardDescription>Detailed information of all workers for the current month.</CardDescription>
-          </CardHeader>
+          </Header>
           <CardContent>
              <div className="border rounded-md">
               <Table>

@@ -1,28 +1,30 @@
+
 'use client';
 
 import type { ReactNode } from 'react';
-import React, { createContext, useState, useEffect } from 'react';
+import React, from 'react';
+import { createContext, useState, useEffect } from 'react';
 import type { User, Role } from '@/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  isLoaded: boolean; // To track if the initial auth check is complete
+  isLoaded: boolean;
   user: User | null;
-  login: (role: Role) => void;
+  login: () => void;
   logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mockUsers: Record<Role, User> = {
-  OWNER: { name: 'Farm Owner', email: 'owner@henshub.com', role: 'OWNER' },
-  WORKER: { name: 'Farm Worker', email: 'worker@henshub.com', role: 'WORKER' },
-  VIEWER: { name: 'Customer', email: 'customer@henshub.com', role: 'VIEWER' },
+const ownerUser: User = {
+  name: 'Farm Owner',
+  email: 'owner@henshub.com',
+  role: 'OWNER',
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false); // New state to track loading
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     try {
@@ -34,14 +36,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Failed to parse user from localStorage', error);
       localStorage.removeItem('user');
     } finally {
-      setIsLoaded(true); // Mark as loaded after checking localStorage
+      setIsLoaded(true);
     }
   }, []);
 
-  const login = (role: Role) => {
-    const userToLogin = mockUsers[role];
-    setUser(userToLogin);
-    localStorage.setItem('user', JSON.stringify(userToLogin));
+  const login = () => {
+    setUser(ownerUser);
+    localStorage.setItem('user', JSON.stringify(ownerUser));
   };
 
   const logout = () => {

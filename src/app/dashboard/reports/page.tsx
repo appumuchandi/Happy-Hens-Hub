@@ -1,18 +1,19 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
-import { eggCollectionData, salesData } from '@/lib/placeholder-data';
+import { eggCollectionData as defaultEggData, salesData as defaultSalesData } from '@/lib/placeholder-data';
 import { subDays, format, getMonth, parseISO } from 'date-fns';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type TimeRange = 'daily' | 'monthly';
 
-const processChartData = (range: TimeRange) => {
+const processChartData = (range: TimeRange, eggCollectionData: any[], salesData: any[]) => {
   if (range === 'monthly') {
     const monthlyData: { [key: string]: { eggs: number; sales: number } } = {};
     const monthLabels = Array.from({ length: 12 }, (_, i) => format(new Date(0, i), 'MMM'));
@@ -26,7 +27,7 @@ const processChartData = (range: TimeRange) => {
         const month = getMonth(date);
         const monthLabel = monthLabels[month];
         
-        if ('quantity' in d) {
+        if ('quantity' in d && 'collector' in d) { // Differentiate egg collection
             monthlyData[monthLabel].eggs += d.quantity;
         }
         if ('revenue' in d) {
@@ -69,15 +70,28 @@ const processChartData = (range: TimeRange) => {
 export default function ReportsPage() {
   const { user } = useAuth();
   const [timeRange, setTimeRange] = useState<TimeRange>('daily');
-  const chartData = processChartData(timeRange);
+  const [eggData, setEggData] = useState<any[]>([]);
+  const [salesData, setSalesData] = useState<any[]>([]);
+  
+  useEffect(() => {
+     if (typeof window !== 'undefined') {
+        const storedEggData = localStorage.getItem('eggCollectionHistory');
+        setEggData(storedEggData ? JSON.parse(storedEggData) : defaultEggData);
+
+        const storedSalesData = localStorage.getItem('salesHistory');
+        setSalesData(storedSalesData ? JSON.parse(storedSalesData) : defaultSalesData);
+     }
+  }, []);
+
+  const chartData = processChartData(timeRange, eggData, salesData);
   
   const chartTitleSuffix = {
     daily: 'Last 7 Days',
     monthly: 'This Year'
   }
 
-  if (user?.role === 'VIEWER') {
-    return <p className="text-destructive">You do not have permission to view this page.</p>;
+  if (!user) {
+    return <p className="text-destructive">You must be logged in to view this page.</p>;
   }
   
   return (
@@ -94,12 +108,10 @@ export default function ReportsPage() {
                         <TabsTrigger value="monthly">Monthly</TabsTrigger>
                     </TabsList>
                 </Tabs>
-                {user?.role === 'OWNER' && (
-                    <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                    </Button>
-                )}
+                <Button>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                </Button>
             </div>
         </div>
       <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
@@ -125,7 +137,7 @@ export default function ReportsPage() {
         <Card className="saffron-border">
           <CardHeader>
             <CardTitle className="font-headline">Sales Revenue (₹)</CardTitle>
-            <CardDescription>Total sales revenue for: {chartTitleSuffix[timeRange]}</CardDescription>
+            <CardDescription>Total manual sales revenue for: {chartTitleSuffix[timeRange]}</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={{}} className="h-[300px] w-full">

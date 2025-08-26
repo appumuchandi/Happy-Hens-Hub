@@ -18,12 +18,10 @@ import {
   Archive,
   Video,
   ShoppingCart,
-  Package,
-  Tag,
+  Settings,
   Moon,
   Sun,
 } from 'lucide-react';
-import type { Role } from '@/types';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -34,25 +32,17 @@ const RupeeIcon = () => (
   );
 
 const navItems = [
-  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['OWNER', 'WORKER', 'VIEWER'] },
-  { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Online Orders', icon: ShoppingCart, roles: ['OWNER', 'VIEWER'] },
-  { href: '/dashboard/price-and-stock', label: 'Price & Stock', icon: Tag, roles: ['OWNER'] },
-  { href: '/dashboard/batch-records', label: 'Batch Records', icon: Archive, roles: ['OWNER'] },
-  { href: '/dashboard/reports', label: 'Reports', icon: LineChart, roles: ['OWNER', 'WORKER'] },
-  { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users, roles: ['OWNER'] },
-  { href: '/dashboard/cctv', label: 'CCTV', icon: Video, roles: ['OWNER'] },
-  { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit, roles: ['OWNER'] },
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
+  { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
+  { href: '/dashboard/reports', label: 'Reports', icon: LineChart },
+  { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users },
+  { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
+  { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
+  { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
+  { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
 ];
-
-const customerNavItems = [
-  { href: '/dashboard', label: 'Home', icon: LayoutDashboard, roles: ['VIEWER'] },
-  { href: '/dashboard/my-orders', label: 'My Orders', icon: Package, roles: ['VIEWER'] },
-  { href: '/dashboard/online-order', label: 'Place Order', icon: ShoppingCart, roles: ['VIEWER'] },
-];
-
 
 export default function AppHeader() {
   const { user, logout } = useAuth();
@@ -71,15 +61,6 @@ export default function AppHeader() {
     sessionStorage.removeItem('cctvAuthenticated');
     logout();
   }
-  
-  const getLabel = (item: typeof navItems[0]) => {
-    if (user?.role === 'VIEWER' && item.href === '/dashboard/online-order') {
-        return 'Place Order';
-    }
-    return item.label;
-  }
-  
-  const itemsToDisplay = user?.role === 'VIEWER' ? customerNavItems : navItems;
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-card px-4 md:px-6">
@@ -92,16 +73,15 @@ export default function AppHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="flex flex-col bg-card">
-            <SheetHeader>
+             <SheetHeader>
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            </SheetHeader>
+              </SheetHeader>
             <nav className="grid gap-2 text-lg font-medium">
-              <Link href="#" className="flex items-center gap-2 text-lg font-semibold mb-4">
+              <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold mb-4">
                  <Boxes className="h-6 w-6 text-primary" />
                  <span className="font-headline">HEN's HUB</span>
               </Link>
-              {itemsToDisplay.map((item) =>
-                item.roles.includes(user?.role as Role) ? (
+              {navItems.map((item) =>
                   <SheetClose asChild key={item.href}>
                     <Link
                       href={item.href}
@@ -112,10 +92,9 @@ export default function AppHeader() {
                       )}
                     >
                       <item.icon className="h-4 w-4" />
-                      {getLabel(item)}
+                      {item.label}
                     </Link>
                   </SheetClose>
-                ) : null
               )}
             </nav>
           </SheetContent>
@@ -135,8 +114,8 @@ export default function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src={`https://placehold.co/40x40/FF9933/121212.png?text=${user?.name.charAt(0)}`} />
-                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={`https://placehold.co/40x40/FF9933/121212.png?text=${user?.name?.charAt(0)}`} />
+                <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
@@ -144,7 +123,7 @@ export default function AppHeader() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>{user?.name} ({user?.role === 'VIEWER' ? 'Customer' : user?.role})</DropdownMenuItem>
+            <DropdownMenuItem disabled>{user?.name}</DropdownMenuItem>
             <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/20 focus:text-destructive">Logout</DropdownMenuItem>

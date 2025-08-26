@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { salesData } from '@/lib/placeholder-data';
+import { salesData as defaultSalesData } from '@/lib/placeholder-data';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
@@ -63,7 +63,7 @@ export default function SalesPage() {
     defaultValues: {
       buyerName: '',
       quantity: 30,
-      pricePerPiece: 0.35,
+      pricePerPiece: 6,
     },
   });
   
@@ -72,6 +72,8 @@ export default function SalesPage() {
         const savedData = localStorage.getItem('salesHistory');
         if (savedData) {
             setSalesHistory(JSON.parse(savedData));
+        } else {
+            setSalesHistory(defaultSalesData);
         }
     }
   }, []);
@@ -83,7 +85,7 @@ export default function SalesPage() {
   }, [salesHistory]);
 
 
-  const { watch, setValue } = form;
+  const { watch } = form;
   const quantity = watch('quantity');
   const pricePerPiece = watch('pricePerPiece');
   const [totalRevenue, setTotalRevenue] = useState(0);
@@ -93,8 +95,8 @@ export default function SalesPage() {
     setTotalRevenue(revenue);
   }, [quantity, pricePerPiece]);
 
-  if (user?.role === 'VIEWER') {
-    return <p className="text-destructive">You do not have permission to view this page.</p>;
+  if (!user) {
+    return <p className="text-destructive">You must be logged in to view this page.</p>;
   }
 
   function onSubmit(data: SalesFormValues) {
@@ -139,7 +141,7 @@ export default function SalesPage() {
   return (
     <div className="space-y-6">
        <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold font-headline">Record Sales</h1>
+        <h1 className="text-3xl font-bold font-headline">Record Manual Sales</h1>
         <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
             <DialogTrigger asChild>
                 <Button>
@@ -233,8 +235,8 @@ export default function SalesPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="lg:col-span-1 saffron-border">
           <CardHeader>
-            <CardTitle className="font-headline">Add New Sale</CardTitle>
-            <CardDescription>Enter the details for a new sales transaction.</CardDescription>
+            <CardTitle className="font-headline">Add New Manual Sale</CardTitle>
+            <CardDescription>Use this for in-person or non-portal sales.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -272,7 +274,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Price Per Piece (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="e.g., 0.35" {...field} />
+                        <Input type="number" step="0.01" placeholder="e.g., 6.00" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -291,8 +293,8 @@ export default function SalesPage() {
         </Card>
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="font-headline">Recent Sales</CardTitle>
-            <CardDescription>View recent sales transactions.</CardDescription>
+            <CardTitle className="font-headline">Recent Manual Sales</CardTitle>
+            <CardDescription>View recent sales transactions recorded here.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="border rounded-md">

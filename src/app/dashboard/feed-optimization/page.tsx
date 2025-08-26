@@ -1,23 +1,45 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { getFeedOptimizationInsights } from './actions';
-import { eggCollectionData, feedData } from '@/lib/placeholder-data';
+import { eggCollectionData as defaultEggData } from '@/lib/placeholder-data';
 import type { FeedOptimizationInsightsOutput } from '@/ai/flows/feed-optimization-insights';
 import { AlertTriangle, Bot, Lightbulb, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { subDays } from 'date-fns';
+
+
+const generateDummyFeedData = (eggData: any[]) => {
+    return eggData.map(d => ({
+        date: d.date,
+        feedConsumption: Math.floor(70 + Math.random() * 10)
+    }));
+};
 
 export default function FeedOptimizationPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [insights, setInsights] = useState<FeedOptimizationInsightsOutput | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
-  
-  if (user?.role !== 'OWNER') {
-    return <p className="text-destructive">You do not have permission to view this page.</p>;
+  const [eggCollectionHistory, setEggCollectionHistory] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedData = localStorage.getItem('eggCollectionHistory');
+      if (savedData) {
+        setEggCollectionHistory(JSON.parse(savedData));
+      } else {
+        setEggCollectionHistory(defaultEggData);
+      }
+    }
+  }, []);
+
+  if (!user) {
+    return <p className="text-destructive">You must be logged in to view this page.</p>;
   }
 
   const handleGenerateInsights = async () => {
@@ -27,13 +49,21 @@ export default function FeedOptimizationPage() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const recentEggData = eggCollectionData
+    const recentEggData = eggCollectionHistory
       .filter(d => new Date(d.date) >= sevenDaysAgo)
       .map(d => ({ date: d.date, eggCount: d.quantity }));
+
+    if(recentEggData.length < 1){
+        toast({
+            variant: 'destructive',
+            title: 'Not Enough Data',
+            description: 'Need at least one day of egg collection data to generate insights.',
+        });
+        setIsLoading(false);
+        return;
+    }
       
-    const recentFeedData = feedData
-      .filter(d => new Date(d.date) >= sevenDaysAgo)
-      .map(d => ({ date: d.date, feedConsumption: d.feedConsumption }));
+    const recentFeedData = generateDummyFeedData(recentEggData);
 
     const result = await getFeedOptimizationInsights({
       eggYieldData: recentEggData,
@@ -83,7 +113,7 @@ export default function FeedOptimizationPage() {
             <CardContent>
                 <Bot className="mx-auto h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-medium">Ready to Optimize?</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Click 'Generate Insights' to analyze the last 7 days of data.</p>
+                <p className="mt-1 text-sm text-muted-foreground">Click 'Generate Insights' to analyze the last 7 days of egg collection data.</p>
             </CardContent>
         </Card>
       )}

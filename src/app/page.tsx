@@ -44,9 +44,11 @@ function LandingPageContent() {
     });
 
     useEffect(() => {
-        const storedSettings = localStorage.getItem('siteSettings');
-        if (storedSettings) {
-            setSettings(JSON.parse(storedSettings));
+        if (typeof window !== 'undefined') {
+            const storedSettings = localStorage.getItem('siteSettings');
+            if (storedSettings) {
+                setSettings(JSON.parse(storedSettings));
+            }
         }
     }, []);
 

@@ -2,12 +2,13 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AuthProvider, useAuth } from '@/lib/auth';
+import { AuthProvider, AuthContext } from '@/lib/auth';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Egg, Phone, MapPin, Wheat } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -86,11 +87,7 @@ function LandingPageContent() {
                             Go to Dashboard
                         </Link>
                     </Button>
-                 ) : (
-                    <Button asChild>
-                        <Link href="/order">Order Now</Link>
-                    </Button>
-                 )}
+                 ) : null}
             </div>
         </nav>
       </header>

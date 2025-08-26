@@ -16,7 +16,7 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const ownerUser: User = {
-  name: 'Farm Owner',
+  name: 'appu_muchandi',
   email: 'owner@henshub.com',
   role: 'OWNER',
 };
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    window.location.href = '/';
+    window.location.href = '/login';
   };
 
   return (

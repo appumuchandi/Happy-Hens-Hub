@@ -17,7 +17,6 @@ import {
   Archive,
   Video,
   Settings,
-  Tag,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 

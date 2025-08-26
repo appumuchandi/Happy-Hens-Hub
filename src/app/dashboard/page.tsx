@@ -3,9 +3,9 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import StatCard from '@/components/dashboard/stat-card';
-import { dashboardStats, siteSettings as defaultSettings, onlineOrdersData } from '@/lib/placeholder-data';
-import { Egg, Users, LineChart, AlertTriangle, ShoppingCart } from 'lucide-react';
-import type { Role, Order, SiteSettings } from '@/types';
+import { dashboardStats, siteSettings as defaultSettings } from '@/lib/placeholder-data';
+import { Egg, Users, LineChart, AlertTriangle } from 'lucide-react';
+import type { SiteSettings } from '@/types';
 import { useEffect, useState } from 'react';
 
 const RupeeIcon = () => (
@@ -16,24 +16,15 @@ const RupeeIcon = () => (
 export default function DashboardPage() {
   const { user } = useAuth();
   const {
-    dailyEggCount,
     henCount,
     feedConsumption,
   } = dashboardStats;
 
-  const [orders, setOrders] = useState<Order[]>([]);
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [salesHistory, setSalesHistory] = useState<any[]>([]);
   
   useEffect(() => {
     if (typeof window !== 'undefined') {
-        const storedOrders = localStorage.getItem('orders');
-        if (storedOrders) {
-            setOrders(JSON.parse(storedOrders));
-        } else {
-            setOrders(onlineOrdersData);
-        }
-
         const storedSettings = localStorage.getItem('siteSettings');
         if (storedSettings) {
             setSettings(JSON.parse(storedSettings));

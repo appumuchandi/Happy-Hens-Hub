@@ -83,12 +83,6 @@ function LandingPageContent() {
                 <span className="text-2xl font-bold font-headline">HEN's HUB</span>
             </Link>
             <div className="flex items-center gap-2">
-                 <Button asChild>
-                    <Link href="/order">
-                        <ShoppingCart className="mr-2"/>
-                        Order Now
-                    </Link>
-                </Button>
                 {isAuthenticated && (
                      <Button variant="outline" asChild>
                         <Link href="/dashboard">

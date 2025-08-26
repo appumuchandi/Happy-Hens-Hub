@@ -20,7 +20,6 @@ import {
   Settings,
   Moon,
   Sun,
-  ShoppingCart,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,7 +34,6 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
-  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users },
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },

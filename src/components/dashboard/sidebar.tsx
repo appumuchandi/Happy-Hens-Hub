@@ -18,6 +18,7 @@ import {
   Video,
   Settings,
   Tag,
+  ShoppingCart,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
+  { href: '/dashboard/orders', label: 'Orders', icon: ShoppingCart },
   { href: '/dashboard/reports', label: 'Reports', icon: LineChart },
   { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users },
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },

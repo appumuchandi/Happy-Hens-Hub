@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AuthProvider, useAuth } from '@/lib/auth';
+import { AuthProvider } from '@/lib/auth';
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -89,22 +90,6 @@ function LandingPageContent() {
       </header>
 
       <main>
-        {/* Hero Section */}
-        <section className="py-20 text-center bg-card">
-            <div className="container mx-auto px-4">
-                <h1 className="text-5xl md:text-6xl font-bold font-headline mb-4">Farm-Fresh Eggs, Delivered.</h1>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-                    Straight from our happy hens to your home. Experience the taste of quality and freshness with every order.
-                </p>
-                <Button size="lg" asChild>
-                    <Link href="/order">
-                        <ShoppingCart className="mr-2"/>
-                        Place Your Order
-                    </Link>
-                </Button>
-            </div>
-        </section>
-        
         {/* About Section */}
         <section id="about" className="py-20">
             <div className="container mx-auto px-4">

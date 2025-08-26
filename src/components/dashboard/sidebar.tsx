@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -28,8 +27,7 @@ const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
-  { href: '/dashboard/reports', label: 'Reports', icon: LineChart },
-  { href: '/dashboard/workers-optimization', label: 'Workers', icon: Users },
+  { href: '/dashboard/workers', label: 'Workers', icon: Users },
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },

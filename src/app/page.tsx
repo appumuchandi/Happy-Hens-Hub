@@ -11,12 +11,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Egg, Phone, MapPin, ShoppingCart, Menu, X, LayoutDashboard } from 'lucide-react';
+import { Egg, Phone, MapPin, ShoppingCart, LayoutDashboard } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from '@/components/ui/separator';
 
 const RupeeIcon = () => (
     <span className="font-bold">₹</span>
@@ -35,7 +34,6 @@ function LandingPageContent() {
     const { toast } = useToast();
     const router = useRouter();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -59,14 +57,6 @@ function LandingPageContent() {
         { src: 'https://picsum.photos/600/400?random=4', alt: 'Feeding time', hint: 'chicken feed' },
     ];
     
-    const navLinks = [
-        { href: '#about', label: 'About Us' },
-        { href: '#pricing', label: 'Pricing' },
-        { href: '#gallery', label: 'Gallery' },
-        { href: '#contact', label: 'Contact' },
-        { href: '#login', label: 'Owner Login' },
-    ]
-
     function onLoginSubmit(data: LoginFormValues) {
         if (data.email === 'owner@henshub.com' && data.password === 'password123') {
             login();
@@ -90,14 +80,7 @@ function LandingPageContent() {
                  <Egg className="h-8 w-8 text-primary" />
                 <span className="text-2xl font-bold font-headline">HEN's HUB</span>
             </Link>
-            <div className="hidden md:flex items-center gap-6">
-                {navLinks.map(link => (
-                     <Link key={link.href} href={link.href} className="text-sm font-medium hover:text-primary transition-colors">
-                        {link.label}
-                    </Link>
-                ))}
-            </div>
-            <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
                  <Button asChild>
                     <Link href="/order">
                         <ShoppingCart className="mr-2"/>
@@ -113,36 +96,7 @@ function LandingPageContent() {
                     </Button>
                 )}
             </div>
-             <div className="md:hidden">
-                <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    {isMenuOpen ? <X/> : <Menu />}
-                    <span className="sr-only">Toggle Menu</span>
-                </Button>
-            </div>
         </nav>
-        {isMenuOpen && (
-            <div className="md:hidden bg-background pb-4">
-                <div className="container mx-auto px-4 flex flex-col gap-4">
-                    {navLinks.map(link => (
-                         <Link key={link.href} href={link.href} className="text-lg font-medium hover:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                            {link.label}
-                        </Link>
-                    ))}
-                    <Separator />
-                    <Button asChild>
-                        <Link href="/order">
-                            <ShoppingCart className="mr-2"/>
-                            Order Now
-                        </Link>
-                    </Button>
-                     {isAuthenticated && (
-                        <Button variant="outline" asChild>
-                            <Link href="/dashboard">Dashboard</Link>
-                        </Button>
-                    )}
-                </div>
-            </div>
-        )}
       </header>
 
       <main>
@@ -220,31 +174,7 @@ function LandingPageContent() {
                 </div>
             </div>
         </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="py-20 bg-card">
-            <div className="container mx-auto px-4 text-center">
-                <h2 className="text-4xl font-bold font-headline mb-8">Get In Touch</h2>
-                <p className="text-lg text-muted-foreground mb-8">Have questions? We'd love to hear from you.</p>
-                <div className="flex flex-col md:flex-row justify-center items-center gap-8">
-                     <div className="flex items-center gap-4">
-                        <Phone className="w-8 h-8 text-primary"/>
-                        <div>
-                            <h3 className="font-semibold text-xl">Call Us</h3>
-                            <a href={`tel:${settings.contactInfo}`} className="text-lg text-muted-foreground hover:text-primary">{settings.contactInfo}</a>
-                        </div>
-                    </div>
-                     <div className="flex items-center gap-4">
-                        <MapPin className="w-8 h-8 text-primary"/>
-                         <div>
-                            <h3 className="font-semibold text-xl">Visit Us</h3>
-                            <p className="text-lg text-muted-foreground">{settings.address}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        
         {/* Login Section */}
         {!isAuthenticated && (
             <section id="login" className="py-20 border-t">
@@ -298,6 +228,30 @@ function LandingPageContent() {
             </section>
         )}
 
+        {/* Contact Section */}
+        <section id="contact" className="py-20 bg-card">
+            <div className="container mx-auto px-4 text-center">
+                <h2 className="text-4xl font-bold font-headline mb-8">Get In Touch</h2>
+                <p className="text-lg text-muted-foreground mb-8">Have questions? We'd love to hear from you.</p>
+                <div className="flex flex-col md:flex-row justify-center items-center gap-8">
+                     <div className="flex items-center gap-4">
+                        <Phone className="w-8 h-8 text-primary"/>
+                        <div>
+                            <h3 className="font-semibold text-xl">Call Us</h3>
+                            <a href={`tel:${settings.contactInfo}`} className="text-lg text-muted-foreground hover:text-primary">{settings.contactInfo}</a>
+                        </div>
+                    </div>
+                     <div className="flex items-center gap-4">
+                        <MapPin className="w-8 h-8 text-primary"/>
+                         <div>
+                            <h3 className="font-semibold text-xl">Visit Us</h3>
+                            <p className="text-lg text-muted-foreground">{settings.address}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
       </main>
 
       {/* Footer */}
@@ -317,5 +271,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

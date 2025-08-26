@@ -137,7 +137,7 @@ function LandingPageContent() {
             </div>
         </section>
         
-        {/* Login Section */}
+        {/* Login Section - Visible only if NOT authenticated */}
         {!isAuthenticated && (
             <section id="login" className="py-20 border-t">
                 <div className="container mx-auto px-4 flex flex-col items-center">

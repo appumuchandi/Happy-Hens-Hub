@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Egg, Phone, MapPin, ShoppingCart, LayoutDashboard } from 'lucide-react';
-import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
+import { Egg, Phone, MapPin, ShoppingCart, LayoutDashboard, Wheat } from 'lucide-react';
+import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -34,6 +34,7 @@ function LandingPageContent() {
     const { toast } = useToast();
     const router = useRouter();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
+    const { feedConsumption } = dashboardStats;
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -51,13 +52,6 @@ function LandingPageContent() {
             }
         }
     }, []);
-
-    const galleryImages = [
-        { src: 'https://picsum.photos/600/400?random=1', alt: 'Hens in the coop', hint: 'hens coop' },
-        { src: 'https://picsum.photos/600/400?random=2', alt: 'Freshly collected eggs', hint: 'eggs basket' },
-        { src: 'https://picsum.photos/600/400?random=3', alt: 'The farm landscape', hint: 'farm landscape' },
-        { src: 'https://picsum.photos/600/400?random=4', alt: 'Feeding time', hint: 'chicken feed' },
-    ];
     
     function onLoginSubmit(data: LoginFormValues) {
         if (data.email === 'owner@henshub.com' && data.password === 'password123') {
@@ -126,7 +120,7 @@ function LandingPageContent() {
         <section id="pricing" className="py-20 bg-card">
             <div className="container mx-auto px-4">
                 <h2 className="text-4xl font-bold text-center mb-12 font-headline">Price & Availability</h2>
-                 <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
                     <Card className="saffron-border">
                         <CardHeader className="text-center">
                             <CardTitle className="font-headline text-2xl">Price per Egg</CardTitle>
@@ -139,34 +133,22 @@ function LandingPageContent() {
                     </Card>
                     <Card>
                         <CardHeader className="text-center">
-                            <CardTitle className="font-headline text-2xl">Available Stock</CardTitle>
+                            <CardTitle className="font-headline text-2xl">Available Egg Stock</CardTitle>
                         </CardHeader>
                         <CardContent className="text-center">
                             <p className="text-5xl font-bold text-accent">{settings.availableStock.toLocaleString()}</p>
                             <p className="text-muted-foreground">eggs available for order</p>
                         </CardContent>
                     </Card>
-                </div>
-            </div>
-        </section>
-
-         {/* Gallery Section */}
-        <section id="gallery" className="py-20">
-             <div className="container mx-auto px-4">
-                <h2 className="text-4xl font-bold text-center mb-12 font-headline">Glimpse of Our Farm</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {galleryImages.map((image, index) => (
-                        <div key={index} className="overflow-hidden rounded-lg shadow-lg aspect-w-1 aspect-h-1">
-                            <Image 
-                                src={image.src} 
-                                alt={image.alt} 
-                                width={600} 
-                                height={400} 
-                                data-ai-hint={image.hint}
-                                className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-300" 
-                            />
-                        </div>
-                    ))}
+                    <Card>
+                        <CardHeader className="text-center">
+                            <CardTitle className="font-headline text-2xl flex items-center justify-center gap-2"><Wheat/>Feed Stock</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center">
+                            <p className="text-5xl font-bold text-sky-500">{dashboardStats.weeklyFeedConsumption} kg</p>
+                            <p className="text-muted-foreground">total feed available</p>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </section>
@@ -267,3 +249,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

@@ -76,7 +76,7 @@ function LandingPageContent() {
                  <Egg className="h-8 w-8 text-primary" />
                 <span className="text-2xl font-bold font-headline">HEN's HUB</span>
             </Link>
-            <div className="flex items-center gap-2">
+             <div className="flex items-center gap-2">
                 {isAuthenticated && (
                      <Button variant="outline" asChild>
                         <Link href="/dashboard">
@@ -249,5 +249,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

@@ -196,30 +196,30 @@ function LandingPageContent() {
                     <h2 className="text-4xl font-bold font-headline mb-8">Get In Touch</h2>
                     <p className="text-lg text-muted-foreground mb-8">Have questions? We'd love to hear from you.</p>
                     <div className="flex flex-col md:flex-row justify-center items-center gap-8">
-                        <div className="flex items-center gap-4">
-                            <Phone className="w-8 h-8 text-primary"/>
-                            <div>
-                                <h3 className="font-semibold text-xl">Call Us</h3>
-                                <div className="flex flex-col">
-                                    <a href="tel:+918861790121" className="text-lg text-muted-foreground hover:text-primary">+91 88617 90121</a>
-                                    <a href="tel:+919113800449" className="text-lg text-muted-foreground hover:text-primary">+91 91138 00449</a>
-                                    <a href="tel:+919380970083" className="text-lg text-muted-foreground hover:text-primary">+91 93809 70083</a>
-                                </div>
+                        <div>
+                            <h3 className="font-semibold text-xl flex items-center justify-center gap-2">
+                                <Phone className="w-6 h-6 text-primary"/>
+                                Call Us
+                            </h3>
+                            <div className="flex flex-col mt-2">
+                                <a href="tel:+918861790121" className="text-lg text-muted-foreground hover:text-primary">+91 88617 90121</a>
+                                <a href="tel:+919113800449" className="text-lg text-muted-foreground hover:text-primary">+91 91138 00449</a>
+                                <a href="tel:+919380970083" className="text-lg text-muted-foreground hover:text-primary">+91 93809 70083</a>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <MapPin className="w-8 h-8 text-primary"/>
-                            <div>
-                                <h3 className="font-semibold text-xl">Visit Us</h3>
-                                <a 
-                                    href="https://www.google.com/maps/dir/?api=1&destination=Happy%20Hen's%20Hub,%2096J8%2B7V2,%20Mugalkhod,%20Karnataka%20587113" 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="text-lg text-muted-foreground hover:text-primary"
-                                >
-                                    Happy Hen's Hub, 96J8+7V2, Mugalkhod, Karnataka 587113
-                                </a>
-                            </div>
+                        <div>
+                            <h3 className="font-semibold text-xl flex items-center justify-center gap-2">
+                                <MapPin className="w-6 h-6 text-primary"/>
+                                Visit Us
+                            </h3>
+                            <a 
+                                href="https://www.google.com/maps/dir/?api=1&destination=Happy%20Hen's%20Hub,%2096J8%2B7V2,%20Mugalkhod,%20Karnataka%20587113" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="text-lg text-muted-foreground hover:text-primary mt-2 block"
+                            >
+                                Happy Hen's Hub, 96J8+7V2, Mugalkhod, Karnataka 587113
+                            </a>
                         </div>
                     </div>
                 </div>

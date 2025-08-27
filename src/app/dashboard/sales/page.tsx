@@ -14,7 +14,7 @@ import { salesData as defaultSalesData } from '@/lib/placeholder-data';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { Download } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +34,17 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 const salesSchema = z.object({
@@ -123,6 +134,14 @@ export default function SalesPage() {
       description: `Your ${reportType} sales report for ${selectedYear} is being downloaded.`
     });
     setOpenDownloadDialog(false);
+  }
+  
+  const handleDelete = (id: string) => {
+    setSalesHistory((prev: any) => prev.filter((sale: any) => sale.id !== id));
+    toast({
+        title: "Sale Deleted",
+        description: "The sale record has been removed.",
+    })
   }
 
   const totalPages = Math.ceil(salesHistory.length / RECORDS_PER_PAGE);
@@ -306,6 +325,7 @@ export default function SalesPage() {
                         <TableHead>Quantity</TableHead>
                         <TableHead>Price/pcs (₹)</TableHead>
                         <TableHead>Revenue (₹)</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -316,10 +336,32 @@ export default function SalesPage() {
                             <TableCell>{sale.quantity}</TableCell>
                             <TableCell>₹{sale.pricePerPiece}</TableCell>
                             <TableCell>₹{sale.revenue}</TableCell>
+                            <TableCell className="text-right">
+                               <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="icon">
+                                        <Trash2 className="h-4 w-4" />
+                                        <span className="sr-only">Delete</span>
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete this sale record.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDelete(sale.id)}>Delete</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                            </TableCell>
                         </TableRow>
                         )) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center">
+                                <TableCell colSpan={6} className="h-24 text-center">
                                     No sales history found.
                                 </TableCell>
                             </TableRow>
@@ -352,3 +394,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

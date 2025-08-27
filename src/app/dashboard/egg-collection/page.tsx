@@ -10,11 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { eggCollectionData } from '@/lib/placeholder-data';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { Download } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +33,17 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 const eggCollectionSchema = z.object({
@@ -109,6 +119,14 @@ export default function EggCollectionPage() {
       description: `Your ${reportType} egg collection report is being downloaded.`
     });
     setOpenDownloadDialog(false);
+  }
+  
+  const handleDelete = (id: string) => {
+    setCollectionHistory((prev: any) => prev.filter((record: any) => record.id !== id));
+    toast({
+        title: "Record Deleted",
+        description: "The egg collection record has been removed.",
+    })
   }
 
   const totalPages = Math.ceil(collectionHistory.length / RECORDS_PER_PAGE);
@@ -269,6 +287,7 @@ export default function EggCollectionPage() {
                     <TableHead>Quantity</TableHead>
                     <TableHead>Batch</TableHead>
                     <TableHead>Collector</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -278,10 +297,32 @@ export default function EggCollectionPage() {
                       <TableCell>{record.quantity}</TableCell>
                       <TableCell>{record.batch}</TableCell>
                       <TableCell>{record.collector}</TableCell>
+                      <TableCell className="text-right">
+                         <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon">
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete this collection record.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(record.id)}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
                   )) : (
                      <TableRow>
-                        <TableCell colSpan={4} className="h-24 text-center">
+                        <TableCell colSpan={5} className="h-24 text-center">
                             No collection history found.
                         </TableCell>
                     </TableRow>
@@ -314,3 +355,5 @@ export default function EggCollectionPage() {
     </div>
   );
 }
+
+    

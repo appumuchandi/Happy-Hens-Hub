@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { getWorkerOptimizationInsights } from '../workers-optimization/actions';
 
 export default function WorkersPage() {
   const { user } = useAuth();
@@ -42,18 +43,39 @@ export default function WorkersPage() {
     setIsLoading(true);
     setInsights(null);
 
-    if(eggCollectionHistory.length === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'No Data Available',
-        description: 'There is no egg collection data to analyze for worker insights.',
-      });
-      setIsLoading(false);
-      return;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentEggData = eggCollectionHistory
+      .filter(d => new Date(d.date) >= thirtyDaysAgo)
+      .map(d => ({ date: d.date, quantity: d.quantity, collector: d.collector }));
+
+
+    if(recentEggData.length < 1){
+        toast({
+            variant: 'destructive',
+            title: 'Not Enough Data',
+            description: 'Need at least one day of egg collection data from the last 30 days to generate insights.',
+        });
+        setIsLoading(false);
+        return;
     }
 
-    // AI insights logic is currently disabled.
-    toast({ title: 'Feature Coming Soon', description: 'AI worker optimization is under development.' });
+    const result = await getWorkerOptimizationInsights({
+      eggCollectionData: recentEggData,
+    });
+
+    if (result.success) {
+      setInsights(result.data);
+      toast({ title: 'Insights Generated', description: 'AI analysis complete.' });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: result.error || 'Failed to generate insights.',
+      });
+    }
+
     setIsLoading(false);
   };
 
@@ -126,7 +148,7 @@ export default function WorkersPage() {
                 <CardTitle className="font-headline">AI Worker Optimization</CardTitle>
                 <CardDescription>Analyze worker productivity based on egg collection data.</CardDescription>
               </div>
-              <Button onClick={handleGenerateInsights} disabled={isLoading} size="lg">
+              <Button onClick={handleGenerateInsights} disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -146,7 +168,7 @@ export default function WorkersPage() {
               <div className="text-center py-12">
                   <Bot className="mx-auto h-12 w-12 text-muted-foreground" />
                   <h3 className="mt-4 text-lg font-medium">Ready for AI Insights?</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Click the button to analyze worker performance.</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Click the button to analyze worker performance from the last 30 days of collection data.</p>
               </div>
             )}
              {insights && (
@@ -197,5 +219,3 @@ export default function WorkersPage() {
     </div>
   );
 }
-
-    

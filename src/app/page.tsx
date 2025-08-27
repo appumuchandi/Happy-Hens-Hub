@@ -125,7 +125,7 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
 
 
 function LandingPageContent() {
-    const { isAuthenticated, login, user } = useAuth();
+    const { isAuthenticated, login } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
@@ -158,7 +158,7 @@ function LandingPageContent() {
     function onLoginSubmit(data: LoginFormValues) {
         if (data.email === 'owner@henshub.com' && data.password === 'appu1234') {
             login({ name: 'appu_muchandi', email: 'owner@henshub.com', role: 'OWNER' });
-            router.push('/dashboard');
+            // The useEffect above will handle the redirect
         } else {
             toast({
                 variant: 'destructive',

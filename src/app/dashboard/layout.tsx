@@ -12,7 +12,7 @@ function AuthenticatedLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // If context is no longer loading and user is not authenticated, redirect
+    // If context is loaded and user is not authenticated, redirect to home.
     if (auth && auth.isLoaded && !auth.isAuthenticated) {
       router.push('/');
     }

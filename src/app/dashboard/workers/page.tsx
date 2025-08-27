@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,8 +9,6 @@ import { Users, Fingerprint, Bot, Loader2, Lightbulb, AlertTriangle } from 'luci
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { getWorkerOptimizationInsights } from '../workers-optimization/actions';
-import type { WorkerOptimizationInsightsOutput } from '@/ai/flows/worker-optimization-insights';
 import { useToast } from '@/hooks/use-toast';
 
 export default function WorkersPage() {
@@ -17,7 +16,7 @@ export default function WorkersPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [insights, setInsights] = useState<WorkerOptimizationInsightsOutput | null>(null);
+  const [insights, setInsights] = useState<any | null>(null);
   const [eggCollectionHistory, setEggCollectionHistory] = useState<any[]>([]);
 
   useEffect(() => {
@@ -53,19 +52,8 @@ export default function WorkersPage() {
       return;
     }
 
-    const result = await getWorkerOptimizationInsights({ eggCollectionData: eggCollectionHistory });
-
-    if (result.success) {
-      setInsights(result.data);
-      toast({ title: 'Insights Generated', description: 'AI analysis for worker optimization is complete.' });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: result.error,
-      });
-    }
-
+    // AI insights logic is currently disabled.
+    toast({ title: 'Feature Coming Soon', description: 'AI worker optimization is under development.' });
     setIsLoading(false);
   };
 
@@ -209,3 +197,5 @@ export default function WorkersPage() {
     </div>
   );
 }
+
+    

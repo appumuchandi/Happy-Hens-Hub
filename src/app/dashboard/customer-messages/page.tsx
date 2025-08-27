@@ -92,9 +92,9 @@ export default function CustomerMessagesPage() {
                                              <p className="whitespace-pre-wrap">{msg.message}</p>
                                              <div className="flex justify-end gap-2 mt-4">
                                                 <Button variant="outline" size="sm" asChild>
-                                                    <a href={`mailto:${msg.email}`}>
+                                                    <a href={`mailto:${msg.email}?subject=RE: Inquiry from HEN's HUB`}>
                                                         <Mail className="mr-2"/>
-                                                        Reply
+                                                        Reply via Email
                                                     </a>
                                                 </Button>
                                                 <Button variant="destructive" size="sm" onClick={() => handleDeleteMessage(msg.id)}>

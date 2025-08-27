@@ -218,7 +218,7 @@ function LandingPageContent() {
                                 rel="noopener noreferrer" 
                                 className="text-lg text-muted-foreground hover:text-primary mt-2 block"
                             >
-                                Happy Hen's Hub, 96J8+7V2, Mugalkhod, Karnataka 587113
+                                Happy Hen's Hub, 96J8+7V2, <br/> Mugalkhod, Karnataka 587113
                             </a>
                         </div>
                     </div>

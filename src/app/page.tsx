@@ -37,7 +37,7 @@ const messageSchema = z.object({
 
 type MessageFormValues = z.infer<typeof messageSchema>;
 
-function ContactForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill out the form below and we'll get back to you as soon as possible.", placeholder = "How can we help you today?" }: { setDialogOpen: (open: boolean) => void, title?: string, description?: string, placeholder?: string }) {
     const { toast } = useToast();
     const messageForm = useForm<MessageFormValues>({
         resolver: zodResolver(messageSchema),
@@ -67,53 +67,59 @@ function ContactForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void
     }
     
     return (
-        <Form {...messageForm}>
-            <form onSubmit={messageForm.handleSubmit(onMessageSubmit)} className="space-y-4">
-                 <FormField
-                    control={messageForm.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Your Name</FormLabel>
-                        <FormControl>
-                            <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={messageForm.control}
-                    name="email"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Your Email</FormLabel>
-                        <FormControl>
-                            <Input type="email" placeholder="you@example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                 <FormField
-                    control={messageForm.control}
-                    name="message"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                            <Textarea placeholder="How can we help you today?" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <Button type="submit" className="w-full">
-                    <Send className="mr-2"/>
-                    Send Message
-                </Button>
-            </form>
-        </Form>
+         <DialogContent>
+            <DialogHeader>
+                <DialogTitle>{title}</DialogTitle>
+                <DialogDescription>{description}</DialogDescription>
+            </DialogHeader>
+            <Form {...messageForm}>
+                <form onSubmit={messageForm.handleSubmit(onMessageSubmit)} className="space-y-4">
+                     <FormField
+                        control={messageForm.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Your Name</FormLabel>
+                            <FormControl>
+                                <Input placeholder="John Doe" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={messageForm.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Your Email</FormLabel>
+                            <FormControl>
+                                <Input type="email" placeholder="you@example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={messageForm.control}
+                        name="message"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Message</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder={placeholder} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit" className="w-full">
+                        <Send className="mr-2"/>
+                        Send Message
+                    </Button>
+                </form>
+            </Form>
+        </DialogContent>
     )
 }
 
@@ -124,6 +130,7 @@ function LandingPageContent() {
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
+    const [openFeedRequestDialog, setOpenFeedRequestDialog] = useState(false);
     
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -217,15 +224,28 @@ function LandingPageContent() {
                                 <p className="text-muted-foreground">eggs available for order</p>
                             </CardContent>
                         </Card>
-                        <Card>
-                            <CardHeader className="text-center">
-                                <CardTitle className="font-headline text-2xl flex items-center justify-center gap-2"><Wheat/>Feed Stock</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-center">
-                                <p className="text-5xl font-bold text-sky-500">{dashboardStats.weeklyFeedConsumption} kg</p>
-                                <p className="text-muted-foreground">total feed available</p>
-                            </CardContent>
-                        </Card>
+                        <Dialog open={openFeedRequestDialog} onOpenChange={setOpenFeedRequestDialog}>
+                            <DialogTrigger asChild>
+                                 <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+                                    <CardHeader className="text-center">
+                                        <CardTitle className="font-headline text-2xl flex items-center justify-center gap-2"><Wheat/>Readymade Feed Stock</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-center">
+                                        <p className="text-5xl font-bold text-sky-500">{dashboardStats.weeklyFeedConsumption} kg</p>
+                                        <p className="text-muted-foreground">total feed available</p>
+                                    </CardContent>
+                                     <CardFooter>
+                                        <p className="text-xs text-muted-foreground mx-auto">Click here to inquire about purchasing feed.</p>
+                                     </CardFooter>
+                                </Card>
+                            </DialogTrigger>
+                             <ContactForm 
+                                setDialogOpen={setOpenFeedRequestDialog} 
+                                title="Request Readymade Feed"
+                                description="Let us know your requirements, and we'll get back to you with a quote."
+                                placeholder="e.g., I would like to purchase 1 ton of readymade feed..."
+                            />
+                        </Dialog>
                     </div>
                 </div>
             </section>
@@ -291,15 +311,7 @@ function LandingPageContent() {
                                 Have questions? We'd love to hear from you.
                             </Button>
                         </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Contact Us</DialogTitle>
-                                <DialogDescription>
-                                    Fill out the form below and we'll get back to you as soon as possible.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <ContactForm setDialogOpen={setOpenContactDialog} />
-                        </DialogContent>
+                        <ContactForm setDialogOpen={setOpenContactDialog} />
                     </Dialog>
                     <div className="flex flex-col md:flex-row justify-center items-center gap-8">
                         <div>
@@ -350,5 +362,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

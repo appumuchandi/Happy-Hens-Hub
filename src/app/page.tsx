@@ -200,7 +200,11 @@ function LandingPageContent() {
                             <Phone className="w-8 h-8 text-primary"/>
                             <div>
                                 <h3 className="font-semibold text-xl">Call Us</h3>
-                                <a href="tel:9380970083" className="text-lg text-muted-foreground hover:text-primary">9380970083</a>
+                                <div className="flex flex-col">
+                                    <a href="tel:+918861790121" className="text-lg text-muted-foreground hover:text-primary">+91 88617 90121</a>
+                                    <a href="tel:+919113800449" className="text-lg text-muted-foreground hover:text-primary">+91 91138 00449</a>
+                                    <a href="tel:+919380970083" className="text-lg text-muted-foreground hover:text-primary">+91 93809 70083</a>
+                                </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">

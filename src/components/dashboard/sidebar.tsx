@@ -16,6 +16,7 @@ import {
   Archive,
   Video,
   Settings,
+  MessageSquare,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -31,6 +32,7 @@ const navItems = [
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
+  { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
 ];
 
@@ -93,4 +95,3 @@ export default function AppSidebar() {
     </aside>
   );
 }
-

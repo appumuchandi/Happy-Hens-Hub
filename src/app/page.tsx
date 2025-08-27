@@ -2,10 +2,10 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AuthProvider, AuthContext } from '@/lib/auth';
+import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Egg, Phone, MapPin, Wheat } from 'lucide-react';
+import { Egg, Phone, MapPin, Wheat, Send } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -15,6 +15,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 const RupeeIcon = () => (
     <span className="font-bold">₹</span>
@@ -27,12 +29,101 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
+const messageSchema = z.object({
+    name: z.string().min(2, { message: "Name must be at least 2 characters."}),
+    email: z.string().email({ message: "Please enter a valid email."}),
+    message: z.string().min(10, { message: "Message must be at least 10 characters."})
+});
+
+type MessageFormValues = z.infer<typeof messageSchema>;
+
+function ContactForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+    const { toast } = useToast();
+    const messageForm = useForm<MessageFormValues>({
+        resolver: zodResolver(messageSchema),
+        defaultValues: {
+            name: '',
+            email: '',
+            message: '',
+        }
+    });
+
+    function onMessageSubmit(data: MessageFormValues) {
+        const newMessage = {
+            id: `MSG${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            ...data
+        };
+
+        const existingMessages = JSON.parse(localStorage.getItem('customerMessages') || '[]');
+        localStorage.setItem('customerMessages', JSON.stringify([newMessage, ...existingMessages]));
+
+        toast({
+            title: "Message Sent!",
+            description: "Thanks for reaching out. We'll get back to you soon.",
+        });
+        messageForm.reset();
+        setDialogOpen(false);
+    }
+    
+    return (
+        <Form {...messageForm}>
+            <form onSubmit={messageForm.handleSubmit(onMessageSubmit)} className="space-y-4">
+                 <FormField
+                    control={messageForm.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Your Name</FormLabel>
+                        <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={messageForm.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Your Email</FormLabel>
+                        <FormControl>
+                            <Input type="email" placeholder="you@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={messageForm.control}
+                    name="message"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Message</FormLabel>
+                        <FormControl>
+                            <Textarea placeholder="How can we help you today?" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full">
+                    <Send className="mr-2"/>
+                    Send Message
+                </Button>
+            </form>
+        </Form>
+    )
+}
+
 
 function LandingPageContent() {
     const { isAuthenticated, login, user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
+    const [openContactDialog, setOpenContactDialog] = useState(false);
     
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -193,8 +284,23 @@ function LandingPageContent() {
             {/* Contact Section */}
             <section id="contact" className="py-20 bg-card">
                 <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-bold font-headline mb-8">Get In Touch</h2>
-                    <p className="text-lg text-muted-foreground mb-8">Have questions? We'd love to hear from you.</p>
+                    <h2 className="text-4xl font-bold font-headline mb-4">Get In Touch</h2>
+                     <Dialog open={openContactDialog} onOpenChange={setOpenContactDialog}>
+                        <DialogTrigger asChild>
+                            <Button variant="link" className="text-lg text-muted-foreground mb-8">
+                                Have questions? We'd love to hear from you.
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Contact Us</DialogTitle>
+                                <DialogDescription>
+                                    Fill out the form below and we'll get back to you as soon as possible.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <ContactForm setDialogOpen={setOpenContactDialog} />
+                        </DialogContent>
+                    </Dialog>
                     <div className="flex flex-col md:flex-row justify-center items-center gap-8">
                         <div>
                             <h3 className="font-semibold text-xl flex items-center justify-center gap-2">

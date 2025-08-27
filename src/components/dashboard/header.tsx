@@ -19,6 +19,7 @@ import {
   Settings,
   Moon,
   Sun,
+  MessageSquare,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -37,6 +38,7 @@ const navItems = [
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
   { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
+  { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
 ];
 

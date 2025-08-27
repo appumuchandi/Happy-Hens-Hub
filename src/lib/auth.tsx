@@ -20,19 +20,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // We start fresh on each full app load. No session restoration.
-    setIsLoaded(true);
+    // Check for user in sessionStorage to persist login across page reloads (but not browser close)
+    try {
+        const storedUser = sessionStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    } catch (error) {
+        console.error("Could not parse user from sessionStorage", error);
+        sessionStorage.removeItem('user');
+    } finally {
+        setIsLoaded(true);
+    }
   }, []);
 
   const login = (loggedInUser: User) => {
     setUser(loggedInUser);
-    // You could store this in sessionStorage if you want session-only persistence
-    // For this requirement, we don't persist it across tabs/restarts.
+    try {
+        sessionStorage.setItem('user', JSON.stringify(loggedInUser));
+    } catch (error) {
+        console.error("Could not save user to sessionStorage", error);
+    }
   };
 
   const logout = () => {
     setUser(null);
-    // No need to clear storage if we don't set it.
+    try {
+        sessionStorage.removeItem('user');
+    } catch (error) {
+        console.error("Could not remove user from sessionStorage", error);
+    }
     window.location.href = '/';
   };
 
@@ -50,3 +67,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    

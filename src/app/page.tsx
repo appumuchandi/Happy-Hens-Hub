@@ -158,7 +158,6 @@ function LandingPageContent() {
     function onLoginSubmit(data: LoginFormValues) {
         if (data.email === 'owner@henshub.com' && data.password === 'appu1234') {
             login({ name: 'appu_muchandi', email: 'owner@henshub.com', role: 'OWNER' });
-            // The useEffect above will handle the redirect
         } else {
             toast({
                 variant: 'destructive',
@@ -362,3 +361,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

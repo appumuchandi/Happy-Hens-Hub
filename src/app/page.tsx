@@ -228,7 +228,7 @@ function LandingPageContent() {
                             <DialogTrigger asChild>
                                  <Card className="cursor-pointer hover:shadow-lg transition-shadow">
                                     <CardHeader className="text-center">
-                                        <CardTitle className="font-headline text-2xl flex items-center justify-center gap-2"><Wheat/>Readymade Feed Stock</CardTitle>
+                                        <CardTitle className="font-headline text-2xl flex items-center justify-center gap-2"><Wheat/>Feed Stock</CardTitle>
                                     </CardHeader>
                                     <CardContent className="text-center">
                                         <p className="text-5xl font-bold text-sky-500">{dashboardStats.weeklyFeedConsumption} kg</p>
@@ -241,9 +241,9 @@ function LandingPageContent() {
                             </DialogTrigger>
                              <ContactForm 
                                 setDialogOpen={setOpenFeedRequestDialog} 
-                                title="Request Readymade Feed"
+                                title="Request Feed Stock"
                                 description="Let us know your requirements, and we'll get back to you with a quote."
-                                placeholder="e.g., I would like to purchase 1 ton of readymade feed..."
+                                placeholder="e.g., I would like to purchase 1 ton of feed..."
                             />
                         </Dialog>
                     </div>

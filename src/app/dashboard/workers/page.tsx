@@ -11,30 +11,32 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getWorkerOptimizationInsights } from '../workers-optimization/actions';
+import { type WorkerOptimizationInsightsOutput } from '@/ai/flows/worker-optimization-insights';
 
 export default function WorkersPage() {
   const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [insights, setInsights] = useState<any | null>(null);
+  const [insights, setInsights] = useState<WorkerOptimizationInsightsOutput | null>(null);
   const [eggCollectionHistory, setEggCollectionHistory] = useState<any[]>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedData = localStorage.getItem('eggCollectionHistory');
       if (savedData) {
-        setEggCollectionHistory(JSON.parse(savedData));
+        try {
+            setEggCollectionHistory(JSON.parse(savedData));
+        } catch (e) {
+            console.error("Failed to parse egg collection history", e);
+            setEggCollectionHistory(defaultEggData);
+        }
       } else {
         setEggCollectionHistory(defaultEggData);
       }
     }
   }, []);
   
-  if (!user) {
-    return <p className="text-destructive">You must be logged in to view this page.</p>;
-  }
-
   const handleBiometricSync = () => {
     router.push('/dashboard/kiosk-setup');
   };
@@ -78,7 +80,10 @@ export default function WorkersPage() {
 
     setIsLoading(false);
   };
-
+  
+  if (!user) {
+    return <p className="text-destructive">You must be logged in to view this page.</p>;
+  }
 
   return (
     <div className="space-y-6">

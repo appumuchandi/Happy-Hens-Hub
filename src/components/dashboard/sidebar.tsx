@@ -17,6 +17,7 @@ import {
   Video,
   Settings,
   MessageSquare,
+  Wheat,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -30,7 +31,7 @@ const navItems = [
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
   { href: '/dashboard/workers', label: 'Workers', icon: Users },
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
-  { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
+  { href: '/dashboard/feed-optimization', label: 'Feed Stock', icon: Wheat },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },

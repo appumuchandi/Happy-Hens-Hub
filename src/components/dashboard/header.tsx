@@ -20,6 +20,7 @@ import {
   Moon,
   Sun,
   MessageSquare,
+  Wheat,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,7 +37,7 @@ const navItems = [
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
   { href: '/dashboard/workers', label: 'Workers', icon: Users },
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
-  { href: '/dashboard/feed-optimization', label: 'AI Feed Optimizer', icon: BrainCircuit },
+  { href: '/dashboard/feed-optimization', label: 'Feed Stock', icon: Wheat },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },

@@ -1,13 +1,12 @@
+
 'use server';
 
-import { feedOptimizationInsights as feedOptimizationInsightsFlow, type FeedOptimizationInsightsInput, type FeedOptimizationInsightsOutput } from '@/ai/flows/feed-optimization-insights';
+// This file is no longer used for feed optimization insights, 
+// but is kept to avoid breaking imports if it was referenced elsewhere.
+// The primary functionality has been moved to the client-side component
+// for managing feed stock.
 
-export async function getFeedOptimizationInsights(input: FeedOptimizationInsightsInput): Promise<{ success: true; data: FeedOptimizationInsightsOutput } | { success: false; error: string; }> {
-    try {
-        const result = await feedOptimizationInsightsFlow(input);
-        return { success: true, data: result };
-    } catch (error) {
-        console.error("Error getting feed optimization insights:", error);
-        return { success: false, error: "An unexpected error occurred while generating insights. Please try again later." };
-    }
+export async function placeholderAction(): Promise<{ success: boolean }> {
+    // This function can be removed if no longer needed.
+    return { success: true };
 }

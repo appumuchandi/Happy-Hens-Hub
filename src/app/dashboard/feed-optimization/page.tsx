@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
 import { Save, Package } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,7 +27,6 @@ export default function FeedStockPage() {
   const [containers, setContainers] = useState<FeedContainer[]>([]);
   const [initialState, setInitialState] = useState<FeedContainer[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
   
   useEffect(() => {
      if (typeof window !== 'undefined') {
@@ -43,10 +41,6 @@ export default function FeedStockPage() {
       }
     }
   }, []);
-
-  if (!user) {
-    return <p className="text-destructive">You must be logged in to view this page.</p>;
-  }
 
   const handleStockChange = (id: string, newQuantity: string) => {
     const quantity = parseFloat(newQuantity);

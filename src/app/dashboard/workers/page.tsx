@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { getWorkerOptimizationInsights } from '../workers-optimization/actions';
+import { workerOptimizationInsights } from '@/ai/flows/worker-optimization-insights';
 import { type WorkerOptimizationInsightsOutput } from '@/ai/flows/worker-optimization-insights';
 
 export default function WorkersPage() {
@@ -63,18 +63,18 @@ export default function WorkersPage() {
         return;
     }
 
-    const result = await getWorkerOptimizationInsights({
-      eggCollectionData: recentEggData,
-    });
+    try {
+      const result = await workerOptimizationInsights({
+        eggCollectionData: recentEggData,
+      });
 
-    if (result.success) {
-      setInsights(result.data);
+      setInsights(result);
       toast({ title: 'Insights Generated', description: 'AI analysis complete.' });
-    } else {
-      toast({
+    } catch (error) {
+       toast({
         variant: 'destructive',
         title: 'Error',
-        description: result.error || 'Failed to generate insights.',
+        description: 'Failed to generate insights.',
       });
     }
 
@@ -195,7 +195,7 @@ export default function WorkersPage() {
                   <CardHeader className="flex flex-row items-center gap-2">
                       <AlertTriangle className="w-6 h-6 text-destructive"/>
                       <CardTitle className="font-headline text-destructive text-lg">Consistency Analysis</CardTitle>
-                  </CardHeader>
+                  </Header>
                   <CardContent>
                       <ul className="space-y-2 list-disc pl-5">
                           {insights.consistencyAnalysis.map((anomaly, index) => (
@@ -208,7 +208,7 @@ export default function WorkersPage() {
                   <CardHeader className="flex flex-row items-center gap-2">
                       <Lightbulb className="w-6 h-6 text-accent"/>
                       <CardTitle className="font-headline text-accent text-lg">Recommendations</CardTitle>
-                  </CardHeader>
+                  </Header>
                   <CardContent>
                       <ul className="space-y-2 list-disc pl-5">
                           {insights.recommendations.map((rec, index) => (

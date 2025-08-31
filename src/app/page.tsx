@@ -135,7 +135,7 @@ function LandingPageContent() {
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            username: 'appu_muchandi',
+            username: '',
             password: '',
         },
     });

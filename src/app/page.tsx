@@ -268,7 +268,7 @@ function LandingPageContent() {
                                     <FormItem>
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g., appu_muchandi" {...field} />
+                                        <Input {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>

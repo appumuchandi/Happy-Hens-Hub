@@ -148,16 +148,16 @@ export default function CctvPage() {
   }
 
   const ForgotPasswordDialog = () => {
-    const [email, setEmail] = useState(user?.email || '');
+    const [username, setUsername] = useState(user?.username || '');
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [step, setStep] = useState(1);
     
-    const canContinue = email && newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4;
+    const canContinue = username && newPassword && confirmNewPassword && newPassword === confirmNewPassword && newPassword.length >= 4;
 
     const handleSendOtp = () => {
-        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to ${email}` });
+        toast({ title: "OTP Sent (Simulation)", description: `An OTP has been sent securely to the owner's registered contact.` });
         setStep(2);
     }
     
@@ -186,15 +186,15 @@ export default function CctvPage() {
                 <DialogHeader>
                     <DialogTitle>Reset CCTV Password</DialogTitle>
                     <DialogDescription>
-                         {step === 1 ? 'Enter your email and new password to receive an OTP.' : 'Enter the OTP to finalize the reset.'}
+                         {step === 1 ? 'Enter your username and new password to receive an OTP.' : 'Enter the OTP to finalize the reset.'}
                     </DialogDescription>
                 </DialogHeader>
                  <div className="space-y-4 py-4">
                     {step === 1 ? (
                         <>
                             <div className="space-y-2">
-                                <Label htmlFor="email">Owner's Email</Label>
-                                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <Label htmlFor="username">Owner's Username</Label>
+                                <Input id="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="new-password-reset">New Password</Label>
@@ -208,7 +208,7 @@ export default function CctvPage() {
                     ) : (
                          <div className="space-y-2">
                             <Label htmlFor="otp">Enter OTP</Label>
-                            <p className="text-sm text-muted-foreground">An OTP has been sent to {email}. Please enter it below.</p>
+                            <p className="text-sm text-muted-foreground">An OTP has been sent to the owner's contact. Please enter it below.</p>
                             <Input id="otp" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
                         </div>
                     )}
@@ -321,7 +321,3 @@ export default function CctvPage() {
     </div>
   );
 }
-
-    
-
-    

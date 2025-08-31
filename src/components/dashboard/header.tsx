@@ -123,7 +123,7 @@ export default function AppHeader() {
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem disabled>{user?.name}</DropdownMenuItem>
-            <DropdownMenuItem disabled>{user?.email}</DropdownMenuItem>
+            <DropdownMenuItem disabled>{user?.username}</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:bg-destructive/20 focus:text-destructive">Logout</DropdownMenuItem>
           </DropdownMenuContent>

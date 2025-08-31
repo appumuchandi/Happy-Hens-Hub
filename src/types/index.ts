@@ -4,7 +4,7 @@ export type Role = 'OWNER' | 'WORKER' | 'VIEWER';
 
 export type User = {
   name: string;
-  email: string;
+  username: string;
   role: 'OWNER'; // Only OWNER role is used for login now
 };
 

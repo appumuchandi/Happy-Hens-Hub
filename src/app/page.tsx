@@ -23,7 +23,7 @@ const RupeeIcon = () => (
 );
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Please enter a valid email.' }),
+  username: z.string().min(1, { message: 'Username is required.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
 
@@ -135,7 +135,7 @@ function LandingPageContent() {
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            email: 'owner@henshub.com',
+            username: 'owner',
             password: '',
         },
     });
@@ -156,13 +156,13 @@ function LandingPageContent() {
     }, [isAuthenticated, router]);
     
     function onLoginSubmit(data: LoginFormValues) {
-        if (data.email === 'owner@henshub.com' && data.password === 'appu1234') {
-            login({ name: 'appu_muchandi', email: 'owner@henshub.com', role: 'OWNER' });
+        if (data.username === 'owner' && data.password === 'appu1234') {
+            login({ name: 'appu_muchandi', username: 'owner', role: 'OWNER' });
         } else {
             toast({
                 variant: 'destructive',
                 title: 'Invalid Credentials',
-                description: 'Please check your email and password.',
+                description: 'Please check your username and password.',
             });
         }
     }
@@ -263,12 +263,12 @@ function LandingPageContent() {
                             <CardContent className="space-y-6">
                                 <FormField
                                 control={form.control}
-                                name="email"
+                                name="username"
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel>Username</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="owner@henshub.com" {...field} />
+                                        <Input placeholder="e.g., owner" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -361,5 +361,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

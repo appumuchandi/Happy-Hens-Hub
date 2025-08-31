@@ -135,7 +135,7 @@ function LandingPageContent() {
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            username: 'owner',
+            username: 'appu_muchandi',
             password: '',
         },
     });
@@ -156,8 +156,8 @@ function LandingPageContent() {
     }, [isAuthenticated, router]);
     
     function onLoginSubmit(data: LoginFormValues) {
-        if (data.username === 'owner' && data.password === 'appu1234') {
-            login({ name: 'appu_muchandi', username: 'owner', role: 'OWNER' });
+        if (data.username === 'appu_muchandi' && data.password === 'appu1234') {
+            login({ name: 'appu_muchandi', username: 'appu_muchandi', role: 'OWNER' });
         } else {
             toast({
                 variant: 'destructive',
@@ -268,7 +268,7 @@ function LandingPageContent() {
                                     <FormItem>
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="e.g., owner" {...field} />
+                                        <Input placeholder="e.g., appu_muchandi" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>

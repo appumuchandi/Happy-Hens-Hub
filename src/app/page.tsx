@@ -132,7 +132,6 @@ function LandingPageContent() {
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
-    const [openLoginDialog, setOpenLoginDialog] = useState(false);
     const { setTheme, theme } = useTheme();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -203,58 +202,6 @@ function LandingPageContent() {
                         <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                         <span className="sr-only">Toggle theme</span>
                     </Button>
-                    {isAuthenticated ? (
-                        <Button asChild>
-                            <Link href="/dashboard">
-                                Go to Dashboard
-                            </Link>
-                        </Button>
-                    ) : (
-                        <Dialog open={openLoginDialog} onOpenChange={setOpenLoginDialog}>
-                            <DialogTrigger asChild>
-                                <Button>Owner/Admin Login</Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-md">
-                                <DialogHeader>
-                                    <DialogTitle>Owner/Admin Login</DialogTitle>
-                                    <DialogDescription>
-                                    This area is for authorized personnel only.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onLoginSubmit)} className="space-y-4">
-                                    <FormField
-                                    control={form.control}
-                                    name="username"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormLabel>Username</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Enter your username" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                    />
-                                    <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <Input type="password" placeholder="Enter your password" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                    />
-                                    <Button type="submit" className="w-full">Login</Button>
-                                </form>
-                                </Form>
-                           </DialogContent>
-                        </Dialog>
-                    )}
                 </div>
             </nav>
         </header>
@@ -495,3 +442,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

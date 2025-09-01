@@ -207,23 +207,6 @@ function LandingPageContent() {
         </header>
 
         <main>
-             {/* Hero Section */}
-            <section id="hero" className="relative h-[60vh] w-full">
-                <Image
-                    src="https://picsum.photos/1600/900"
-                    alt="A beautiful sunrise over the farm"
-                    fill
-                    className="object-cover"
-                    priority
-                    data-ai-hint="farm sunrise"
-                />
-                <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white">
-                    <h1 className="text-5xl md:text-7xl font-bold font-headline">
-                        Fresh, Healthy, Farm-to-Home Eggs
-                    </h1>
-                </div>
-            </section>
-            
             {/* About Section */}
             <section id="about" className="py-20">
                 <div className="container mx-auto px-4">

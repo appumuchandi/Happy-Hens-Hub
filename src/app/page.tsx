@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Egg, Phone, MapPin, Wheat, Send } from 'lucide-react';
+import { Egg, Phone, MapPin, Wheat, Send, Recycle, ClipboardList } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -190,7 +190,7 @@ function LandingPageContent() {
 
         <main>
             {/* About Section */}
-            <section id="about" className="py-20">
+            <section id="about" className="py-12">
                 <div className="container mx-auto px-4">
                     <h2 className="text-4xl font-bold text-center mb-12 font-headline">About Our Farm</h2>
                     <div className="max-w-4xl mx-auto text-center text-muted-foreground">
@@ -248,17 +248,63 @@ function LandingPageContent() {
                     </div>
                 </div>
             </section>
+            
+            {/* Farm Updates Section */}
+             <section id="farm-updates" className="py-20">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-4xl font-bold text-center mb-12 font-headline">Farm Updates</h2>
+                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                        <Card>
+                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
+                                <div className="bg-blue-100 p-4 rounded-full">
+                                    <Egg className="w-8 h-8 text-blue-600"/>
+                                </div>
+                                <h3 className="text-xl font-bold">Bulk Egg Orders</h3>
+                                <p className="text-muted-foreground">Please contact Farm administrator for Bulk Eggs.</p>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
+                                <div className="bg-orange-100 p-4 rounded-full">
+                                    <Wheat className="w-8 h-8 text-orange-600"/>
+                                </div>
+                                <h3 className="text-xl font-bold">Ready Feed Orders</h3>
+                                <p className="text-muted-foreground">Please contact Farm administrator for Feed.</p>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
+                                <div className="bg-green-100 p-4 rounded-full">
+                                    <Recycle className="w-8 h-8 text-green-600"/>
+                                </div>
+                                <h3 className="text-xl font-bold">Compost Fertilizer</h3>
+                                <p className="text-2xl font-bold text-foreground">370 Bags</p>
+                                <p className="text-muted-foreground">at Rs. 170/Bag</p>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
+                                <div className="bg-yellow-100 p-4 rounded-full">
+                                    <ClipboardList className="w-8 h-8 text-yellow-600"/>
+                                </div>
+                                <h3 className="text-xl font-bold">Maize Requirement</h3>
+                                <p className="text-2xl font-bold text-foreground">150.00 Quintal</p>
+                                <p className="text-muted-foreground">Needed to restock silos</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </section>
 
             {/* Login Section */}
             {!isAuthenticated && (
-            <section id="login" className="py-20">
+            <section id="login" className="py-20 bg-card">
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <Card className="w-full max-w-md saffron-border shadow-lg">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onLoginSubmit)}>
                             <CardHeader>
-                                <CardTitle className="font-headline text-2xl text-center">Owner Login</CardTitle>
-                                <CardDescription className="text-center">Enter your credentials to access the dashboard.</CardDescription>
+                                <CardTitle className="font-headline text-2xl text-center">Login</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <FormField
@@ -301,12 +347,12 @@ function LandingPageContent() {
             )}
             
             {/* Contact Section */}
-            <section id="contact" className="py-20 bg-card">
+            <section id="contact" className="py-20">
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-4xl font-bold font-headline mb-4">Get In Touch</h2>
                      <Dialog open={openContactDialog} onOpenChange={setOpenContactDialog}>
                         <DialogTrigger asChild>
-                            <Button variant="link" className="text-lg text-muted-foreground mb-8">
+                             <Button variant="link" className="text-lg text-muted-foreground mb-8">
                                 Have questions? We'd love to hear from you.
                             </Button>
                         </DialogTrigger>

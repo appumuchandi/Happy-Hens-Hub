@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Egg, Phone, MapPin, Wheat, Send, Recycle, ClipboardList } from 'lucide-react';
+import { Egg, Phone, MapPin, Wheat, Send, Recycle, ClipboardList, Moon, Sun } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { useTheme } from 'next-themes';
 
 const RupeeIcon = () => (
     <span className="font-bold">₹</span>
@@ -131,7 +132,8 @@ function LandingPageContent() {
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
     const [openFeedRequestDialog, setOpenFeedRequestDialog] = useState(false);
-    
+    const { setTheme, theme } = useTheme();
+
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -177,6 +179,15 @@ function LandingPageContent() {
                     <span className="text-2xl font-bold font-headline">HEN's HUB</span>
                 </Link>
                 <div className="flex items-center gap-2">
+                     <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        >
+                        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span className="sr-only">Toggle theme</span>
+                    </Button>
                     {isAuthenticated ? (
                         <Button asChild>
                             <Link href="/dashboard">
@@ -286,7 +297,7 @@ function LandingPageContent() {
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
                                 <div className="bg-yellow-100 p-4 rounded-full">
                                     <ClipboardList className="w-8 h-8 text-yellow-600"/>
-                                </div>
+                                d</div>
                                 <h3 className="text-xl font-bold">Maize Requirement</h3>
                                 <p className="text-2xl font-bold text-foreground">150.00 Quintal</p>
                                 <p className="text-muted-foreground">Needed to restock silos</p>

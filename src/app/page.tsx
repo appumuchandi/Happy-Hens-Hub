@@ -131,7 +131,6 @@ function LandingPageContent() {
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
-    const [openFeedRequestDialog, setOpenFeedRequestDialog] = useState(false);
     const { setTheme, theme } = useTheme();
 
     const form = useForm<LoginFormValues>({
@@ -214,7 +213,7 @@ function LandingPageContent() {
             <section id="pricing" className="py-20 bg-card">
                 <div className="container mx-auto px-4">
                     <h2 className="text-4xl font-bold text-center mb-12 font-headline">Price & Availability</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
                         <Card className="saffron-border">
                             <CardHeader className="text-center">
                                 <CardTitle className="font-headline text-2xl">Price per Egg</CardTitle>
@@ -234,28 +233,6 @@ function LandingPageContent() {
                                 <p className="text-muted-foreground">eggs available for order</p>
                             </CardContent>
                         </Card>
-                        <Dialog open={openFeedRequestDialog} onOpenChange={setOpenFeedRequestDialog}>
-                            <DialogTrigger asChild>
-                                 <Card className="cursor-pointer hover:shadow-lg transition-shadow">
-                                    <CardHeader className="text-center">
-                                        <CardTitle className="font-headline text-2xl flex items-center justify-center gap-2"><Wheat/>Feed Stock</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-center">
-                                        <p className="text-5xl font-bold text-sky-500">{dashboardStats.weeklyFeedConsumption} kg</p>
-                                        <p className="text-muted-foreground">total feed available</p>
-                                    </CardContent>
-                                     <CardFooter>
-                                        <p className="text-xs text-muted-foreground mx-auto">Click here to inquire about purchasing feed.</p>
-                                     </CardFooter>
-                                </Card>
-                            </DialogTrigger>
-                             <ContactForm 
-                                setDialogOpen={setOpenFeedRequestDialog} 
-                                title="Request Feed Stock"
-                                description="Let us know your requirements, and we'll get back to you with a quote."
-                                placeholder="e.g., I would like to purchase 1 ton of feed..."
-                            />
-                        </Dialog>
                     </div>
                 </div>
             </section>
@@ -297,7 +274,7 @@ function LandingPageContent() {
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
                                 <div className="bg-yellow-100 p-4 rounded-full">
                                     <ClipboardList className="w-8 h-8 text-yellow-600"/>
-                                d</div>
+                                </div>
                                 <h3 className="text-xl font-bold">Maize Requirement</h3>
                                 <p className="text-2xl font-bold text-foreground">150.00 Quintal</p>
                                 <p className="text-muted-foreground">Needed to restock silos</p>

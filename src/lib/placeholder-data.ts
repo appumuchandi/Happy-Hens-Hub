@@ -88,7 +88,7 @@ export const siteSettings: SiteSettings = {
     upiId: 'owner@upi',
     contactInfo: '+91 98765 43210',
     address: 'Hens Hub Farm, Ruralville, Agri-State',
-    aboutFarm: `Welcome to HEN's HUB, a family-owned farm dedicated to ethical and sustainable poultry farming. 
+    aboutFarm: `Welcome to Happy HEN's HUB, a family-owned farm dedicated to ethical and sustainable poultry farming. 
     Our hens are raised in a free-range environment, ensuring they lead happy, healthy lives. 
     We believe that the quality of our eggs is a direct reflection of the care our hens receive. 
     We avoid antibiotics and hormones, providing our flock with natural, high-quality feed. 

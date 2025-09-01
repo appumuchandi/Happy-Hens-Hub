@@ -208,12 +208,12 @@ function LandingPageContent() {
                     </div>
                 </div>
             </section>
-
-            {/* Pricing & Stock Section */}
-            <section id="pricing" className="py-20 bg-card">
+            
+            {/* Farm Updates Section */}
+             <section id="farm-updates" className="py-20 bg-card">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-4xl font-bold text-center mb-12 font-headline">Price & Availability</h2>
-                    <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
+                    <h2 className="text-4xl font-bold text-center mb-12 font-headline">Farm Updates</h2>
+                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         <Card className="saffron-border">
                             <CardHeader className="text-center">
                                 <CardTitle className="font-headline text-2xl">Price per Egg</CardTitle>
@@ -233,19 +233,10 @@ function LandingPageContent() {
                                 <p className="text-muted-foreground">eggs available for order</p>
                             </CardContent>
                         </Card>
-                    </div>
-                </div>
-            </section>
-            
-            {/* Farm Updates Section */}
-             <section id="farm-updates" className="py-20">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-4xl font-bold text-center mb-12 font-headline">Farm Updates</h2>
-                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
                         <Card>
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-blue-100 p-4 rounded-full">
-                                    <Egg className="w-8 h-8 text-blue-600"/>
+                                <div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-full">
+                                    <Egg className="w-8 h-8 text-blue-600 dark:text-blue-400"/>
                                 </div>
                                 <h3 className="text-xl font-bold">Bulk Egg Orders</h3>
                                 <p className="text-muted-foreground">Please contact Farm administrator for Bulk Eggs.</p>
@@ -253,8 +244,8 @@ function LandingPageContent() {
                         </Card>
                          <Card>
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-orange-100 p-4 rounded-full">
-                                    <Wheat className="w-8 h-8 text-orange-600"/>
+                                <div className="bg-orange-100 dark:bg-orange-900/50 p-4 rounded-full">
+                                    <Wheat className="w-8 h-8 text-orange-600 dark:text-orange-400"/>
                                 </div>
                                 <h3 className="text-xl font-bold">Ready Feed Orders</h3>
                                 <p className="text-muted-foreground">Please contact Farm administrator for Feed.</p>
@@ -262,8 +253,8 @@ function LandingPageContent() {
                         </Card>
                          <Card>
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-green-100 p-4 rounded-full">
-                                    <Recycle className="w-8 h-8 text-green-600"/>
+                                <div className="bg-green-100 dark:bg-green-900/50 p-4 rounded-full">
+                                    <Recycle className="w-8 h-8 text-green-600 dark:text-green-400"/>
                                 </div>
                                 <h3 className="text-xl font-bold">Compost Fertilizer</h3>
                                 <p className="text-2xl font-bold text-foreground">370 Bags</p>
@@ -272,8 +263,8 @@ function LandingPageContent() {
                         </Card>
                          <Card>
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-yellow-100 p-4 rounded-full">
-                                    <ClipboardList className="w-8 h-8 text-yellow-600"/>
+                                <div className="bg-yellow-100 dark:bg-yellow-900/50 p-4 rounded-full">
+                                    <ClipboardList className="w-8 h-8 text-yellow-600 dark:text-yellow-400"/>
                                 </div>
                                 <h3 className="text-xl font-bold">Maize Requirement</h3>
                                 <p className="text-2xl font-bold text-foreground">150.00 Quintal</p>
@@ -286,7 +277,7 @@ function LandingPageContent() {
 
             {/* Login Section */}
             {!isAuthenticated && (
-            <section id="login" className="py-20 bg-card">
+            <section id="login" className="py-20">
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <Card className="w-full max-w-md saffron-border shadow-lg">
                         <Form {...form}>

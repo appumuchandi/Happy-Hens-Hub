@@ -15,6 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from 'next-themes';
@@ -131,6 +132,7 @@ function LandingPageContent() {
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
+    const [openLoginDialog, setOpenLoginDialog] = useState(false);
     const { setTheme, theme } = useTheme();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -207,14 +209,76 @@ function LandingPageContent() {
                                 Go to Dashboard
                             </Link>
                         </Button>
-                    ) : null}
+                    ) : (
+                        <Dialog open={openLoginDialog} onOpenChange={setOpenLoginDialog}>
+                            <DialogTrigger asChild>
+                                <Button>Owner/Admin Login</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Owner/Admin Login</DialogTitle>
+                                    <DialogDescription>
+                                    This area is for authorized personnel only.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onLoginSubmit)} className="space-y-4">
+                                    <FormField
+                                    control={form.control}
+                                    name="username"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Username</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter your username" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    />
+                                    <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="Enter your password" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    />
+                                    <Button type="submit" className="w-full">Login</Button>
+                                </form>
+                                </Form>
+                           </DialogContent>
+                        </Dialog>
+                    )}
                 </div>
             </nav>
         </header>
 
         <main>
+             {/* Hero Section */}
+            <section id="hero" className="relative h-[60vh] w-full">
+                <Image
+                    src="https://picsum.photos/1600/900"
+                    alt="A beautiful sunrise over the farm"
+                    fill
+                    className="object-cover"
+                    priority
+                    data-ai-hint="farm sunrise"
+                />
+                <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white">
+                    <h1 className="text-5xl md:text-7xl font-bold font-headline">
+                        Fresh, Healthy, Farm-to-Home Eggs
+                    </h1>
+                </div>
+            </section>
+            
             {/* About Section */}
-            <section id="about" className="py-12">
+            <section id="about" className="py-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-4xl font-bold text-center mb-12 font-headline">About Our Farm</h2>
                     <div className="max-w-4xl mx-auto text-center text-muted-foreground">
@@ -431,5 +495,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

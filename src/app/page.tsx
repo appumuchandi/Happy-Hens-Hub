@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Egg, Phone, MapPin, Wheat, Send, Recycle, ClipboardList, Moon, Sun } from 'lucide-react';
+import { Egg, Phone, MapPin, Wheat, Send, Recycle, ClipboardList, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -132,6 +132,7 @@ function LandingPageContent() {
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
     const { setTheme, theme } = useTheme();
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -167,6 +168,19 @@ function LandingPageContent() {
             });
         }
     }
+    
+    const LeafIcon = (props: React.SVGProps<SVGSVGElement>) => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 256 256"
+        {...props}
+      >
+        <path
+          d="M216.7,152.2a88.1,88.1,0,0,1-152.1,3.4A87.9,87.9,0,0,1,120,32.1a88.4,88.4,0,0,1,72.2,35.4c.1.1.2.2.3.3a88.1,88.1,0,0,1,24.2,84.4ZM127.9,224A112,112,0,0,0,215.8,56.2,112.1,112.1,0,0,0,40,144a112,112,0,0,0,87.9,80Z"
+          fill="currentColor"
+        />
+      </svg>
+    );
 
     return (
         <div className="bg-background text-foreground">
@@ -233,7 +247,7 @@ function LandingPageContent() {
                                 <p className="text-muted-foreground">eggs available for order</p>
                             </CardContent>
                         </Card>
-                        <Card>
+                         <Card>
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
                                 <div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-full">
                                     <Egg className="w-8 h-8 text-blue-600 dark:text-blue-400"/>
@@ -277,25 +291,31 @@ function LandingPageContent() {
 
             {/* Login Section */}
             {!isAuthenticated && (
-            <section id="login" className="py-20">
+            <section id="login" className="py-20 bg-background">
                 <div className="container mx-auto px-4 flex flex-col items-center">
-                    <Card className="w-full max-w-md saffron-border shadow-lg">
+                    <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
+                        <div className="flex flex-col items-center mb-8">
+                            <div className="bg-green-500 text-white p-4 rounded-2xl mb-4">
+                                <LeafIcon className="w-10 h-10" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-foreground">Happy Hens Hub</h2>
+                            <p className="text-muted-foreground">Welcome to your farm management system</p>
+                        </div>
+
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onLoginSubmit)}>
-                            <CardHeader>
-                                <CardTitle className="font-headline text-2xl text-center">Login</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
+                            <form onSubmit={form.handleSubmit(onLoginSubmit)} className="space-y-6">
                                 <FormField
                                 control={form.control}
                                 name="username"
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>Username</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
+                                    <div className="relative">
+                                        <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                        <FormControl>
+                                            <Input placeholder="Enter your username" {...field} className="pl-10 h-12 rounded-full bg-muted border-transparent focus:bg-background focus:border-primary" />
+                                        </FormControl>
+                                    </div>
+                                    <FormMessage className="pl-4"/>
                                     </FormItem>
                                 )}
                                 />
@@ -304,23 +324,48 @@ function LandingPageContent() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" placeholder="••••••••" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                        <FormControl>
+                                            <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} className="pl-10 pr-10 h-12 rounded-full bg-muted border-transparent focus:bg-background focus:border-primary" />
+                                        </FormControl>
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            {showPassword ? <EyeOff className="h-5 w-5 text-muted-foreground"/> : <Eye className="h-5 w-5 text-muted-foreground" />}
+                                        </button>
+                                    </div>
+                                    <FormMessage className="pl-4"/>
                                     </FormItem>
                                 )}
                                 />
-                            </CardContent>
-                            <CardFooter>
-                                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                                Sign In
+                                <Button type="submit" size="lg" className="w-full h-14 rounded-full bg-gradient-to-r from-green-400 to-teal-500 hover:from-green-500 hover:to-teal-600 text-white text-lg font-bold shadow-lg">
+                                    Sign In
+                                    <ChevronRight className="ml-2"/>
                                 </Button>
-                            </CardFooter>
                             </form>
                         </Form>
-                    </Card>
+                        <div className="mt-8 flex justify-between items-center text-sm">
+                            <Dialog open={openContactDialog} onOpenChange={setOpenContactDialog}>
+                                <DialogTrigger asChild>
+                                    <Button variant="link" className="text-muted-foreground">Contact Farm Administrator</Button>
+                                </DialogTrigger>
+                                <ContactForm 
+                                    setDialogOpen={setOpenContactDialog} 
+                                    title="Contact Administrator" 
+                                    description="For login issues or other administrative queries, please leave a message."
+                                    placeholder="Please describe your login issue."
+                                />
+                            </Dialog>
+                             <a 
+                                href="https://www.google.com/maps/dir/?api=1&destination=Happy%20Hen's%20Hub,%2096J8%2B7V2,%20Mugalkhod,%20Karnataka%20587113" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="flex items-center gap-1 text-muted-foreground hover:text-primary"
+                            >
+                                <MapPin className="h-4 w-4"/>
+                                Locate Us
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </section>
             )}
@@ -386,3 +431,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

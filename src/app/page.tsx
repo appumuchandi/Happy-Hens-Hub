@@ -232,16 +232,6 @@ function LandingPageContent() {
         </header>
 
         <main>
-            {/* About Section */}
-            <section id="about" className="py-20">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-4xl font-bold text-center mb-12 font-headline">About Our Farm</h2>
-                    <div className="max-w-4xl mx-auto text-center text-muted-foreground">
-                        <p className="whitespace-pre-line text-lg">{settings.aboutFarm}</p>
-                    </div>
-                </div>
-            </section>
-            
             {/* Farm Updates Section */}
              <section id="farm-updates" className="py-20 bg-card">
                 <div className="container mx-auto px-4">

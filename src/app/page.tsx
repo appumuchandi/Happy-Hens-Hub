@@ -6,24 +6,19 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Wheat, Send, Recycle, ClipboardList, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
-import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
+import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from 'next-themes';
 
-const RupeeIcon = () => (
-    <span className="font-bold">₹</span>
-);
 
 const H3Logo = () => (
     <svg 
@@ -31,19 +26,11 @@ const H3Logo = () => (
         className="h-10 w-auto" 
         fill="none" 
     >
+        <path d="M10 10 V 70 H 25 V 45 C 25 25, 45 25, 45 45 V 70 H 60 V 10 H 45 V 35 C 45 55, 25 55, 25 35 V 10 Z" fill="hsl(var(--primary))" />
         <text 
-            x="0" y="65" 
-            fontSize="80" 
-            fill="hsl(var(--foreground))"
-            fontFamily="sans-serif"
-            fontWeight="bold"
-        >
-            H
-        </text>
-         <text 
-            x="68" y="65" 
-            fontSize="80" 
-            fill="#FF0000"
+            x="68" y="35" 
+            fontSize="40" 
+            fill="hsl(var(--accent))"
             fontFamily="sans-serif"
             fontWeight="bold"
         >
@@ -235,72 +222,6 @@ function LandingPageContent() {
                 </div>
             </section>
 
-            {/* Farm Updates Section */}
-             <section id="farm-updates" className="py-20 bg-card">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-4xl font-bold text-center mb-12 font-headline">Farm Updates</h2>
-                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        <Card className="saffron-border">
-                            <CardHeader className="text-center">
-                                <CardTitle className="font-headline text-2xl">Price per Egg</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-center">
-                                <p className="text-5xl font-bold text-primary flex items-center justify-center">
-                                    <RupeeIcon />{settings.pricePerEgg.toFixed(2)}
-                                </p>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="text-center">
-                                <CardTitle className="font-headline text-2xl">Available Egg Stock</CardTitle>
-                            </CardHeader>
-                            <CardContent className="text-center">
-                                <p className="text-5xl font-bold text-accent">{settings.availableStock.toLocaleString()}</p>
-                                <p className="text-muted-foreground">eggs available for order</p>
-                            </CardContent>
-                        </Card>
-                         <Card>
-                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-full">
-                                    <Image src="https://placehold.co/40x40/3399FF/FFFFFF.png" alt="Bulk Egg Orders" width={40} height={40} data-ai-hint="eggs basket"/>
-                                </div>
-                                <h3 className="text-xl font-bold">Bulk Egg Orders</h3>
-                                <p className="text-muted-foreground">Please contact Farm administrator for Bulk Eggs.</p>
-                            </CardContent>
-                        </Card>
-                         <Card>
-                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-orange-100 dark:bg-orange-900/50 p-4 rounded-full">
-                                    <Wheat className="w-8 h-8 text-orange-600 dark:text-orange-400"/>
-                                </div>
-                                <h3 className="text-xl font-bold">Ready Feed Orders</h3>
-                                <p className="text-muted-foreground">Please contact Farm administrator for Feed.</p>
-                            </CardContent>
-                        </Card>
-                         <Card>
-                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-green-100 dark:bg-green-900/50 p-4 rounded-full">
-                                    <Recycle className="w-8 h-8 text-green-600 dark:text-green-400"/>
-                                </div>
-                                <h3 className="text-xl font-bold">Compost Fertilizer</h3>
-                                <p className="text-2xl font-bold text-foreground">370 Bags</p>
-                                <p className="text-muted-foreground">at Rs. 170/Bag</p>
-                            </CardContent>
-                        </Card>
-                         <Card>
-                             <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
-                                <div className="bg-yellow-100 dark:bg-yellow-900/50 p-4 rounded-full">
-                                    <ClipboardList className="w-8 h-8 text-yellow-600 dark:text-yellow-400"/>
-                                </div>
-                                <h3 className="text-xl font-bold">Maize Requirement</h3>
-                                <p className="text-2xl font-bold text-foreground">150.00 Quintal</p>
-                                <p className="text-muted-foreground">Needed to restock silos</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-            </section>
-
             {/* Login Section */}
             {!isAuthenticated && (
             <section id="login" className="py-20 bg-background">
@@ -452,3 +373,4 @@ export default function LandingPage() {
     
 
     
+

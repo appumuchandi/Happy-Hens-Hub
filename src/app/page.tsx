@@ -41,11 +41,11 @@ const H3Logo = () => (
             H
         </text>
          <text 
-            x="68" y="40" 
-            fontSize="48" 
+            x="68" y="65" 
+            fontSize="80" 
             fill="#FF0000"
             fontFamily="sans-serif"
-            fontWeight="normal"
+            fontWeight="bold"
         >
             3
         </text>
@@ -224,9 +224,14 @@ function LandingPageContent() {
 
         <main>
              {/* Welcome Section */}
-             <section className="py-20 text-center bg-background">
+             <section className="py-20 text-center bg-background overflow-hidden">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-4xl md:text-5xl font-bold font-headline text-foreground animate-slide-in-left">Welcome to Happy Hens Hub</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold font-headline text-foreground animate-fade-in-bounce">
+                        Welcome to <span className="text-amber-500">Happy Hens Hub</span>
+                    </h1>
+                    <p className="mt-4 text-lg md:text-xl text-muted-foreground animate-fade-in-delay">
+                        From happy hens to happy homes.
+                    </p>
                 </div>
             </section>
 
@@ -446,3 +451,4 @@ export default function LandingPage() {
 
     
 
+    

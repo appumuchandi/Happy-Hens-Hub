@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 import colors from 'tailwindcss/colors';
 
@@ -80,25 +81,35 @@ export default {
             height: '0',
           },
         },
-        'slide-in-from-left': {
+        'fade-in-bounce': {
           '0%': {
-            transform: 'translateX(-100%)',
             opacity: '0',
+            transform: 'translateY(-20px)',
+          },
+          '60%': {
+            opacity: '1',
+            transform: 'translateY(5px)',
           },
           '100%': {
-            transform: 'translateX(0)',
-            opacity: '1',
+            transform: 'translateY(0)',
           },
         },
+        'fade-in-delay': {
+            '0%': { opacity: '0' },
+            '50%': { opacity: '0' },
+            '100%': { opacity: '1' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'slide-in-left': 'slide-in-from-left 1s ease-out forwards',
+        'fade-in-bounce': 'fade-in-bounce 1s ease-out forwards',
+        'fade-in-delay': 'fade-in-delay 1.5s ease-out forwards',
       },
     },
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
 
+    
     

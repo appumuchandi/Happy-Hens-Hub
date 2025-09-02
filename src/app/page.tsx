@@ -24,43 +24,6 @@ const RupeeIcon = () => (
     <span className="font-bold">₹</span>
 );
 
-const H3Logo = ({ className }: { className?: string }) => (
-    <svg
-      className={className}
-      viewBox="0 0 128 128"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-    >
-      <path
-        d="M20 12L20 116H44V72H84V116H108V12H84V52H44V12H20Z"
-        fill="#FF9933"
-      />
-      <path
-        d="M56 52C56 56.4183 52.4183 60 48 60C43.5817 60 40 56.4183 40 52C40 47.5817 43.5817 44 48 44C52.4183 44 56 47.5817 56 52Z"
-        fill="white"
-      />
-      <path
-        d="M84 52H44V72H57.2727C60.4545 66.8889 68 64 68 64V52H84Z"
-        fill="#E68A2E"
-      />
-      <path
-        d="M86 4C86 6.20914 84.2091 8 82 8H72C69.7909 8 68 6.20914 68 4C68 1.79086 69.7909 0 72 0H82C84.2091 0 86 1.79086 86 4Z"
-        fill="white"
-      />
-       <text
-            x="100"
-            y="32"
-            fontFamily="sans-serif"
-            fontSize="32"
-            fontWeight="bold"
-            fill="#FF9933"
-        >
-            3
-        </text>
-    </svg>
-);
-
-
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
@@ -213,7 +176,6 @@ function LandingPageContent() {
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
             <nav className="container mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
                 <Link href="/" className="flex items-center gap-2">
-                    <H3Logo className="h-8 w-8" />
                     <span className="text-2xl font-bold font-headline">Happy Hen's Hub</span>
                 </Link>
                 <div className="flex items-center gap-2">
@@ -313,7 +275,6 @@ function LandingPageContent() {
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
-                             <H3Logo className="w-24 h-24" />
                             <h2 className="text-2xl font-bold text-foreground mt-2">Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>

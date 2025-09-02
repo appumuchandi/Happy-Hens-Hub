@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, ShoppingCart, Leaf, Gift } from 'lucide-react';
+import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, ShoppingCart, Leaf, Gift, Recycle, Wheat, Archive } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -133,6 +133,11 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
     )
 }
 
+const OIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/>
+    </svg>
+)
 
 function LandingPageContent() {
     const { isAuthenticated, login } = useAuth();
@@ -215,44 +220,61 @@ function LandingPageContent() {
             </section>
             
             {/* Farm Updates Section */}
-            <section className="py-20 bg-muted/50">
+            <section className="py-12 bg-muted/50">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold font-headline text-center mb-12">Farm Updates</h2>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <Card className="overflow-hidden group">
-                             <Image src="https://picsum.photos/600/400" data-ai-hint="chicks farm" alt="New batch of chicks" width={600} height={400} className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" />
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <ShoppingCart className="text-primary"/>
-                                    New Batch of Chicks
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">We're excited to welcome a new batch of healthy chicks to our farm! They are settling in nicely and will soon join our free-range flock.</p>
+                    <div className="text-center mb-12">
+                        <h2 className="text-3xl font-bold font-headline text-primary">Farm Updates</h2>
+                        <p className="text-muted-foreground">Latest stock and requirement details.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* Bulk Egg Orders */}
+                        <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+                            <CardContent className="pt-6 flex items-center gap-4">
+                                <div className="bg-blue-500 text-white rounded-full p-3">
+                                    <OIcon />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
+                                    <CardDescription className="text-blue-600 dark:text-blue-400">Please contact Farm administrator for Bulk Eggs.</CardDescription>
+                                </div>
                             </CardContent>
                         </Card>
-                         <Card className="overflow-hidden group">
-                             <Image src="https://picsum.photos/600/400" data-ai-hint="organic feed" alt="Organic feed" width={600} height={400} className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" />
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Leaf className="text-primary"/>
-                                    Organic Feed Introduced
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">Our hens are now enjoying a new, locally-sourced organic feed mix. Happy hens lay the best eggs!</p>
+                        {/* Ready Feed Orders */}
+                         <Card className="bg-orange-100/50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
+                            <CardContent className="pt-6 flex items-center gap-4">
+                                <div className="bg-orange-500 text-white rounded-full p-3">
+                                    <Wheat />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-orange-800 dark:text-orange-300">Ready Feed Orders</CardTitle>
+                                    <CardDescription className="text-orange-600 dark:text-orange-400">Please Contact Farm administrator for Feed.</CardDescription>
+                                </div>
                             </CardContent>
                         </Card>
-                         <Card className="overflow-hidden group">
-                             <Image src="https://picsum.photos/600/400" data-ai-hint="egg carton" alt="Eggs on sale" width={600} height={400} className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" />
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Gift className="text-primary"/>
-                                    Seasonal Egg Sale
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">Don't miss our seasonal sale! Get a discount on our fresh, free-range eggs for a limited time. Visit us at the farm to learn more.</p>
+                        {/* Compost Fertilizer */}
+                         <Card className="bg-green-100/50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                            <CardContent className="pt-6 flex items-center gap-4">
+                                <div className="bg-green-500 text-white rounded-full p-3">
+                                    <Recycle />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-green-800 dark:text-green-300">Compost Fertilizer Available</CardTitle>
+                                    <p className="text-2xl font-bold text-green-700 dark:text-green-400">370 Bags</p>
+                                    <p className="text-sm text-green-600 dark:text-green-500">at Rs. 175/Bag</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                        {/* Maize Requirement */}
+                         <Card className="bg-yellow-100/50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+                            <CardContent className="pt-6 flex items-center gap-4">
+                                <div className="bg-yellow-500 text-white rounded-full p-3">
+                                    <Archive />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-yellow-800 dark:text-yellow-300">Maize Requirement</CardTitle>
+                                    <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">150.00 Quintal</p>
+                                    <p className="text-sm text-yellow-600 dark:text-yellow-500">Needed to restock silos</p>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -410,5 +432,6 @@ export default function LandingPage() {
     
 
     
+
 
 

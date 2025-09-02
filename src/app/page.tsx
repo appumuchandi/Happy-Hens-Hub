@@ -28,7 +28,7 @@ const H3Logo = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 100 100" 
-        className="h-10 w-10 text-primary" 
+        className="h-10 w-10 text-amber-500" 
         fill="none" 
         stroke="currentColor" 
         strokeWidth="5"
@@ -329,7 +329,7 @@ function LandingPageContent() {
                                     <div className="relative">
                                         <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                         <FormControl>
-                                            <Input placeholder="Enter your username" {...field} className="pl-10 h-12 rounded-full bg-muted border-transparent focus:bg-background focus:border-primary" />
+                                            <Input placeholder="Enter your username" {...field} className="pl-10 h-12 rounded-full bg-background border-input focus:bg-background focus:border-primary" />
                                         </FormControl>
                                     </div>
                                     <FormMessage className="pl-4"/>
@@ -344,7 +344,7 @@ function LandingPageContent() {
                                     <div className="relative">
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                         <FormControl>
-                                            <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} className="pl-10 pr-10 h-12 rounded-full bg-muted border-transparent focus:bg-background focus:border-primary" />
+                                            <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} className="pl-10 pr-10 h-12 rounded-full bg-background border-input focus:bg-background focus:border-primary" />
                                         </FormControl>
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2">
                                             {showPassword ? <EyeOff className="h-5 w-5 text-muted-foreground"/> : <Eye className="h-5 w-5 text-muted-foreground" />}
@@ -453,7 +453,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    
-
-    

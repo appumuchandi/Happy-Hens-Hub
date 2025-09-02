@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import StatCard from '@/components/dashboard/stat-card';
-import { dashboardStats, siteSettings as defaultSettings } from '@/lib/placeholder-data';
+import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
 import { Egg, Users, LineChart, AlertTriangle } from 'lucide-react';
 import type { SiteSettings } from '@/types';
 import { useEffect, useState } from 'react';
@@ -15,14 +15,10 @@ const RupeeIcon = () => (
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const {
-    henCount,
-    feedConsumption,
-  } = dashboardStats;
-
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [salesHistory, setSalesHistory] = useState<any[]>([]);
-  
+  const [totalFeedStock, setTotalFeedStock] = useState(0);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
         const storedSettings = localStorage.getItem('siteSettings');
@@ -34,6 +30,13 @@ export default function DashboardPage() {
         if (storedSales) {
             setSalesHistory(JSON.parse(storedSales));
         }
+        
+        const storedFeed = localStorage.getItem('feedContainers');
+        if (storedFeed) {
+            const feedContainers = JSON.parse(storedFeed);
+            const total = feedContainers.reduce((acc: number, container: any) => acc + container.quantity, 0);
+            setTotalFeedStock(total);
+        }
     }
   }, []);
   
@@ -41,6 +44,11 @@ export default function DashboardPage() {
     .filter(o => new Date(o.date).toDateString() === new Date().toDateString())
     .reduce((acc, o) => acc + parseFloat(o.revenue), 0);
 
+  // Assuming a total feed capacity for the alert percentage.
+  // This could be made a setting later.
+  const totalFeedCapacity = 10000; // e.g., 10,000 kg total capacity
+  const feedStockPercentage = totalFeedCapacity > 0 ? (totalFeedStock / totalFeedCapacity) * 100 : 0;
+  const showLowFeedAlert = feedStockPercentage < 20;
 
   if (!user) {
     return <p className="text-destructive">You must be logged in to view this page.</p>;
@@ -73,26 +81,28 @@ export default function DashboardPage() {
 
         <StatCard
           title="Active Hen Count"
-          value={henCount.toLocaleString()}
+          value={settings.henCount?.toLocaleString() || 500}
           icon={Users}
-          description="Total active hens"
+          description="Total active hens in the farm"
         />
 
         <StatCard
           title="Daily Feed Consumption"
-          value={`${feedConsumption} kg`}
+          value={`${settings.feedConsumption?.toLocaleString() || 75} kg`}
           icon={LineChart}
-          description="Feed consumed today"
+          description="Estimated feed consumed today"
           color="sky"
         />
         
-        <StatCard
-            title="System Alert"
-            value="Low Feed Stock"
-            icon={AlertTriangle}
-            description="Feed level below 20%"
-            color="red"
-          />
+        {showLowFeedAlert && (
+          <StatCard
+              title="System Alert"
+              value="Low Feed Stock"
+              icon={AlertTriangle}
+              description={`Feed level is at ${feedStockPercentage.toFixed(1)}% capacity`}
+              color="red"
+            />
+        )}
       </div>
     </div>
   );

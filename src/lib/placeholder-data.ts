@@ -87,7 +87,9 @@ a family-owned farm dedicated to ethical and sustainable poultry farming.
     Thank you for supporting local farming and choosing eggs that are as wholesome as they are delicious.`,
     compostBags: 370,
     compostPricePerBag: 175,
-    maizeQuintals: 150.00
+    maizeQuintals: 150.00,
+    henCount: 500,
+    feedConsumption: 75,
 };
 
 export type Order = {

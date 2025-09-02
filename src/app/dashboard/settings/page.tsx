@@ -27,6 +27,8 @@ const settingsSchema = z.object({
   compostBags: z.coerce.number().int().nonnegative('Compost bags must be a non-negative number.'),
   compostPricePerBag: z.coerce.number().nonnegative('Compost price must be a non-negative number.'),
   maizeQuintals: z.coerce.number().nonnegative('Maize quintals must be a non-negative number.'),
+  henCount: z.coerce.number().int().positive('Hen count must be a positive number.'),
+  feedConsumption: z.coerce.number().positive('Feed consumption must be a positive number.'),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -48,6 +50,8 @@ export default function SettingsPage() {
           const parsedSettings = JSON.parse(storedSettings);
           setSettings(parsedSettings);
           form.reset(parsedSettings);
+        } else {
+           form.reset(defaultSettings);
         }
     }
   }, [form]);
@@ -70,7 +74,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-3xl font-bold font-headline">Site Settings</h1>
         <p className="text-muted-foreground">
-          Manage the public information displayed on your farm's homepage.
+          Manage the public information displayed on your farm's homepage and dashboard.
         </p>
       </div>
 
@@ -79,46 +83,80 @@ export default function SettingsPage() {
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
-                        <CardTitle className="font-headline">Public Information</CardTitle>
+                        <CardTitle className="font-headline">Farm & Site Information</CardTitle>
                          <Button type="submit">
                             <Save className="mr-2 h-4 w-4" />
                             Save Changes
                         </Button>
                     </div>
-                    <CardDescription>This information will be visible to all visitors on your homepage.</CardDescription>
+                    <CardDescription>This information will be visible to visitors and used in dashboard calculations.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">
                      <div>
-                        <h3 className="text-lg font-medium mb-4">Farm Details</h3>
+                        <h3 className="text-lg font-medium mb-4">Core Farm Metrics</h3>
+                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <FormField
+                            control={form.control}
+                            name="henCount"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Active Hen Count</FormLabel>
+                                <FormControl>
+                                    <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                             <FormField
+                            control={form.control}
+                            name="feedConsumption"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Daily Feed Consumption (kg)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" step="0.1" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="pricePerEgg"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Price Per Egg (₹)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" step="0.01" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="availableStock"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Available Stock (eggs)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                         </div>
+                     </div>
+                     
+                    <Separator />
+
+                     <div>
+                        <h3 className="text-lg font-medium mb-4">Public Information</h3>
                         <div className="grid md:grid-cols-2 gap-8">
                              <div className="space-y-6">
                                 <FormField
-                                control={form.control}
-                                name="pricePerEgg"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Price Per Egg (₹)</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" step="0.01" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="availableStock"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Available Stock (eggs)</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                 <FormField
                                 control={form.control}
                                 name="aboutFarm"
                                 render={({ field }) => (
@@ -193,50 +231,46 @@ export default function SettingsPage() {
                     
                     <div>
                         <h3 className="text-lg font-medium mb-4">Homepage Updates</h3>
-                        <div className="grid md:grid-cols-2 gap-8">
-                             <div className="space-y-6">
-                                <FormField
-                                control={form.control}
-                                name="compostBags"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Compost Fertilizer (Bags)</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="compostPricePerBag"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Compost Price per Bag (₹)</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                             </div>
-                             <div className="space-y-6">
-                                <FormField
-                                control={form.control}
-                                name="maizeQuintals"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Maize Requirement (Quintals)</FormLabel>
-                                    <FormControl>
-                                        <Input type="number" step="0.01" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                             </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                             <FormField
+                            control={form.control}
+                            name="compostBags"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Compost Fertilizer (Bags)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="compostPricePerBag"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Compost Price per Bag (₹)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                            <FormField
+                            control={form.control}
+                            name="maizeQuintals"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Maize Requirement (Quintals)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" step="0.01" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
                         </div>
                     </div>
                 </CardContent>

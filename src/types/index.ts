@@ -19,6 +19,8 @@ export type SiteSettings = {
     compostBags: number;
     compostPricePerBag: number;
     maizeQuintals: number;
+    henCount: number;
+    feedConsumption: number;
 };
 
 export type Order = {

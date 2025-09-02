@@ -427,13 +427,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    
-
-    
-
-    
-
-
-
-

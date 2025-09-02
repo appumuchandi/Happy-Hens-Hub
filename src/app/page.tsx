@@ -31,11 +31,13 @@ const H3Logo = () => (
         className="h-10 w-10 text-primary" 
         fill="none" 
         stroke="currentColor" 
-        strokeWidth="4"
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
     >
-        <path d="M83.87,75 L50,93.3 L16.13,75 L16.13,25 L50,6.7 L83.87,25 Z"></path>
+        <path d="M50 7.5L93.3 25v50L50 92.5L6.7 75V25L50 7.5z" />
         <text 
-            x="50" y="62" 
+            x="38" y="70" 
             textAnchor="middle" 
             fontSize="48" 
             fill="currentColor"
@@ -43,7 +45,18 @@ const H3Logo = () => (
             fontFamily="sans-serif"
             fontWeight="bold"
         >
-            H<tspan fontSize="32" dy="-1.2em">3</tspan>
+            H
+        </text>
+         <text 
+            x="72" y="45" 
+            textAnchor="middle" 
+            fontSize="36" 
+            fill="currentColor"
+            stroke="none"
+            fontFamily="sans-serif"
+            fontWeight="normal"
+        >
+            3
         </text>
     </svg>
 );
@@ -440,5 +453,7 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    
 
     

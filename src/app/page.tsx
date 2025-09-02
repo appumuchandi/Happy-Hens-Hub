@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -28,7 +29,7 @@ const H3Logo = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 100 100" 
-        className="h-10 w-10 text-yellow-500" 
+        className="h-12 w-12 text-yellow-500" 
         fill="none" 
         stroke="currentColor" 
         strokeWidth="5"
@@ -305,7 +306,7 @@ function LandingPageContent() {
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
                             <H3Logo />
-                            <h2 className="text-2xl font-bold text-foreground mt-2">Happy Hens Hub</h2>
+                            <h2 className="text-2xl font-bold text-foreground mt-2 animate-slide-in-left">Welcome to Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>
 
@@ -443,5 +444,7 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    
 
     

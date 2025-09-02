@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Egg, Phone, MapPin, Wheat, Send, Recycle, ClipboardList, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { Phone, MapPin, Wheat, Send, Recycle, ClipboardList, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings, dashboardStats } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -23,6 +23,31 @@ import { useTheme } from 'next-themes';
 const RupeeIcon = () => (
     <span className="font-bold">₹</span>
 );
+
+const H3Logo = () => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 100 100" 
+        className="h-10 w-10 text-primary" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="4"
+    >
+        <path d="M83.87,75 L50,93.3 L16.13,75 L16.13,25 L50,6.7 L83.87,25 Z"></path>
+        <text 
+            x="50" y="62" 
+            textAnchor="middle" 
+            fontSize="48" 
+            fill="currentColor"
+            stroke="none"
+            fontFamily="sans-serif"
+            fontWeight="bold"
+        >
+            H<tspan fontSize="32" dy="-1.2em">3</tspan>
+        </text>
+    </svg>
+);
+
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
@@ -176,6 +201,7 @@ function LandingPageContent() {
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
             <nav className="container mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
                 <Link href="/" className="flex items-center gap-2">
+                    <H3Logo />
                     <span className="text-2xl font-bold font-headline">Happy Hen's Hub</span>
                 </Link>
                 <div className="flex items-center gap-2">
@@ -230,7 +256,7 @@ function LandingPageContent() {
                          <Card>
                              <CardContent className="pt-6 flex flex-col items-center text-center gap-2">
                                 <div className="bg-blue-100 dark:bg-blue-900/50 p-4 rounded-full">
-                                    <Egg className="w-8 h-8 text-blue-600 dark:text-blue-400"/>
+                                    <Image src="https://placehold.co/40x40/3399FF/FFFFFF.png" alt="Bulk Egg Orders" width={40} height={40} data-ai-hint="eggs basket"/>
                                 </div>
                                 <h3 className="text-xl font-bold">Bulk Egg Orders</h3>
                                 <p className="text-muted-foreground">Please contact Farm administrator for Bulk Eggs.</p>
@@ -275,6 +301,7 @@ function LandingPageContent() {
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
+                            <H3Logo />
                             <h2 className="text-2xl font-bold text-foreground mt-2">Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>

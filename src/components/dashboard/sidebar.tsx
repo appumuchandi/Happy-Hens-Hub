@@ -18,6 +18,7 @@ import {
   Settings,
   MessageSquare,
   Wheat,
+  ShoppingCart,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -27,6 +28,7 @@ const RupeeIcon = () => (
 
 const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/dashboard/online-orders', label: 'Online Orders', icon: ShoppingCart },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
   { href: '/dashboard/workers', label: 'Workers', icon: Users },

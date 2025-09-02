@@ -23,13 +23,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 
 
 const H3Logo = () => (
-     <svg viewBox="0 0 100 80" className="h-10 w-auto" fill="none">
-        <path d="M10 10 V 70 H 25 V 45 C 25 25, 45 25, 45 45 V 70 H 60 V 10 H 45 V 35 C 45 55, 25 55, 25 35 V 10 Z" fill="hsl(var(--primary))" />
-        <text x="68" y="35" fontSize="40" fill="hsl(var(--accent))" fontFamily="sans-serif" fontWeight="bold">
-            3
-        </text>
+    <svg width="60" height="40" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5.52734 33.6133V7.23828H12.1641V17.8848H22.4609V7.23828H29.0977V33.6133H22.4609V22.6152H12.1641V33.6133H5.52734Z" fill="hsl(var(--foreground))"/>
+        <path d="M42.4381 34.4238C46.8913 34.4238 50.5241 33.0449 53.3366 30.2871C56.1491 27.5293 57.5553 23.8691 57.5553 19.3066C57.5553 14.6895 56.1491 11.0293 53.3366 8.3252C50.5241 5.62109 46.8913 4.26855 42.4381 4.26855C37.985 4.26855 34.3522 5.62109 31.5397 8.3252C28.7272 11.0293 27.3209 14.6895 27.3209 19.3066C27.3209 23.8691 28.7272 27.5293 31.5397 30.2871C34.3522 33.0449 37.985 34.4238 42.4381 34.4238ZM42.4381 29.5898C39.6706 29.5898 37.569 28.6885 36.1334 26.8848C34.6979 25.0811 33.9798 22.5693 33.9798 19.3477C33.9798 16.126 34.6979 13.6143 36.1334 11.8105C37.569 9.95215 39.6706 9.02344 42.4381 9.02344C45.2057 9.02344 47.3073 9.95215 48.7428 11.8105C50.1784 13.6143 50.8961 16.126 50.8961 19.3477C50.8961 22.5693 50.1784 25.0811 48.7428 26.8848C47.3073 28.6885 45.2057 29.5898 42.4381 29.5898Z" fill="#FF0000"/>
     </svg>
 );
+
 
 
 const loginSchema = z.object({
@@ -228,17 +227,19 @@ function LandingPageContent() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Bulk Egg Orders */}
-                        <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                            <CardContent className="pt-6 flex items-center gap-4">
-                                <div className="bg-blue-500 text-white rounded-full p-3">
-                                    <OIcon />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
-                                    <CardDescription className="text-blue-600 dark:text-blue-400">Please contact Farm administrator for Bulk Eggs.</CardDescription>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <Link href="/bulk-order">
+                            <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full cursor-pointer hover:shadow-lg transition-shadow">
+                                <CardContent className="pt-6 flex items-center gap-4">
+                                    <div className="bg-blue-500 text-white rounded-full p-3">
+                                        <OIcon />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
+                                        <CardDescription className="text-blue-600 dark:text-blue-400">Please contact Farm administrator for Bulk Eggs.</CardDescription>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
                         {/* Ready Feed Orders */}
                          <Card className="bg-orange-100/50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
                             <CardContent className="pt-6 flex items-center gap-4">
@@ -432,6 +433,7 @@ export default function LandingPage() {
     
 
     
+
 
 
 

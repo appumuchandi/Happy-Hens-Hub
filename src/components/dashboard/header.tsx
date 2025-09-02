@@ -21,6 +21,7 @@ import {
   Sun,
   MessageSquare,
   Wheat,
+  ShoppingCart,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -33,6 +34,7 @@ const RupeeIcon = () => (
 
 const navItems = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/dashboard/online-orders', label: 'Online Orders', icon: ShoppingCart },
   { href: '/dashboard/egg-collection', label: 'Egg Collection', icon: Egg },
   { href: '/dashboard/sales', label: 'Sales', icon: RupeeIcon },
   { href: '/dashboard/workers', label: 'Workers', icon: Users },

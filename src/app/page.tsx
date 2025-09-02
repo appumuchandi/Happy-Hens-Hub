@@ -1,5 +1,4 @@
 
-
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -211,19 +210,17 @@ function LandingPageContent() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Bulk Egg Orders */}
-                        <Link href="/bulk-order">
-                            <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full cursor-pointer hover:shadow-lg transition-shadow">
-                                <CardContent className="pt-6 flex items-center gap-4">
-                                    <div className="bg-blue-500 text-white rounded-full p-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/></svg>
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
-                                        <CardDescription className="text-blue-600 dark:text-blue-400">Please contact Farm administrator for Bulk Eggs.</CardDescription>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </Link>
+                        <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full">
+                            <CardContent className="pt-6 flex items-center gap-4">
+                                <div className="bg-blue-500 text-white rounded-full p-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/></svg>
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
+                                    <CardDescription className="text-blue-600 dark:text-blue-400">Please contact Farm administrator for Bulk Eggs.</CardDescription>
+                                </div>
+                            </CardContent>
+                        </Card>
                         {/* Ready Feed Orders */}
                          <Card className="bg-orange-100/50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
                             <CardContent className="pt-6 flex items-center gap-4">

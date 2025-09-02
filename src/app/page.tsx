@@ -29,7 +29,7 @@ const H3Logo = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 100 80" 
-        className="h-16 w-auto" 
+        className="h-10 w-auto" 
         fill="none" 
     >
         <text 

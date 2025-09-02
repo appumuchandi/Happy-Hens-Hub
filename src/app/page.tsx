@@ -28,7 +28,7 @@ const H3Logo = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 100 100" 
-        className="h-10 w-10 text-amber-500" 
+        className="h-10 w-10 text-yellow-500" 
         fill="none" 
         stroke="currentColor" 
         strokeWidth="5"
@@ -453,3 +453,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

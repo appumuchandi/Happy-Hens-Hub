@@ -22,15 +22,6 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 
-const H3Logo = () => (
-    <svg width="60" height="40" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M5.52734 33.6133V7.23828H12.1641V17.8848H22.4609V7.23828H29.0977V33.6133H22.4609V22.6152H12.1641V33.6133H5.52734Z" fill="hsl(var(--foreground))"/>
-        <path d="M42.4381 34.4238C46.8913 34.4238 50.5241 33.0449 53.3366 30.2871C56.1491 27.5293 57.5553 23.8691 57.5553 19.3066C57.5553 14.6895 56.1491 11.0293 53.3366 8.3252C50.5241 5.62109 46.8913 4.26855 42.4381 4.26855C37.985 4.26855 34.3522 5.62109 31.5397 8.3252C28.7272 11.0293 27.3209 14.6895 27.3209 19.3066C27.3209 23.8691 28.7272 27.5293 31.5397 30.2871C34.3522 33.0449 37.985 34.4238 42.4381 34.4238ZM42.4381 29.5898C39.6706 29.5898 37.569 28.6885 36.1334 26.8848C34.6979 25.0811 33.9798 22.5693 33.9798 19.3477C33.9798 16.126 34.6979 13.6143 36.1334 11.8105C37.569 9.95215 39.6706 9.02344 42.4381 9.02344C45.2057 9.02344 47.3073 9.95215 48.7428 11.8105C50.1784 13.6143 50.8961 16.126 50.8961 19.3477C50.8961 22.5693 50.1784 25.0811 48.7428 26.8848C47.3073 28.6885 45.2057 29.5898 42.4381 29.5898Z" fill="#FF0000"/>
-    </svg>
-);
-
-
-
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
@@ -132,12 +123,6 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
     )
 }
 
-const OIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/>
-    </svg>
-)
-
 function LandingPageContent() {
     const { isAuthenticated, login } = useAuth();
     const router = useRouter();
@@ -188,7 +173,6 @@ function LandingPageContent() {
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
             <nav className="container mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
                 <Link href="/" className="flex items-center gap-2">
-                    <H3Logo />
                     <span className="text-2xl font-bold font-headline">Happy Hen's Hub</span>
                 </Link>
                 <div className="flex items-center gap-2">
@@ -231,7 +215,7 @@ function LandingPageContent() {
                             <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full cursor-pointer hover:shadow-lg transition-shadow">
                                 <CardContent className="pt-6 flex items-center gap-4">
                                     <div className="bg-blue-500 text-white rounded-full p-3">
-                                        <OIcon />
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/></svg>
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
@@ -288,7 +272,6 @@ function LandingPageContent() {
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
-                            <H3Logo />
                             <h2 className="text-2xl font-bold text-foreground mt-2">Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>

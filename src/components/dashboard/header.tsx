@@ -79,7 +79,6 @@ export default function AppHeader() {
               </SheetHeader>
             <nav className="grid gap-2 text-lg font-medium">
               <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold mb-4">
-                 <Boxes className="h-6 w-6 text-primary" />
                  <span className="font-headline">HEN's HUB</span>
               </Link>
               {navItems.map((item) =>

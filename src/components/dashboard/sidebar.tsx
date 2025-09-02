@@ -61,7 +61,6 @@ export default function AppSidebar() {
     <aside className="hidden md:flex flex-col w-64 bg-card border-r border-border">
        <div className="p-4">
         <Link href="/dashboard" className="flex items-center gap-2 mb-8">
-            <Boxes className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold font-headline text-foreground">HEN's HUB</h1>
         </Link>
       </div>

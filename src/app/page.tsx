@@ -29,7 +29,7 @@ const H3Logo = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 100 100" 
-        className="h-12 w-12 text-yellow-500" 
+        className="h-16 w-16 text-yellow-500" 
         fill="none" 
         stroke="currentColor" 
         strokeWidth="5"
@@ -38,7 +38,7 @@ const H3Logo = () => (
     >
         <path d="M50 7.5L93.3 25v50L50 92.5L6.7 75V25L50 7.5z" />
         <text 
-            x="38" y="70" 
+            x="50" y="70" 
             textAnchor="middle" 
             fontSize="48" 
             fill="currentColor"
@@ -49,7 +49,7 @@ const H3Logo = () => (
             H
         </text>
          <text 
-            x="72" y="45" 
+            x="75" y="45" 
             textAnchor="middle" 
             fontSize="36" 
             fill="currentColor"
@@ -233,6 +233,13 @@ function LandingPageContent() {
         </header>
 
         <main>
+             {/* Welcome Section */}
+             <section className="py-20 text-center bg-background">
+                <div className="container mx-auto px-4">
+                    <h1 className="text-4xl md:text-5xl font-bold font-headline text-foreground animate-slide-in-left">Welcome to Happy Hens Hub</h1>
+                </div>
+            </section>
+
             {/* Farm Updates Section */}
              <section id="farm-updates" className="py-20 bg-card">
                 <div className="container mx-auto px-4">
@@ -306,7 +313,7 @@ function LandingPageContent() {
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
                             <H3Logo />
-                            <h2 className="text-2xl font-bold text-foreground mt-2 animate-slide-in-left">Welcome to Happy Hens Hub</h2>
+                            <h2 className="text-2xl font-bold text-foreground mt-2">Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>
 

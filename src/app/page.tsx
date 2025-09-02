@@ -27,7 +27,6 @@ const RupeeIcon = () => (
 
 const H3Logo = () => (
     <svg 
-        xmlns="http://www.w3.org/2000/svg" 
         viewBox="0 0 100 80" 
         className="h-10 w-auto" 
         fill="none" 
@@ -44,7 +43,7 @@ const H3Logo = () => (
          <text 
             x="68" y="40" 
             fontSize="48" 
-            fill="hsl(var(--destructive))"
+            fill="#FF0000"
             fontFamily="sans-serif"
             fontWeight="normal"
         >
@@ -446,3 +445,4 @@ export default function LandingPage() {
     
 
     
+

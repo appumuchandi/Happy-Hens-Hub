@@ -170,31 +170,12 @@ function LandingPageContent() {
         }
     }
     
-    const LeafIcon = (props: React.SVGProps<SVGSVGElement>) => (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        {...props}
-      >
-        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c-2.8 2.3-3.6 4.3-3.6 7.2" />
-        <path d="M11 20A7 7 0 0 1 9.8 6.1" />
-      </svg>
-    );
-
     return (
         <div className="bg-background text-foreground">
         {/* Header */}
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
             <nav className="container mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
                 <Link href="/" className="flex items-center gap-2">
-                    <LeafIcon className="h-8 w-8 text-primary" />
                     <span className="text-2xl font-bold font-headline">Happy Hen's Hub</span>
                 </Link>
                 <div className="flex items-center gap-2">
@@ -294,9 +275,6 @@ function LandingPageContent() {
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
-                            <div className="bg-green-500 text-white p-4 rounded-2xl mb-4">
-                                <LeafIcon className="w-10 h-10" />
-                            </div>
                             <h2 className="text-2xl font-bold text-foreground">Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>

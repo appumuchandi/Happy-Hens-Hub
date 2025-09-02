@@ -28,32 +28,23 @@ const RupeeIcon = () => (
 const H3Logo = () => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 100 100" 
-        className="h-16 w-16 text-yellow-500" 
+        viewBox="0 0 100 80" 
+        className="h-16 w-auto" 
         fill="none" 
-        stroke="currentColor" 
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
     >
-        <path d="M50 7.5L93.3 25v50L50 92.5L6.7 75V25L50 7.5z" />
         <text 
-            x="50" y="70" 
-            textAnchor="middle" 
-            fontSize="48" 
-            fill="currentColor"
-            stroke="none"
+            x="0" y="65" 
+            fontSize="80" 
+            fill="hsl(var(--foreground))"
             fontFamily="sans-serif"
             fontWeight="bold"
         >
             H
         </text>
          <text 
-            x="75" y="45" 
-            textAnchor="middle" 
-            fontSize="36" 
-            fill="currentColor"
-            stroke="none"
+            x="68" y="40" 
+            fontSize="48" 
+            fill="hsl(var(--destructive))"
             fontFamily="sans-serif"
             fontWeight="normal"
         >

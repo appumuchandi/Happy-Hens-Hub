@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
 import { Save } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { Separator } from '@/components/ui/separator';
 
 const settingsSchema = z.object({
   pricePerEgg: z.coerce.number().positive('Price must be a positive number.'),
@@ -23,6 +24,9 @@ const settingsSchema = z.object({
   contactInfo: z.string().min(10, 'Please enter a valid contact number or email.'),
   address: z.string().min(10, 'Please enter a valid address.'),
   aboutFarm: z.string().min(50, 'Description should be at least 50 characters.'),
+  compostBags: z.coerce.number().int().nonnegative('Compost bags must be a non-negative number.'),
+  compostPricePerBag: z.coerce.number().nonnegative('Compost price must be a non-negative number.'),
+  maizeQuintals: z.coerce.number().nonnegative('Maize quintals must be a non-negative number.'),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -70,9 +74,9 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Card>
-         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
                         <CardTitle className="font-headline">Public Information</CardTitle>
@@ -83,106 +87,162 @@ export default function SettingsPage() {
                     </div>
                     <CardDescription>This information will be visible to all visitors on your homepage.</CardDescription>
                 </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-8">
-                     <div className="space-y-6">
-                        <FormField
-                        control={form.control}
-                        name="pricePerEgg"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Price Per Egg (₹)</FormLabel>
-                            <FormControl>
-                                <Input type="number" step="0.01" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="availableStock"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Available Stock (eggs)</FormLabel>
-                            <FormControl>
-                                <Input type="number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                         <FormField
-                        control={form.control}
-                        name="aboutFarm"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>About the Farm</FormLabel>
-                            <FormControl>
-                                <Textarea rows={10} placeholder="Tell your customers about your farm..." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
+                <CardContent className="space-y-8">
+                     <div>
+                        <h3 className="text-lg font-medium mb-4">Farm Details</h3>
+                        <div className="grid md:grid-cols-2 gap-8">
+                             <div className="space-y-6">
+                                <FormField
+                                control={form.control}
+                                name="pricePerEgg"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Price Per Egg (₹)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" step="0.01" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="availableStock"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Available Stock (eggs)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                 <FormField
+                                control={form.control}
+                                name="aboutFarm"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>About the Farm</FormLabel>
+                                    <FormControl>
+                                        <Textarea rows={10} placeholder="Tell your customers about your farm..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                             </div>
+                             <div className="space-y-6">
+                                <FormField
+                                control={form.control}
+                                name="upiId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>UPI ID</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="your-upi@bank" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="qrCodeUrl"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>UPI QR Code Image URL</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="https://your-image-host.com/qr.png" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="contactInfo"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Contact Info (Phone/Email)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="+91 98765 43210" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="address"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Farm Address</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Your farm's physical address" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                             </div>
+                        </div>
                      </div>
-                     <div className="space-y-6">
-                        <FormField
-                        control={form.control}
-                        name="upiId"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>UPI ID</FormLabel>
-                            <FormControl>
-                                <Input placeholder="your-upi@bank" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="qrCodeUrl"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>UPI QR Code Image URL</FormLabel>
-                            <FormControl>
-                                <Input placeholder="https://your-image-host.com/qr.png" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="contactInfo"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Contact Info (Phone/Email)</FormLabel>
-                            <FormControl>
-                                <Input placeholder="+91 98765 43210" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="address"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Farm Address</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Your farm's physical address" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                     </div>
+
+                    <Separator />
+                    
+                    <div>
+                        <h3 className="text-lg font-medium mb-4">Homepage Updates</h3>
+                        <div className="grid md:grid-cols-2 gap-8">
+                             <div className="space-y-6">
+                                <FormField
+                                control={form.control}
+                                name="compostBags"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Compost Fertilizer (Bags)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="compostPricePerBag"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Compost Price per Bag (₹)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                             </div>
+                             <div className="space-y-6">
+                                <FormField
+                                control={form.control}
+                                name="maizeQuintals"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Maize Requirement (Quintals)</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" step="0.01" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                             </div>
+                        </div>
+                    </div>
                 </CardContent>
-            </form>
-         </Form>
-      </Card>
+            </Card>
+        </form>
+      </Form>
     </div>
   );
 }

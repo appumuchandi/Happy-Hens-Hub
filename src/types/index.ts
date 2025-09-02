@@ -16,6 +16,9 @@ export type SiteSettings = {
     contactInfo: string;
     address: string;
     aboutFarm: string;
+    compostBags: number;
+    compostPricePerBag: number;
+    maizeQuintals: number;
 };
 
 export type Order = {

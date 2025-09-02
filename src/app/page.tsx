@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, ShoppingCart, Leaf, Gift, Recycle, Wheat, Archive } from 'lucide-react';
-import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
+import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, Recycle, Wheat, Archive } from 'lucide-react';
+import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
+import type { SiteSettings } from '@/types';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -17,9 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from 'next-themes';
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
+const OIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/></svg>);
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
@@ -213,7 +214,7 @@ function LandingPageContent() {
                         <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full">
                             <CardContent className="pt-6 flex items-center gap-4">
                                 <div className="bg-blue-500 text-white rounded-full p-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/></svg>
+                                    <OIcon/>
                                 </div>
                                 <div>
                                     <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
@@ -241,8 +242,8 @@ function LandingPageContent() {
                                 </div>
                                 <div>
                                     <CardTitle className="text-lg text-green-800 dark:text-green-300">Compost Fertilizer Available</CardTitle>
-                                    <p className="text-2xl font-bold text-green-700 dark:text-green-400">370 Bags</p>
-                                    <p className="text-sm text-green-600 dark:text-green-500">at Rs. 175/Bag</p>
+                                    <p className="text-2xl font-bold text-green-700 dark:text-green-400">{settings.compostBags} Bags</p>
+                                    <p className="text-sm text-green-600 dark:text-green-500">at Rs. {settings.compostPricePerBag}/Bag</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -254,7 +255,7 @@ function LandingPageContent() {
                                 </div>
                                 <div>
                                     <CardTitle className="text-lg text-yellow-800 dark:text-yellow-300">Maize Requirement</CardTitle>
-                                    <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">150.00 Quintal</p>
+                                    <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">{settings.maizeQuintals.toFixed(2)} Quintal</p>
                                     <p className="text-sm text-yellow-600 dark:text-yellow-500">Needed to restock silos</p>
                                 </div>
                             </CardContent>

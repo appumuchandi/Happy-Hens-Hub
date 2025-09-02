@@ -1,5 +1,6 @@
 
 import { subDays, format } from 'date-fns';
+import type { SiteSettings } from '@/types';
 
 export const dashboardStats = {
   dailyEggCount: 450,
@@ -71,16 +72,6 @@ export const batchData = Array.from({ length: 5 }, (_, i) => ({
 
 // --- New Firestore-like Structures ---
 
-export type SiteSettings = {
-    pricePerEgg: number;
-    availableStock: number;
-    qrCodeUrl: string;
-    upiId: string;
-    contactInfo: string;
-    address: string;
-    aboutFarm: string;
-};
-
 export const siteSettings: SiteSettings = {
     pricePerEgg: 6,
     availableStock: 5000,
@@ -93,7 +84,10 @@ a family-owned farm dedicated to ethical and sustainable poultry farming.
     Our hens are raised in a free-range environment, ensuring they lead happy, healthy lives. 
     We believe that the quality of our eggs is a direct reflection of the care our hens receive. 
     We avoid antibiotics and hormones, providing our flock with natural, high-quality feed. 
-    Thank you for supporting local farming and choosing eggs that are as wholesome as they are delicious.`
+    Thank you for supporting local farming and choosing eggs that are as wholesome as they are delicious.`,
+    compostBags: 370,
+    compostPricePerBag: 175,
+    maizeQuintals: 150.00
 };
 
 export type Order = {

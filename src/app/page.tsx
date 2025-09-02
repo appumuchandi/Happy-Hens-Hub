@@ -171,22 +171,21 @@ function LandingPageContent() {
     }
     
     const LeafIcon = (props: React.SVGProps<SVGSVGElement>) => (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            {...props}
-        >
-            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c-2.8 2.3-3.6 4.3-3.6 7.2" />
-            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c-2.8 2.3-3.6 4.3-3.6 7.2" opacity="0.5" />
-            <path d="M11 20A7 7.0 0 0 1 9.8 6.1" />
-        </svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+      >
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c-2.8 2.3-3.6 4.3-3.6 7.2" />
+        <path d="M11 20A7 7 0 0 1 9.8 6.1" />
+      </svg>
     );
 
     return (
@@ -346,7 +345,12 @@ function LandingPageContent() {
                         <div className="mt-8 flex justify-between items-center text-sm">
                             <Dialog open={openContactDialog} onOpenChange={setOpenContactDialog}>
                                 <DialogTrigger asChild>
-                                    <Button variant="link" className="text-muted-foreground">Contact Farm Administrator</Button>
+                                    <Button variant="link" className="text-muted-foreground p-0 h-auto text-left">
+                                      <div className="flex flex-col items-start leading-snug">
+                                        <span>Contact Farm</span>
+                                        <span>Administrator</span>
+                                      </div>
+                                    </Button>
                                 </DialogTrigger>
                                 <ContactForm 
                                     setDialogOpen={setOpenContactDialog} 
@@ -431,5 +435,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

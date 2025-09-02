@@ -26,32 +26,34 @@ const RupeeIcon = () => (
 
 const H3Logo = ({ className }: { className?: string }) => (
     <svg
-        className={className}
-        viewBox="0 0 100 100"
-        xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      viewBox="0 0 128 128"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
     >
-        <circle cx="50" cy="50" r="48" fill="#004d40" />
-        <text
-            x="50%"
-            y="50%"
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontFamily="Georgia, serif"
-            fontSize="50"
+      <path
+        d="M20 12L20 116H44V72H84V116H108V12H84V52H44V12H20Z"
+        fill="#FF9933"
+      />
+      <path
+        d="M56 52C56 56.4183 52.4183 60 48 60C43.5817 60 40 56.4183 40 52C40 47.5817 43.5817 44 48 44C52.4183 44 56 47.5817 56 52Z"
+        fill="white"
+      />
+      <path
+        d="M84 52H44V72H57.2727C60.4545 66.8889 68 64 68 64V52H84Z"
+        fill="#E68A2E"
+      />
+      <path
+        d="M86 4C86 6.20914 84.2091 8 82 8H72C69.7909 8 68 6.20914 68 4C68 1.79086 69.7909 0 72 0H82C84.2091 0 86 1.79086 86 4Z"
+        fill="white"
+      />
+       <text
+            x="100"
+            y="32"
+            fontFamily="sans-serif"
+            fontSize="32"
             fontWeight="bold"
-            fill="#ffffff"
-        >
-            H
-        </text>
-        <text
-            x="78%"
-            y="35%"
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontFamily="Georgia, serif"
-            fontSize="30"
-            fontWeight="bold"
-            fill="#ffd700"
+            fill="#FF9933"
         >
             3
         </text>

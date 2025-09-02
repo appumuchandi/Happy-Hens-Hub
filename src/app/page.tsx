@@ -24,6 +24,36 @@ const RupeeIcon = () => (
     <span className="font-bold">₹</span>
 );
 
+const H3Logo = ({ className }: { className?: string }) => (
+    <svg
+        className={className}
+        viewBox="0 0 100 50"
+        xmlns="http://www.w3.org/2000/svg"
+        >
+        <text
+            x="0"
+            y="40"
+            fontFamily="Arial, sans-serif"
+            fontSize="40"
+            fontWeight="bold"
+            fill="#36454F"
+        >
+            H
+        </text>
+        <text
+            x="38"
+            y="20"
+            fontFamily="Arial, sans-serif"
+            fontSize="25"
+            fontWeight="bold"
+            fill="#FFD700"
+        >
+            3
+        </text>
+    </svg>
+);
+
+
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
@@ -176,6 +206,7 @@ function LandingPageContent() {
         <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
             <nav className="container mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
                 <Link href="/" className="flex items-center gap-2">
+                    <H3Logo className="h-8 w-16" />
                     <span className="text-2xl font-bold font-headline">Happy Hen's Hub</span>
                 </Link>
                 <div className="flex items-center gap-2">
@@ -275,7 +306,8 @@ function LandingPageContent() {
                 <div className="container mx-auto px-4 flex flex-col items-center">
                     <div className="w-full max-w-md bg-card p-8 rounded-2xl shadow-lg">
                         <div className="flex flex-col items-center mb-8">
-                            <h2 className="text-2xl font-bold text-foreground">Happy Hens Hub</h2>
+                             <H3Logo className="w-24 h-12" />
+                            <h2 className="text-2xl font-bold text-foreground mt-2">Happy Hens Hub</h2>
                             <p className="text-muted-foreground">Welcome to your farm management system</p>
                         </div>
 
@@ -413,3 +445,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

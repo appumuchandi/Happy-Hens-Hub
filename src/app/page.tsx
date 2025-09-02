@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, ShoppingCart, Leaf, Gift } from 'lucide-react';
 import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -18,22 +18,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 
 const H3Logo = () => (
-    <svg 
-        viewBox="0 0 100 80" 
-        className="h-10 w-auto" 
-        fill="none" 
-    >
+     <svg viewBox="0 0 100 80" className="h-10 w-auto" fill="none">
         <path d="M10 10 V 70 H 25 V 45 C 25 25, 45 25, 45 45 V 70 H 60 V 10 H 45 V 35 C 45 55, 25 55, 25 35 V 10 Z" fill="hsl(var(--primary))" />
-        <text 
-            x="68" y="35" 
-            fontSize="40" 
-            fill="hsl(var(--accent))"
-            fontFamily="sans-serif"
-            fontWeight="bold"
-        >
+        <text x="68" y="35" fontSize="40" fill="hsl(var(--accent))" fontFamily="sans-serif" fontWeight="bold">
             3
         </text>
     </svg>
@@ -221,6 +213,51 @@ function LandingPageContent() {
                     </p>
                 </div>
             </section>
+            
+            {/* Farm Updates Section */}
+            <section className="py-20 bg-muted/50">
+                <div className="container mx-auto px-4">
+                    <h2 className="text-3xl font-bold font-headline text-center mb-12">Farm Updates</h2>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <Card className="overflow-hidden group">
+                             <Image src="https://picsum.photos/600/400" data-ai-hint="chicks farm" alt="New batch of chicks" width={600} height={400} className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" />
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <ShoppingCart className="text-primary"/>
+                                    New Batch of Chicks
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">We're excited to welcome a new batch of healthy chicks to our farm! They are settling in nicely and will soon join our free-range flock.</p>
+                            </CardContent>
+                        </Card>
+                         <Card className="overflow-hidden group">
+                             <Image src="https://picsum.photos/600/400" data-ai-hint="organic feed" alt="Organic feed" width={600} height={400} className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" />
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Leaf className="text-primary"/>
+                                    Organic Feed Introduced
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">Our hens are now enjoying a new, locally-sourced organic feed mix. Happy hens lay the best eggs!</p>
+                            </CardContent>
+                        </Card>
+                         <Card className="overflow-hidden group">
+                             <Image src="https://picsum.photos/600/400" data-ai-hint="egg carton" alt="Eggs on sale" width={600} height={400} className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" />
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Gift className="text-primary"/>
+                                    Seasonal Egg Sale
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">Don't miss our seasonal sale! Get a discount on our fresh, free-range eggs for a limited time. Visit us at the farm to learn more.</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </section>
 
             {/* Login Section */}
             {!isAuthenticated && (
@@ -373,4 +410,5 @@ export default function LandingPage() {
     
 
     
+
 

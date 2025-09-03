@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -133,12 +133,6 @@ export default function DashboardPage() {
               Here's a snapshot of your farm's performance.
             </p>
         </div>
-         {isOwner && (
-          <Button onClick={settingsForm.handleSubmit(onSettingsSubmit)} disabled={!settingsForm.formState.isDirty}>
-              <Save className="mr-2 h-4 w-4" />
-              {settingsForm.formState.isDirty ? 'Save Changes' : 'Saved'}
-          </Button>
-        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -293,6 +287,12 @@ export default function DashboardPage() {
                           </div>
                       </div>
                   </CardContent>
+                   <CardFooter className="border-t pt-6">
+                        <Button type="submit" disabled={!settingsForm.formState.isDirty}>
+                            <Save className="mr-2 h-4 w-4" />
+                            {settingsForm.formState.isDirty ? 'Save Changes' : 'Saved'}
+                        </Button>
+                    </CardFooter>
               </Card>
           </form>
         </Form>

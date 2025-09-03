@@ -166,14 +166,14 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
                     <FormField name="name" control={reservationForm.control} render={({ field }) => (
                         <FormItem>
                             <FormLabel>Your Name</FormLabel>
-                            <FormControl><Input placeholder="e.g., John Doe" {...field} /></FormControl>
+                            <FormControl><Input placeholder="Enter your name" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
                     <FormField name="phone" control={reservationForm.control} render={({ field }) => (
                         <FormItem>
                             <FormLabel>Phone Number</FormLabel>
-                            <FormControl><Input placeholder="e.g., 9876543210" {...field} /></FormControl>
+                            <FormControl><Input placeholder="Enter your phone no." {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -485,3 +485,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

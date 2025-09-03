@@ -30,7 +30,7 @@ interface CameraFeed {
   isConnected: boolean;
 }
 
-const DEFAULT_CCTV_PASSWORD = "1234";
+const DEFAULT_CCTV_PASSWORD = "appu1234";
 
 export default function CctvPage() {
   const { user } = useAuth();

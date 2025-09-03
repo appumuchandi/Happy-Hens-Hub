@@ -26,15 +26,7 @@ export const feedData = Array.from({ length: 30 }, (_, i) => ({
 
 export const workersData: any[] = [];
 
-export const batchData = Array.from({ length: 5 }, (_, i) => ({
-  id: `BATCH${101 + i}`,
-  name: `Batch B${101 + i}`,
-  vaccinationRecords: [
-    { vaccine: 'Newcastle Disease (NDV)', date: format(subDays(today, 45 - i*5), 'yyyy-MM-dd') },
-    { vaccine: 'Infectious Bronchitis (IBV)', date: format(subDays(today, 30 - i*5), 'yyyy-MM-dd') },
-    { vaccine: 'Fowl Pox', date: format(subDays(today, 15 - i*5), 'yyyy-MM-dd') },
-  ]
-}));
+export const batchData: any[] = [];
 
 
 // --- New Firestore-like Structures ---

@@ -1,104 +1,288 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
-import { batchData } from '@/lib/placeholder-data';
 import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { PlusCircle, Trash2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose
+} from "@/components/ui/dialog"
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+interface VaccinationRecord {
+  vaccine: string;
+  date: string;
+}
+
+interface Batch {
+  id: string;
+  name: string;
+  vaccinationRecords: VaccinationRecord[];
+}
+
+const batchSchema = z.object({
+  name: z.string().min(2, 'Batch name must be at least 2 characters.'),
+});
+type BatchFormValues = z.infer<typeof batchSchema>;
+
+
+const vaccinationSchema = z.object({
+    vaccine: z.string().min(2, 'Vaccine name is required.'),
+    date: z.date({ required_error: "A date for vaccination is required."}),
+});
+type VaccinationFormValues = z.infer<typeof vaccinationSchema>;
+
 
 export default function BatchRecordsPage() {
   const { user } = useAuth();
-  const [selectedBatch, setSelectedBatch] = useState<string | null>(null);
-  
+  const { toast } = useToast();
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
+  const [isVaccineDialogOpen, setIsVaccineDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const savedData = localStorage.getItem('batchRecords');
+        if (savedData) {
+            setBatches(JSON.parse(savedData));
+        }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('batchRecords', JSON.stringify(batches));
+    }
+  }, [batches]);
+
+  const batchForm = useForm<BatchFormValues>({
+    resolver: zodResolver(batchSchema),
+    defaultValues: { name: '' },
+  });
+
+  const vaccineForm = useForm<VaccinationFormValues>({
+    resolver: zodResolver(vaccinationSchema),
+    defaultValues: { vaccine: '', date: new Date() },
+  });
+
   if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
-
-  const handleBatchSelect = (batchId: string) => {
-    setSelectedBatch(batchId === 'all' ? null : batchId);
+  
+  const handleAddBatch = (data: BatchFormValues) => {
+    const newBatch: Batch = {
+        id: `BATCH${Date.now()}`,
+        name: data.name,
+        vaccinationRecords: []
+    };
+    setBatches(prev => [...prev, newBatch]);
+    toast({ title: 'Batch Added!', description: `Batch "${data.name}" has been created.` });
+    batchForm.reset();
   }
+  
+  const handleAddVaccination = (data: VaccinationFormValues) => {
+    if (!selectedBatch) return;
+    const newRecord: VaccinationRecord = {
+        vaccine: data.vaccine,
+        date: data.date.toISOString(),
+    };
+    
+    setBatches(prev => prev.map(batch => 
+        batch.id === selectedBatch.id 
+        ? { ...batch, vaccinationRecords: [...batch.vaccinationRecords, newRecord] } 
+        : batch
+    ));
 
-  const filteredData = selectedBatch
-    ? batchData.filter(batch => batch.id === selectedBatch)
-    : batchData;
+    toast({ title: 'Vaccination Added!', description: `Record for ${data.vaccine} added to ${selectedBatch.name}.` });
+    vaccineForm.reset();
+    setIsVaccineDialogOpen(false);
+  }
+  
+  const handleDeleteBatch = (id: string) => {
+    setBatches(prev => prev.filter(batch => batch.id !== id));
+    toast({ title: 'Batch Deleted', description: 'The batch record has been removed.' });
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <h1 className="text-3xl font-bold font-headline">Batch Records</h1>
-            <p className="text-muted-foreground">
-              View vaccination history for all your batches.
-            </p>
+      <h1 className="text-3xl font-bold font-headline">Batch Records</h1>
+      
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">Add New Batch</CardTitle>
+              <CardDescription>Create a new batch to track.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...batchForm}>
+                <form onSubmit={batchForm.handleSubmit(handleAddBatch)} className="space-y-4">
+                  <FormField
+                    control={batchForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Batch Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Broiler Batch 101" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">Add Batch</Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
         </div>
-        <div className="flex items-center gap-2">
-            <Select onValueChange={handleBatchSelect} defaultValue="all">
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a batch" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Batches</SelectItem>
-                    {batchData.map((batch) => (
-                        <SelectItem key={batch.id} value={batch.id}>
-                            {batch.name}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">All Batches</CardTitle>
+              <CardDescription>View and manage all your batch records.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="border rounded-md">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Batch Name</TableHead>
+                      <TableHead>Vaccination Records</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {batches.length > 0 ? batches.map((batch) => (
+                      <TableRow key={batch.id}>
+                        <TableCell className="font-medium">{batch.name}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-2">
+                            {batch.vaccinationRecords.map((record, index) => (
+                              <Badge key={index} variant="secondary" className="flex flex-col items-start gap-1 p-2">
+                                <span className="font-semibold">{record.vaccine}</span>
+                                <span className="text-xs text-muted-foreground">{format(parseISO(record.date), 'PPP')}</span>
+                              </Badge>
+                            ))}
+                            {batch.vaccinationRecords.length === 0 && <span className="text-xs text-muted-foreground">No records yet.</span>}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right space-x-2">
+                           <Dialog open={isVaccineDialogOpen && selectedBatch?.id === batch.id} onOpenChange={(isOpen) => {
+                               if(!isOpen) setSelectedBatch(null);
+                               setIsVaccineDialogOpen(isOpen);
+                           }}>
+                            <DialogTrigger asChild>
+                               <Button variant="outline" size="sm" onClick={() => setSelectedBatch(batch)}>
+                                    <PlusCircle className="mr-2 h-4 w-4"/>
+                                    Add Vaccine
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Add Vaccination Record for {batch.name}</DialogTitle>
+                                    <DialogDescription>Enter the details of the vaccination.</DialogDescription>
+                                </DialogHeader>
+                                 <Form {...vaccineForm}>
+                                    <form onSubmit={vaccineForm.handleSubmit(handleAddVaccination)} className="space-y-4 py-4">
+                                        <FormField control={vaccineForm.control} name="vaccine" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Vaccine Name</FormLabel>
+                                                <FormControl><Input placeholder="e.g., Newcastle Disease (NDV)" {...field} /></FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={vaccineForm.control} name="date" render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Date of Vaccination</FormLabel>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button variant="outline" className="pl-3 text-left font-normal">
+                                                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )} />
+                                        <DialogFooter>
+                                            <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
+                                            <Button type="submit">Save Record</Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                          </Dialog>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                               <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER'}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>This will permanently delete the batch "{batch.name}" and all its records.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteBatch(batch.id)}>Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={3} className="h-24 text-center">
+                          No batches created yet.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-      
-      <Card>
-          <CardHeader>
-            <CardTitle className="font-headline">Vaccination History</CardTitle>
-            <CardDescription>
-                {selectedBatch 
-                    ? `Showing records for ${batchData.find(b => b.id === selectedBatch)?.name}` 
-                    : 'Showing records for all batches.'
-                }
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-             <div className="border rounded-md">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Batch Name</TableHead>
-                    <TableHead>Vaccination Records</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredData.map((batch) => (
-                    <TableRow key={batch.id}>
-                      <TableCell className="font-medium">{batch.name}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-2">
-                           {batch.vaccinationRecords.map((record, index) => (
-                                <Badge key={index} variant="secondary" className="flex flex-col items-start gap-1 p-2">
-                                    <span className="font-semibold">{record.vaccine}</span>
-                                    <span className="text-xs text-muted-foreground">{format(new Date(record.date), 'PPP')}</span>
-                                </Badge>
-                           ))}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
     </div>
   );
 }

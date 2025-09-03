@@ -3,7 +3,7 @@
 
 import type { ReactNode } from 'react';
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import type { User } from '@/types';
+import type { User, WorkerCredentials } from '@/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -14,6 +14,12 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function recordLogin(username: string) {
+    const loginHistory = JSON.parse(localStorage.getItem('loginHistory') || '{}');
+    loginHistory[username] = new Date().toISOString();
+    localStorage.setItem('loginHistory', JSON.stringify(loginHistory));
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -38,6 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(loggedInUser);
     try {
         sessionStorage.setItem('user', JSON.stringify(loggedInUser));
+        if(loggedInUser.role !== 'OWNER'){
+            recordLogin(loggedInUser.username);
+        }
     } catch (error) {
         console.error("Could not save user to sessionStorage", error);
     }
@@ -47,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     try {
         sessionStorage.removeItem('user');
+        sessionStorage.removeItem('cctvAuthenticated');
     } catch (error) {
         console.error("Could not remove user from sessionStorage", error);
     }
@@ -67,5 +77,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    

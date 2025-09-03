@@ -9,10 +9,8 @@ import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   Egg,
-  BrainCircuit,
   LogOut,
   Menu,
-  Boxes,
   Users,
   Archive,
   Video,
@@ -22,6 +20,7 @@ import {
   MessageSquare,
   Wheat,
   ShoppingCart,
+  KeyRound,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -43,6 +42,7 @@ const navItems = [
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
+  { href: '/dashboard/login-credentials', label: 'Login Credentials', icon: KeyRound },
 ];
 
 export default function AppHeader() {

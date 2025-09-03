@@ -9,9 +9,7 @@ import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   Egg,
-  BrainCircuit,
   LogOut,
-  Boxes,
   Users,
   Archive,
   Video,
@@ -19,6 +17,7 @@ import {
   MessageSquare,
   Wheat,
   ShoppingCart,
+  KeyRound,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -37,6 +36,7 @@ const navItems = [
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
+  { href: '/dashboard/login-credentials', label: 'Login Credentials', icon: KeyRound },
 ];
 
 

@@ -252,9 +252,10 @@ function LandingPageContent() {
         // Check for worker credentials from localStorage
         const storedWorkerCredentials = localStorage.getItem('workerCredentials');
         if (storedWorkerCredentials) {
-            const workerCreds: WorkerCredentials = JSON.parse(storedWorkerCredentials);
-            if (data.username === workerCreds.username && data.password === workerCreds.password) {
-                login({ name: 'Farm Worker', username: workerCreds.username, role: 'WORKER' });
+            const workerCredsList: WorkerCredentials[] = JSON.parse(storedWorkerCredentials);
+            const foundUser = workerCredsList.find(c => c.username === data.username && c.password === data.password);
+            if (foundUser) {
+                login({ name: foundUser.username, username: foundUser.username, role: 'WORKER' });
                 return;
             }
         }
@@ -462,7 +463,7 @@ function LandingPageContent() {
                                 Have questions? We'd love to hear from you.
                             </Button>
                         </DialogTrigger>
-                        <ContactForm setDialogOpen={openContactDialog} />
+                        <ContactForm setDialogOpen={setOpenContactDialog} />
                     </Dialog>
                     <div className="flex flex-col md:flex-row justify-center items-center gap-8">
                         <div>

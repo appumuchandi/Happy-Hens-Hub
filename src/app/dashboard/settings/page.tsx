@@ -14,7 +14,6 @@ import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeh
 import { Save } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Separator } from '@/components/ui/separator';
-import type { WorkerCredentials } from '@/types';
 
 const settingsSchema = z.object({
   pricePerEgg: z.coerce.number().positive('Price must be a positive number.'),
@@ -26,13 +25,7 @@ const settingsSchema = z.object({
   feedConsumption: z.coerce.number().positive('Feed consumption must be a positive number.'),
 });
 
-const workerCredentialsSchema = z.object({
-    username: z.string().min(4, 'Username must be at least 4 characters long.'),
-    password: z.string().min(6, 'Password must be at least 6 characters long.'),
-});
-
 type SettingsFormValues = z.infer<typeof settingsSchema>;
-type WorkerCredentialsFormValues = z.infer<typeof workerCredentialsSchema>;
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -41,14 +34,6 @@ export default function SettingsPage() {
   const settingsForm = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: defaultSettings,
-  });
-
-  const workerForm = useForm<WorkerCredentialsFormValues>({
-    resolver: zodResolver(workerCredentialsSchema),
-    defaultValues: {
-      username: '',
-      password: '',
-    }
   });
 
   useEffect(() => {
@@ -77,15 +62,6 @@ export default function SettingsPage() {
       title: 'Settings Saved!',
       description: 'Your farm information has been updated.',
     });
-  }
-
-  function onWorkerCredentialsSubmit(data: WorkerCredentialsFormValues) {
-    localStorage.setItem('workerCredentials', JSON.stringify(data));
-    toast({
-        title: 'Login Credentials Updated!',
-        description: 'The login for other users has been successfully saved.',
-    });
-    workerForm.reset();
   }
 
   return (
@@ -215,51 +191,6 @@ export default function SettingsPage() {
                             />
                         </div>
                     </div>
-                </CardContent>
-            </Card>
-        </form>
-      </Form>
-
-       <Form {...workerForm}>
-          <form onSubmit={workerForm.handleSubmit(onWorkerCredentialsSubmit)}>
-            <Card>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="font-headline">Login Credentials</CardTitle>
-                         <Button type="submit">
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Credentials
-                        </Button>
-                    </div>
-                    <CardDescription>Set the username and password for other users to log in to the dashboard.</CardDescription>
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-8">
-                    <FormField
-                        control={workerForm.control}
-                        name="username"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter username" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={workerForm.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                                <Input type="password" placeholder="Enter password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                 </CardContent>
             </Card>
         </form>

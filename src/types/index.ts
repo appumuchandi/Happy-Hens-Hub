@@ -32,5 +32,5 @@ export type Order = {
 
 export type WorkerCredentials = {
   username: string;
-  password?: string; // Password is used for setting/updating, but not stored with user object
+  password?: string; 
 }

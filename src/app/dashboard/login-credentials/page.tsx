@@ -208,7 +208,7 @@ export default function LoginCredentialsPage() {
                                                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                                     <AlertDialogDescription>
                                                         This will permanently delete the user <span className="font-bold">{u.username}</span> and cannot be undone.
-                                                    </Description>
+                                                    </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -5,7 +5,7 @@ export type Role = 'OWNER' | 'WORKER' | 'VIEWER';
 export type User = {
   name: string;
   username: string;
-  role: 'OWNER'; // Only OWNER role is used for login now
+  role: Role;
 };
 
 export type SiteSettings = {
@@ -29,3 +29,8 @@ export type Order = {
   status: 'pending' | 'accepted' | 'rejected' | 'delivered';
   timestamp: string;
 };
+
+export type WorkerCredentials = {
+  username: string;
+  password?: string; // Password is used for setting/updating, but not stored with user object
+}

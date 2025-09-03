@@ -14,6 +14,7 @@ import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeh
 import { Save } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Separator } from '@/components/ui/separator';
+import type { WorkerCredentials } from '@/types';
 
 const settingsSchema = z.object({
   pricePerEgg: z.coerce.number().positive('Price must be a positive number.'),
@@ -25,16 +26,24 @@ const settingsSchema = z.object({
   feedConsumption: z.coerce.number().positive('Feed consumption must be a positive number.'),
 });
 
+const workerCredentialsSchema = z.object({
+    username: z.string().min(4, 'Username must be at least 4 characters long.'),
+    password: z.string().min(6, 'Password must be at least 6 characters long.'),
+});
+
 type SettingsFormValues = z.infer<typeof settingsSchema>;
+type WorkerCredentialsFormValues = z.infer<typeof workerCredentialsSchema>;
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   
-  const form = useForm<SettingsFormValues>({
+  const settingsForm = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
-    defaultValues: settings,
+  });
+
+  const workerForm = useForm<WorkerCredentialsFormValues>({
+    resolver: zodResolver(workerCredentialsSchema),
   });
 
   useEffect(() => {
@@ -42,24 +51,38 @@ export default function SettingsPage() {
         const storedSettings = localStorage.getItem('siteSettings');
         if (storedSettings) {
           const parsedSettings = JSON.parse(storedSettings);
-          setSettings(parsedSettings);
-          form.reset(parsedSettings);
+          settingsForm.reset(parsedSettings);
         } else {
-           form.reset(defaultSettings);
+           settingsForm.reset(defaultSettings);
+        }
+
+        const storedWorkerCredentials = localStorage.getItem('workerCredentials');
+        if (storedWorkerCredentials) {
+            const parsedCredentials = JSON.parse(storedWorkerCredentials);
+            workerForm.reset(parsedCredentials);
+        } else {
+            workerForm.reset({ username: 'worker', password: 'password' });
         }
     }
-  }, [form]);
+  }, [settingsForm, workerForm]);
   
-  if (!user) {
-    return <p className="text-destructive">You must be logged in to view this page.</p>;
+  if (user?.role !== 'OWNER') {
+    return <p className="text-destructive">You do not have permission to manage settings.</p>;
   }
 
-  function onSubmit(data: SettingsFormValues) {
+  function onSettingsSubmit(data: SettingsFormValues) {
     localStorage.setItem('siteSettings', JSON.stringify(data));
-    setSettings(data);
     toast({
       title: 'Settings Saved!',
-      description: 'Your public site information has been updated.',
+      description: 'Your farm information has been updated.',
+    });
+  }
+
+  function onWorkerCredentialsSubmit(data: WorkerCredentialsFormValues) {
+    localStorage.setItem('workerCredentials', JSON.stringify(data));
+    toast({
+        title: 'Worker Credentials Updated!',
+        description: 'The login for workers has been successfully saved.',
     });
   }
 
@@ -72,8 +95,8 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form {...settingsForm}>
+          <form onSubmit={settingsForm.handleSubmit(onSettingsSubmit)}>
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
@@ -90,7 +113,7 @@ export default function SettingsPage() {
                         <h3 className="text-lg font-medium mb-4">Core Farm Metrics</h3>
                          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                             <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="henCount"
                             render={({ field }) => (
                                 <FormItem>
@@ -103,7 +126,7 @@ export default function SettingsPage() {
                             )}
                             />
                              <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="feedConsumption"
                             render={({ field }) => (
                                 <FormItem>
@@ -116,7 +139,7 @@ export default function SettingsPage() {
                             )}
                             />
                             <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="pricePerEgg"
                             render={({ field }) => (
                                 <FormItem>
@@ -129,7 +152,7 @@ export default function SettingsPage() {
                             )}
                             />
                             <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="availableStock"
                             render={({ field }) => (
                                 <FormItem>
@@ -150,7 +173,7 @@ export default function SettingsPage() {
                         <h3 className="text-lg font-medium mb-4">Homepage Updates</h3>
                         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                              <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="compostBags"
                             render={({ field }) => (
                                 <FormItem>
@@ -163,7 +186,7 @@ export default function SettingsPage() {
                             )}
                             />
                             <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="compostPricePerBag"
                             render={({ field }) => (
                                 <FormItem>
@@ -176,7 +199,7 @@ export default function SettingsPage() {
                             )}
                             />
                             <FormField
-                            control={form.control}
+                            control={settingsForm.control}
                             name="maizeQuintals"
                             render={({ field }) => (
                                 <FormItem>
@@ -190,6 +213,51 @@ export default function SettingsPage() {
                             />
                         </div>
                     </div>
+                </CardContent>
+            </Card>
+        </form>
+      </Form>
+
+       <Form {...workerForm}>
+          <form onSubmit={workerForm.handleSubmit(onWorkerCredentialsSubmit)}>
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <CardTitle className="font-headline">Worker Login Credentials</CardTitle>
+                         <Button type="submit">
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Credentials
+                        </Button>
+                    </div>
+                    <CardDescription>Set the username and password that workers will use to log in to the dashboard.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-8">
+                    <FormField
+                        control={workerForm.control}
+                        name="username"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Worker Username</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter a username for workers" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={workerForm.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Worker Password</FormLabel>
+                            <FormControl>
+                                <Input type="password" placeholder="Enter a secure password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </CardContent>
             </Card>
         </form>

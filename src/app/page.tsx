@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, Recycle, Wheat, Archive, ShoppingCart } from 'lucide-react';
 import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
-import type { SiteSettings } from '@/types';
+import type { SiteSettings, WorkerCredentials } from '@/types';
 import Link from 'next/link';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -139,15 +139,11 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
 
     const { watch, setValue } = reservationForm;
     const trays = watch('trays');
-    const quantity = watch('quantity');
 
     useEffect(() => {
         const trayCount = Number(trays) || 0;
-        const newQuantity = trayCount * 30;
-        if (quantity !== newQuantity) {
-           setValue('quantity', newQuantity);
-        }
-    }, [trays, quantity, setValue]);
+        setValue('quantity', trayCount * 30);
+    }, [trays, setValue]);
 
 
     function onReservationSubmit(data: ReservationFormValues) {
@@ -199,7 +195,7 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
                     <FormField name="quantity" control={reservationForm.control} render={({ field }) => (
                         <FormItem>
                             <FormLabel>Quantity (in pieces)</FormLabel>
-                            <FormControl><Input type="number" placeholder="Total eggs will be calculated here" {...field} readOnly className="bg-muted/50" /></FormControl>
+                            <FormControl><Input type="number" {...field} readOnly className="bg-muted/50" /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -247,15 +243,28 @@ function LandingPageContent() {
     }, [isAuthenticated, router]);
     
     function onLoginSubmit(data: LoginFormValues) {
+        // Check for owner credentials
         if (data.username === 'appu_muchandi' && data.password === 'appu1234') {
-            login({ name: 'appu_muchandi', username: 'appu_muchandi', role: 'OWNER' });
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Invalid Credentials',
-                description: 'Please check your username and password.',
-            });
+            login({ name: 'Appu Muchandi', username: 'appu_muchandi', role: 'OWNER' });
+            return;
         }
+
+        // Check for worker credentials from localStorage
+        const storedWorkerCredentials = localStorage.getItem('workerCredentials');
+        if (storedWorkerCredentials) {
+            const workerCreds: WorkerCredentials = JSON.parse(storedWorkerCredentials);
+            if (data.username === workerCreds.username && data.password === workerCreds.password) {
+                login({ name: 'Farm Worker', username: workerCreds.username, role: 'WORKER' });
+                return;
+            }
+        }
+        
+        // If no match
+        toast({
+            variant: 'destructive',
+            title: 'Invalid Credentials',
+            description: 'Please check your username and password.',
+        });
     }
     
     return (
@@ -453,7 +462,7 @@ function LandingPageContent() {
                                 Have questions? We'd love to hear from you.
                             </Button>
                         </DialogTrigger>
-                        <ContactForm setDialogOpen={setOpenContactDialog} />
+                        <ContactForm setDialogOpen={openContactDialog} />
                     </Dialog>
                     <div className="flex flex-col md:flex-row justify-center items-center gap-8">
                         <div>
@@ -504,5 +513,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

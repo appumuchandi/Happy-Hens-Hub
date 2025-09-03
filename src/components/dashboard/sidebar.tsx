@@ -35,7 +35,6 @@ const navItems = [
   { href: '/dashboard/egg-reservations', label: 'Egg Reservations', icon: ShoppingCart },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
-  { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },
   { href: '/dashboard/login-credentials', label: 'Login Credentials', icon: KeyRound },
 ];
 

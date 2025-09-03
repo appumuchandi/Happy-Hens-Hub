@@ -6,11 +6,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Trash2, Users, KeyRound } from 'lucide-react';
+import { Save, Trash2, Users, KeyRound, Eye, EyeOff, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import type { WorkerCredentials } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -38,11 +39,16 @@ interface StoredUser extends WorkerCredentials {
     lastLogin?: string;
 }
 
+const CREDENTIALS_PASSWORD = "appu1234";
+
 export default function LoginCredentialsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [storedUsers, setStoredUsers] = useState<StoredUser[]>([]);
   const [loginHistory, setLoginHistory] = useState<Record<string, string>>({});
+  const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
 
   const form = useForm<CredentialsFormValues>({
     resolver: zodResolver(credentialsSchema),
@@ -54,14 +60,18 @@ export default function LoginCredentialsPage() {
 
   useEffect(() => {
      if (typeof window !== 'undefined') {
+        const sessionAuth = sessionStorage.getItem('credentialsAuthenticated');
+        if (sessionAuth === 'true') {
+            setIsAuthenticated(true);
+        }
+
         const savedCreds = localStorage.getItem('workerCredentials');
         const history = localStorage.getItem('loginHistory');
         
         const parsedCreds = savedCreds ? JSON.parse(savedCreds) : [];
         const parsedHistory = history ? JSON.parse(history) : {};
         
-        // Add owner to the list for display purposes
-        const allUsers = [{ username: 'appu_muchandi', password: '•••' }, ...parsedCreds];
+        const allUsers: StoredUser[] = [{ username: 'appu_muchandi', password: '•••' }, ...parsedCreds];
         
         setStoredUsers(allUsers);
         setLoginHistory(parsedHistory);
@@ -69,10 +79,9 @@ export default function LoginCredentialsPage() {
   }, []);
 
   const updateStoredUsers = (users: StoredUser[]) => {
-      // Filter out the owner before saving to not store owner credentials in the workers list
       const workersOnly = users.filter(u => u.username !== 'appu_muchandi');
-      setStoredUsers(users);
       localStorage.setItem('workerCredentials', JSON.stringify(workersOnly));
+      setStoredUsers(users);
   }
 
   if (user?.role !== 'OWNER') {
@@ -89,11 +98,14 @@ export default function LoginCredentialsPage() {
     let updatedUsers = [...storedUsers];
 
     if(existingUserIndex > -1){
-        // Update existing user
-        updatedUsers[existingUserIndex] = { ...updatedUsers[existingUserIndex], ...data };
-        toast({ title: 'Credentials Updated!', description: `Login for ${data.username} has been updated.` });
+        const workersOnly = updatedUsers.filter(u => u.username !== 'appu_muchandi');
+        const workerIndex = workersOnly.findIndex(w => w.username === data.username);
+        if (workerIndex > -1) {
+            workersOnly[workerIndex] = { ...workersOnly[workerIndex], ...data };
+            updatedUsers = [{ username: 'appu_muchandi', password: '•••' }, ...workersOnly];
+            toast({ title: 'Credentials Updated!', description: `Login for ${data.username} has been updated.` });
+        }
     } else {
-        // Add new user
         updatedUsers.push(data);
         toast({ title: 'User Added!', description: `${data.username} can now log in.` });
     }
@@ -110,6 +122,55 @@ export default function LoginCredentialsPage() {
     const updatedUsers = storedUsers.filter(u => u.username !== username);
     updateStoredUsers(updatedUsers);
     toast({ title: 'User Deleted', description: `${username} has been removed.` });
+  }
+
+  const togglePasswordVisibility = (username: string) => {
+    setPasswordVisibility(prev => ({ ...prev, [username]: !prev[username] }));
+  }
+  
+  const handlePasswordSubmit = () => {
+    if (password === CREDENTIALS_PASSWORD) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('credentialsAuthenticated', 'true');
+        toast({ title: 'Access Granted' });
+    } else {
+        toast({ variant: 'destructive', title: 'Access Denied', description: 'Incorrect password.' });
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle className="text-center font-headline flex items-center justify-center gap-2">
+                        <Lock /> Secure Area
+                    </CardTitle>
+                    <CardDescription className="text-center">
+                        This is a restricted area. Please enter your owner password to continue.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="cctv-password">Password</Label>
+                        <Input 
+                            id="cctv-password" 
+                            type="password" 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                            placeholder="Enter your password"
+                        />
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button className="w-full" onClick={handlePasswordSubmit}>
+                        Unlock
+                    </Button>
+                </CardFooter>
+            </Card>
+        </div>
+    )
   }
 
   return (
@@ -189,7 +250,21 @@ export default function LoginCredentialsPage() {
                                 {storedUsers.length > 0 ? storedUsers.map((u) => (
                                     <TableRow key={u.username}>
                                         <TableCell className="font-medium">{u.username}</TableCell>
-                                        <TableCell>{'••••••••'}</TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                            <span>
+                                                {u.username === 'appu_muchandi' 
+                                                    ? '••••••••' 
+                                                    : passwordVisibility[u.username] ? u.password : '••••••••'
+                                                }
+                                            </span>
+                                            {u.username !== 'appu_muchandi' && (
+                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => togglePasswordVisibility(u.username)}>
+                                                     {passwordVisibility[u.username] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </Button>
+                                            )}
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             {loginHistory[u.username] 
                                                 ? format(parseISO(loginHistory[u.username]), 'PPP p') 
@@ -235,3 +310,5 @@ export default function LoginCredentialsPage() {
     </div>
   );
 }
+
+    

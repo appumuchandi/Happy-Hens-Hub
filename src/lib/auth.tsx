@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
         sessionStorage.removeItem('user');
         sessionStorage.removeItem('cctvAuthenticated');
+        sessionStorage.removeItem('credentialsAuthenticated');
     } catch (error) {
         console.error("Could not remove user from sessionStorage", error);
     }
@@ -76,3 +77,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    

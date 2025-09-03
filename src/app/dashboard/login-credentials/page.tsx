@@ -59,12 +59,16 @@ export default function LoginCredentialsPage() {
   });
 
   useEffect(() => {
-     if (typeof window !== 'undefined') {
-        const sessionAuth = sessionStorage.getItem('credentialsAuthenticated');
-        if (sessionAuth === 'true') {
-            setIsAuthenticated(true);
-        }
+    if (typeof window !== 'undefined') {
+      const sessionAuth = sessionStorage.getItem('credentialsAuthenticated');
+      if (sessionAuth === 'true') {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
 
+  useEffect(() => {
+     if (typeof window !== 'undefined' && isAuthenticated) {
         const savedCreds = localStorage.getItem('workerCredentials');
         const history = localStorage.getItem('loginHistory');
         
@@ -76,16 +80,7 @@ export default function LoginCredentialsPage() {
         setStoredUsers(allUsers);
         setLoginHistory(parsedHistory);
      }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const sessionAuth = sessionStorage.getItem('credentialsAuthenticated');
-      if (sessionAuth === 'true') {
-        setIsAuthenticated(true);
-      }
-    }
-  }, []);
+  }, [isAuthenticated]);
 
 
   const updateStoredUsers = (users: StoredUser[]) => {
@@ -320,5 +315,3 @@ export default function LoginCredentialsPage() {
     </div>
   );
 }
-
-    

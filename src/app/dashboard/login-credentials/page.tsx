@@ -78,6 +78,16 @@ export default function LoginCredentialsPage() {
      }
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sessionAuth = sessionStorage.getItem('credentialsAuthenticated');
+      if (sessionAuth === 'true') {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
+
+
   const updateStoredUsers = (users: StoredUser[]) => {
       const workersOnly = users.filter(u => u.username !== 'appu_muchandi');
       localStorage.setItem('workerCredentials', JSON.stringify(workersOnly));
@@ -184,50 +194,50 @@ export default function LoginCredentialsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <Card>
-                    <CardHeader>
-                        <div className="flex justify-between items-center">
-                            <CardTitle className="font-headline flex items-center gap-2"><KeyRound/> Add / Edit User</CardTitle>
-                        </div>
-                        <CardDescription>Enter a username to update an existing user or create a new one.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="username"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Enter username" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" placeholder="Enter password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <Button type="submit" className="w-full">
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Credentials
-                        </Button>
-                    </CardContent>
-                </Card>
-              </form>
-            </Form>
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="font-headline flex items-center gap-2"><KeyRound/> Add / Edit User</CardTitle>
+              </div>
+              <CardDescription>Enter a username to update an existing user or create a new one.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter username" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="Enter password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full">
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Credentials
+                    </Button>
+                  </form>
+                </Form>
+            </CardContent>
+          </Card>
         </div>
         <div className="lg:col-span-2">
             <Card>
@@ -310,5 +320,3 @@ export default function LoginCredentialsPage() {
     </div>
   );
 }
-
-    

@@ -104,7 +104,7 @@ export default function EggCollectionPage() {
         batch: data.batch || 'N/A',
     };
 
-    setCollectionHistory((prev: any) => [newRecord, ...prev]);
+    setCollectionHistory((prev) => [newRecord, ...prev]);
     
     toast({
       title: 'Success!',
@@ -122,7 +122,7 @@ export default function EggCollectionPage() {
   }
   
   const handleDelete = (id: string) => {
-    setCollectionHistory((prev: any) => prev.filter((record: any) => record.id !== id));
+    setCollectionHistory((prev) => prev.filter((record: any) => record.id !== id));
     toast({
         title: "Record Deleted",
         description: "The egg collection record has been removed.",

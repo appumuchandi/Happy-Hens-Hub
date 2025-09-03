@@ -119,7 +119,7 @@ export default function SalesPage() {
         revenue: totalRevenue.toFixed(2),
     };
     
-    setSalesHistory((prev: any) => [newSale, ...prev]);
+    setSalesHistory((prev) => [newSale, ...prev]);
 
     toast({
       title: 'Sale Recorded!',
@@ -137,7 +137,7 @@ export default function SalesPage() {
   }
   
   const handleDelete = (id: string) => {
-    setSalesHistory((prev: any) => prev.filter((sale: any) => sale.id !== id));
+    setSalesHistory((prev) => prev.filter((sale: any) => sale.id !== id));
     toast({
         title: "Sale Deleted",
         description: "The sale record has been removed.",

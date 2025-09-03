@@ -54,11 +54,15 @@ export default function AppHeader() {
     if (pathname.startsWith('/dashboard/cctv') && !href.startsWith('/dashboard/cctv')) {
       sessionStorage.removeItem('cctvAuthenticated');
     }
+    if (pathname.startsWith('/dashboard/login-credentials') && !href.startsWith('/dashboard/login-credentials')) {
+      sessionStorage.removeItem('credentialsAuthenticated');
+    }
     router.push(href);
   };
 
   const handleLogout = () => {
     sessionStorage.removeItem('cctvAuthenticated');
+    sessionStorage.removeItem('credentialsAuthenticated');
     logout();
   }
 

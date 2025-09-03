@@ -2,9 +2,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import React, from 'react';
-import { createContext, useState, useEffect, useContext } from 'react';
-import type { User, WorkerCredentials } from '@/types';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import type { User } from '@/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -58,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sessionStorage.removeItem('cctvAuthenticated');
         sessionStorage.removeItem('credentialsAuthenticated');
     } catch (error) {
-        console.error("Could not remove user from sessionStorage", error);
+        console.error("Could not remove items from sessionStorage", error);
     }
     window.location.href = '/';
   };
@@ -77,5 +76,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-    

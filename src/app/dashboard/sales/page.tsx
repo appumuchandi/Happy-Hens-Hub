@@ -10,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { salesData as defaultSalesData } from '@/lib/placeholder-data';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
@@ -68,13 +67,14 @@ export default function SalesPage() {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const form = useForm<SalesFormValues>({
     resolver: zodResolver(salesSchema),
     defaultValues: {
       buyerName: '',
-      quantity: 30,
-      pricePerPiece: 6,
+      quantity: undefined, // Changed to undefined
+      pricePerPiece: undefined, // Changed to undefined
     },
   });
   
@@ -84,11 +84,19 @@ export default function SalesPage() {
         const savedData = localStorage.getItem('salesHistory');
         if (savedData) {
             setSalesHistory(JSON.parse(savedData));
-        } else {
-            setSalesHistory(defaultSalesData);
+        }
+
+        const storedSettings = localStorage.getItem('siteSettings');
+        if (storedSettings) {
+            try {
+                const parsedSettings = JSON.parse(storedSettings);
+                form.setValue('pricePerPiece', parsedSettings.pricePerEgg || 0);
+            } catch(e) {
+                console.error("Failed to parse settings", e);
+            }
         }
     }
-  }, []);
+  }, [form]);
   
   // Save data to localStorage whenever salesHistory changes
   useEffect(() => {
@@ -101,8 +109,7 @@ export default function SalesPage() {
   const { watch } = form;
   const quantity = watch('quantity');
   const pricePerPiece = watch('pricePerPiece');
-  const [totalRevenue, setTotalRevenue] = useState(0);
-
+  
   useEffect(() => {
     const revenue = (quantity || 0) * (pricePerPiece || 0);
     setTotalRevenue(revenue);
@@ -127,7 +134,13 @@ export default function SalesPage() {
       title: 'Sale Recorded!',
       description: `Sale to ${data.buyerName} for ₹${totalRevenue.toFixed(2)} has been recorded.`,
     });
-    form.reset();
+    
+    const currentPrice = form.getValues('pricePerPiece');
+    form.reset({
+        buyerName: '',
+        quantity: undefined,
+        pricePerPiece: currentPrice
+    });
   }
 
   const handleDownload = () => {
@@ -139,7 +152,8 @@ export default function SalesPage() {
   }
   
   const handleDelete = (id: string) => {
-    setSalesHistory((prev) => prev.filter((sale: any) => sale.id !== id));
+    const updatedHistory = salesHistory.filter((sale: any) => sale.id !== id);
+    setSalesHistory(updatedHistory);
     toast({
         title: "Sale Deleted",
         description: "The sale record has been removed.",

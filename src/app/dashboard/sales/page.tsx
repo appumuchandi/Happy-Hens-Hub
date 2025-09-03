@@ -314,7 +314,7 @@ export default function SalesPage() {
           <CardHeader>
             <CardTitle className="font-headline">Recent Manual Sales</CardTitle>
             <CardDescription>View recent sales transactions recorded here.</CardDescription>
-          </Header>
+          </CardHeader>
           <CardContent>
             <div className="border rounded-md">
                 <Table>

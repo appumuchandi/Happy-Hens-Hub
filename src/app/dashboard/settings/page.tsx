@@ -40,6 +40,7 @@ export default function SettingsPage() {
   
   const settingsForm = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
+    defaultValues: defaultSettings,
   });
 
   const workerForm = useForm<WorkerCredentialsFormValues>({
@@ -54,8 +55,12 @@ export default function SettingsPage() {
     if (typeof window !== 'undefined') {
         const storedSettings = localStorage.getItem('siteSettings');
         if (storedSettings) {
-          const parsedSettings = JSON.parse(storedSettings);
-          settingsForm.reset(parsedSettings);
+          try {
+            const parsedSettings = JSON.parse(storedSettings);
+            settingsForm.reset(parsedSettings);
+          } catch(e) {
+             settingsForm.reset(defaultSettings);
+          }
         } else {
            settingsForm.reset(defaultSettings);
         }

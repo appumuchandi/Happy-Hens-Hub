@@ -134,7 +134,7 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
     const { toast } = useToast();
     const reservationForm = useForm<ReservationFormValues & { trays: number | string }>({
         resolver: zodResolver(reservationSchema),
-        defaultValues: { name: "", phone: "", quantity: undefined, trays: '' },
+        defaultValues: { name: "", phone: "", quantity: '', trays: '' },
     });
 
     const { watch, setValue } = reservationForm;
@@ -148,18 +148,20 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
              if(quantity !== newQuantity){
                  setValue('quantity', newQuantity, { shouldValidate: true });
              }
-        } else if(trays === '' && quantity !== undefined) {
-            setValue('quantity', undefined, { shouldValidate: true });
+        } else if(trays === '' && quantity !== '') {
+            setValue('quantity', '', { shouldValidate: true });
         }
     }, [trays, setValue, quantity]);
 
     useEffect(() => {
-        if (quantity !== undefined) {
-            const newTrays = (quantity / 30);
+        if (quantity !== '' && quantity !== undefined) {
+            const newTrays = (Number(quantity) / 30);
             const currentTrays = Number(trays);
             if (currentTrays !== newTrays) {
                  setValue('trays', newTrays, { shouldValidate: false });
             }
+        } else if (quantity === '' && trays !== '') {
+            setValue('trays', '', { shouldValidate: true });
         }
     }, [quantity, setValue, trays]);
 
@@ -518,6 +520,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    
-

@@ -143,22 +143,23 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
     const trays = watch('trays');
 
     useEffect(() => {
+        const currentTrays = Number(trays);
         if (trays !== '' && trays !== undefined) {
-             const newQuantity = Number(trays) * 30;
-             if(quantity !== newQuantity){
-                 setValue('quantity', newQuantity, { shouldValidate: true });
-             }
-        } else if(trays === '' && quantity !== '') {
+            const newQuantity = Number(trays) * 30;
+            if (Number(quantity) !== newQuantity) {
+                setValue('quantity', newQuantity, { shouldValidate: true });
+            }
+        } else if (trays === '' && quantity !== '') {
             setValue('quantity', '', { shouldValidate: true });
         }
     }, [trays, setValue, quantity]);
 
     useEffect(() => {
         if (quantity !== '' && quantity !== undefined) {
-            const newTrays = (Number(quantity) / 30);
+            const newTrays = Number(quantity) / 30;
             const currentTrays = Number(trays);
-            if (currentTrays !== newTrays) {
-                 setValue('trays', newTrays, { shouldValidate: false });
+             if (currentTrays !== newTrays) {
+                setValue('trays', newTrays, { shouldValidate: false });
             }
         } else if (quantity === '' && trays !== '') {
             setValue('trays', '', { shouldValidate: true });

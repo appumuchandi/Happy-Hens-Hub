@@ -124,7 +124,7 @@ export default function LoginCredentialsPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
             <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <Card>
                     <CardHeader>
                         <div className="flex justify-between items-center">
@@ -165,7 +165,7 @@ export default function LoginCredentialsPage() {
                         </Button>
                     </CardContent>
                 </Card>
-            </form>
+              </form>
             </Form>
         </div>
         <div className="lg:col-span-2">
@@ -208,7 +208,7 @@ export default function LoginCredentialsPage() {
                                                     <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                                     <AlertDialogDescription>
                                                         This will permanently delete the user <span className="font-bold">{u.username}</span> and cannot be undone.
-                                                    </AlertDialogDescription>
+                                                    </Description>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
                                                     <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -60,14 +60,19 @@ export default function LoginCredentialsPage() {
         const parsedCreds = savedCreds ? JSON.parse(savedCreds) : [];
         const parsedHistory = history ? JSON.parse(history) : {};
         
-        setStoredUsers(parsedCreds);
+        // Add owner to the list for display purposes
+        const allUsers = [{ username: 'appu_muchandi', password: '•••' }, ...parsedCreds];
+        
+        setStoredUsers(allUsers);
         setLoginHistory(parsedHistory);
      }
   }, []);
 
   const updateStoredUsers = (users: StoredUser[]) => {
+      // Filter out the owner before saving to not store owner credentials in the workers list
+      const workersOnly = users.filter(u => u.username !== 'appu_muchandi');
       setStoredUsers(users);
-      localStorage.setItem('workerCredentials', JSON.stringify(users));
+      localStorage.setItem('workerCredentials', JSON.stringify(workersOnly));
   }
 
   if (user?.role !== 'OWNER') {
@@ -75,12 +80,17 @@ export default function LoginCredentialsPage() {
   }
 
   function onSubmit(data: CredentialsFormValues) {
+     if (data.username === 'appu_muchandi') {
+      toast({ variant: 'destructive', title: 'Cannot modify owner', description: 'The owner account cannot be modified from here.' });
+      return;
+    }
+    
     const existingUserIndex = storedUsers.findIndex(u => u.username === data.username);
     let updatedUsers = [...storedUsers];
 
     if(existingUserIndex > -1){
         // Update existing user
-        updatedUsers[existingUserIndex] = data;
+        updatedUsers[existingUserIndex] = { ...updatedUsers[existingUserIndex], ...data };
         toast({ title: 'Credentials Updated!', description: `Login for ${data.username} has been updated.` });
     } else {
         // Add new user
@@ -93,6 +103,10 @@ export default function LoginCredentialsPage() {
   }
 
   const handleDeleteUser = (username: string) => {
+    if (username === 'appu_muchandi') {
+      toast({ variant: 'destructive', title: 'Cannot delete owner', description: 'The owner account cannot be deleted.' });
+      return;
+    }
     const updatedUsers = storedUsers.filter(u => u.username !== username);
     updateStoredUsers(updatedUsers);
     toast({ title: 'User Deleted', description: `${username} has been removed.` });
@@ -184,7 +198,7 @@ export default function LoginCredentialsPage() {
                                         <TableCell className="text-right">
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="icon">
+                                                    <Button variant="destructive" size="icon" disabled={u.username === 'appu_muchandi'}>
                                                         <Trash2 className="h-4 w-4" />
                                                         <span className="sr-only">Delete User</span>
                                                     </Button>

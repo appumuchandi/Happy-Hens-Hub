@@ -2,7 +2,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
 import type { User, WorkerCredentials } from '@/types';
 
 interface AuthContextType {
@@ -44,9 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(loggedInUser);
     try {
         sessionStorage.setItem('user', JSON.stringify(loggedInUser));
-        if(loggedInUser.role !== 'OWNER'){
-            recordLogin(loggedInUser.username);
-        }
+        recordLogin(loggedInUser.username);
     } catch (error) {
         console.error("Could not save user to sessionStorage", error);
     }

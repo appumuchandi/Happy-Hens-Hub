@@ -300,7 +300,7 @@ export default function EggCollectionPage() {
                       <TableCell className="text-right">
                          <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="icon">
+                            <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER'}>
                                 <Trash2 className="h-4 w-4" />
                                 <span className="sr-only">Delete</span>
                             </Button>

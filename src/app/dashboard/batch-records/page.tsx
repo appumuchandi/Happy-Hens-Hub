@@ -21,7 +21,7 @@ export default function BatchRecordsPage() {
   const { user } = useAuth();
   const [selectedBatch, setSelectedBatch] = useState<string | null>(null);
   
-  if (user?.role !== 'OWNER') {
+  if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 

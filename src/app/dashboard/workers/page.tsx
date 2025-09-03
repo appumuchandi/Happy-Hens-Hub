@@ -81,8 +81,8 @@ export default function WorkersPage() {
     setIsLoading(false);
   };
   
-  if (!user) {
-    return <p className="text-destructive">You must be logged in to view this page.</p>;
+  if (user?.role === 'VIEWER') {
+    return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 
   return (
@@ -94,7 +94,7 @@ export default function WorkersPage() {
               View and manage your worker records and generate AI-powered optimization insights.
             </p>
         </div>
-         <Button onClick={handleBiometricSync}>
+         <Button onClick={handleBiometricSync} disabled={user?.role !== 'OWNER'}>
           <Fingerprint className="mr-2 h-4 w-4" />
           Sync with Biometrics
         </Button>
@@ -153,7 +153,7 @@ export default function WorkersPage() {
                 <CardTitle className="font-headline">AI Worker Optimization</CardTitle>
                 <CardDescription>Analyze worker productivity based on egg collection data.</CardDescription>
               </div>
-              <Button onClick={handleGenerateInsights} disabled={isLoading}>
+              <Button onClick={handleGenerateInsights} disabled={isLoading || user?.role !== 'OWNER'}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

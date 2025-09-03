@@ -106,8 +106,8 @@ export default function SalesPage() {
     setTotalRevenue(revenue);
   }, [quantity, pricePerPiece]);
 
-  if (!user) {
-    return <p className="text-destructive">You must be logged in to view this page.</p>;
+  if (user?.role === 'VIEWER') {
+    return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 
   function onSubmit(data: SalesFormValues) {
@@ -339,7 +339,7 @@ export default function SalesPage() {
                             <TableCell className="text-right">
                                <AlertDialog>
                                   <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="icon">
+                                    <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER'}>
                                         <Trash2 className="h-4 w-4" />
                                         <span className="sr-only">Delete</span>
                                     </Button>

@@ -39,6 +39,7 @@ const navItems = [
   { href: '/dashboard/workers', label: 'Workers', icon: Users },
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
   { href: '/dashboard/feed-optimization', label: 'Feed Stock', icon: Wheat },
+  { href: '/dashboard/egg-reservations', label: 'Egg Reservations', icon: ShoppingCart },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/settings', label: 'Site Settings', icon: Settings },

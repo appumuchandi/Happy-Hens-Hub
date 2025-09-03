@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, Recycle, Wheat, Archive } from 'lucide-react';
+import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, Recycle, Wheat, Archive, ShoppingCart } from 'lucide-react';
 import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
 import type { SiteSettings } from '@/types';
 import Link from 'next/link';
@@ -36,6 +36,14 @@ const messageSchema = z.object({
 });
 
 type MessageFormValues = z.infer<typeof messageSchema>;
+
+const reservationSchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    phone: z.string().min(10, "A valid phone number is required"),
+    quantity: z.coerce.number().int().positive("Quantity must be a positive number"),
+});
+type ReservationFormValues = z.infer<typeof reservationSchema>;
+
 
 function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill out the form below and we'll get back to you as soon as possible.", placeholder = "How can we help you today?" }: { setDialogOpen: (open: boolean) => void, title?: string, description?: string, placeholder?: string }) {
     const { toast } = useToast();
@@ -123,12 +131,76 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
     )
 }
 
+function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+    const { toast } = useToast();
+    const reservationForm = useForm<ReservationFormValues>({
+        resolver: zodResolver(reservationSchema),
+        defaultValues: { name: "", phone: "", quantity: 30 },
+    });
+
+    function onReservationSubmit(data: ReservationFormValues) {
+        const newReservation = {
+            id: `RES${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            status: 'Pending',
+            ...data
+        };
+        const existingReservations = JSON.parse(localStorage.getItem('eggReservations') || '[]');
+        localStorage.setItem('eggReservations', JSON.stringify([newReservation, ...existingReservations]));
+        toast({
+            title: "Reservation Placed!",
+            description: "Your egg request has been sent. We'll contact you when it's ready for pickup.",
+        });
+        reservationForm.reset();
+        setDialogOpen(false);
+    }
+
+    return (
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Reserve Your Eggs</DialogTitle>
+                <DialogDescription>Let us know how many eggs you need, and we'll prepare them for your pickup.</DialogDescription>
+            </DialogHeader>
+            <Form {...reservationForm}>
+                <form onSubmit={reservationForm.handleSubmit(onReservationSubmit)} className="space-y-4">
+                    <FormField name="name" control={reservationForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Your Name</FormLabel>
+                            <FormControl><Input placeholder="e.g., John Doe" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="phone" control={reservationForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl><Input placeholder="e.g., 9876543210" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="quantity" control={reservationForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Quantity (in pieces)</FormLabel>
+                            <FormControl><Input type="number" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <Button type="submit" className="w-full">
+                        <ShoppingCart className="mr-2"/>
+                        Place Reservation
+                    </Button>
+                </form>
+            </Form>
+        </DialogContent>
+    );
+}
+
 function LandingPageContent() {
     const { isAuthenticated, login } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
+    const [openReservationDialog, setOpenReservationDialog] = useState(false);
     const { setTheme, theme } = useTheme();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -211,17 +283,22 @@ function LandingPageContent() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {/* Bulk Egg Orders */}
-                        <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full">
-                            <CardContent className="pt-6 flex items-center gap-4">
-                                <div className="bg-blue-500 text-white rounded-full p-3">
-                                    <OIcon/>
-                                </div>
-                                <div>
-                                    <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
-                                    <CardDescription className="text-blue-600 dark:text-blue-400">Please contact Farm administrator for Bulk Eggs.</CardDescription>
-                                </div>
-                            </CardContent>
-                        </Card>
+                         <Dialog open={openReservationDialog} onOpenChange={setOpenReservationDialog}>
+                            <DialogTrigger asChild>
+                                <Card className="bg-blue-100/50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 h-full cursor-pointer hover:border-blue-400 transition-all">
+                                    <CardContent className="pt-6 flex items-center gap-4">
+                                        <div className="bg-blue-500 text-white rounded-full p-3">
+                                            <ShoppingCart/>
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-lg text-blue-800 dark:text-blue-300">Bulk Egg Orders</CardTitle>
+                                            <CardDescription className="text-blue-600 dark:text-blue-400">Click here to reserve eggs for pickup.</CardDescription>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </DialogTrigger>
+                             <ReservationForm setDialogOpen={setOpenReservationDialog} />
+                        </Dialog>
                         {/* Ready Feed Orders */}
                          <Card className="bg-orange-100/50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
                             <CardContent className="pt-6 flex items-center gap-4">

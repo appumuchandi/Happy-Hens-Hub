@@ -80,7 +80,7 @@ export default function SettingsPage() {
         title: 'Login Credentials Updated!',
         description: 'The login for other users has been successfully saved.',
     });
-    workerForm.reset({ username: '', password: '' });
+    workerForm.reset();
   }
 
   return (

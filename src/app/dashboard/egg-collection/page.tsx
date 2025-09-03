@@ -75,7 +75,6 @@ export default function EggCollectionPage() {
     },
   });
   
-  // Load data from localStorage on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
         const savedData = localStorage.getItem('eggCollectionHistory');
@@ -84,14 +83,6 @@ export default function EggCollectionPage() {
         }
     }
   }, []);
-  
-  // Save data to localStorage whenever collectionHistory changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('eggCollectionHistory', JSON.stringify(collectionHistory));
-    }
-  }, [collectionHistory]);
-
 
   if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
@@ -106,7 +97,9 @@ export default function EggCollectionPage() {
         batch: data.batch || 'N/A',
     };
 
-    setCollectionHistory((prev) => [newRecord, ...prev]);
+    const updatedHistory = [newRecord, ...collectionHistory];
+    setCollectionHistory(updatedHistory);
+    localStorage.setItem('eggCollectionHistory', JSON.stringify(updatedHistory));
     
     toast({
       title: 'Success!',
@@ -124,7 +117,9 @@ export default function EggCollectionPage() {
   }
   
   const handleDelete = (id: string) => {
-    setCollectionHistory((prev) => prev.filter((record: any) => record.id !== id));
+    const updatedHistory = collectionHistory.filter((record: any) => record.id !== id);
+    setCollectionHistory(updatedHistory);
+    localStorage.setItem('eggCollectionHistory', JSON.stringify(updatedHistory));
     toast({
         title: "Record Deleted",
         description: "The egg collection record has been removed.",

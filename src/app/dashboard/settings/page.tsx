@@ -102,7 +102,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Active Hen Count</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} />
+                                    <Input type="number" placeholder="Enter hen count" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -115,7 +115,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Daily Feed Consumption (kg)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" step="0.1" {...field} />
+                                    <Input type="number" step="0.1" placeholder="Enter feed consumption" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -128,7 +128,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Price Per Egg (₹)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" step="0.01" {...field} />
+                                    <Input type="number" step="0.01" placeholder="Enter price per egg" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -141,7 +141,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Available Stock (eggs)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} />
+                                    <Input type="number" placeholder="Enter available stock" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                                     <FormItem>
                                     <FormLabel>UPI ID</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="your-upi@bank" {...field} />
+                                        <Input placeholder="Enter your UPI ID" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -204,7 +204,7 @@ export default function SettingsPage() {
                                     <FormItem>
                                     <FormLabel>Contact Info (Phone/Email)</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="+91 98765 43210" {...field} />
+                                        <Input placeholder="Enter contact info" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                                     <FormItem>
                                     <FormLabel>Farm Address</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Your farm's physical address" {...field} />
+                                        <Input placeholder="Enter your farm's address" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -239,7 +239,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Compost Fertilizer (Bags)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} />
+                                    <Input type="number" placeholder="Enter number of bags" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -252,7 +252,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Compost Price per Bag (₹)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" {...field} />
+                                    <Input type="number" placeholder="Enter price per bag" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -265,7 +265,7 @@ export default function SettingsPage() {
                                 <FormItem>
                                 <FormLabel>Maize Requirement (Quintals)</FormLabel>
                                 <FormControl>
-                                    <Input type="number" step="0.01" {...field} />
+                                    <Input type="number" step="0.01" placeholder="Enter maize quintals" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>

@@ -267,7 +267,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Buyer Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., John Doe" {...field} />
+                        <Input placeholder="Enter buyer's name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -280,7 +280,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Quantity (pcs)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g., 30" {...field} />
+                        <Input type="number" placeholder="Enter quantity" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -293,7 +293,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Price Per Piece (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="e.g., 6.00" {...field} />
+                        <Input type="number" step="0.01" placeholder="Enter price per piece" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -314,7 +314,7 @@ export default function SalesPage() {
           <CardHeader>
             <CardTitle className="font-headline">Recent Manual Sales</CardTitle>
             <CardDescription>View recent sales transactions recorded here.</CardDescription>
-          </CardHeader>
+          </Header>
           <CardContent>
             <div className="border rounded-md">
                 <Table>
@@ -394,5 +394,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

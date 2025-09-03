@@ -249,7 +249,7 @@ export default function EggCollectionPage() {
                     <FormItem>
                       <FormLabel>Number of Eggs</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g., 450" {...field} />
+                        <Input type="number" placeholder="Enter number of eggs" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -262,7 +262,7 @@ export default function EggCollectionPage() {
                     <FormItem>
                       <FormLabel>Batch / Flock ID (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., B101" {...field} />
+                        <Input placeholder="Enter batch/flock ID" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -355,5 +355,3 @@ export default function EggCollectionPage() {
     </div>
   );
 }
-
-    

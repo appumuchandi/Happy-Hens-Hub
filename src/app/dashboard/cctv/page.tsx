@@ -126,11 +126,11 @@ export default function CctvPage() {
                      <h3 className="font-semibold text-lg">Add New Camera</h3>
                     <div className="space-y-2">
                         <Label htmlFor="new-camera-name">Camera Name</Label>
-                        <Input id="new-camera-name" placeholder="e.g., Back Door" value={newCameraName} onChange={(e) => setNewCameraName(e.target.value)} />
+                        <Input id="new-camera-name" placeholder="Enter camera name" value={newCameraName} onChange={(e) => setNewCameraName(e.target.value)} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="new-camera-location">Camera Location</Label>
-                        <Input id="new-camera-location" placeholder="e.g., Main Building" value={newCameraLocation} onChange={(e) => setNewCameraLocation(e.target.value)} />
+                        <Input id="new-camera-location" placeholder="Enter camera location" value={newCameraLocation} onChange={(e) => setNewCameraLocation(e.target.value)} />
                     </div>
                     <Button variant="outline" onClick={handleAddCamera}>
                         <PlusCircle className="mr-2"/>
@@ -209,7 +209,7 @@ export default function CctvPage() {
                          <div className="space-y-2">
                             <Label htmlFor="otp">Enter OTP</Label>
                             <p className="text-sm text-muted-foreground">An OTP has been sent to the owner's contact. Please enter it below.</p>
-                            <Input id="otp" placeholder="e.g., 123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
+                            <Input id="otp" placeholder="123456" value={otp} onChange={(e) => setOtp(e.target.value)} />
                         </div>
                     )}
                  </div>

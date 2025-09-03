@@ -11,11 +11,6 @@ export type User = {
 export type SiteSettings = {
     pricePerEgg: number;
     availableStock: number;
-    qrCodeUrl: string;
-    upiId: string;
-    contactInfo: string;
-    address: string;
-    aboutFarm: string;
     compostBags: number;
     compostPricePerBag: number;
     maizeQuintals: number;

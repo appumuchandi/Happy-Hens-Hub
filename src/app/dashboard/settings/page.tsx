@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { siteSettings as defaultSettings, type SiteSettings } from '@/lib/placeholder-data';
 import { Save } from 'lucide-react';
@@ -19,11 +18,6 @@ import { Separator } from '@/components/ui/separator';
 const settingsSchema = z.object({
   pricePerEgg: z.coerce.number().positive('Price must be a positive number.'),
   availableStock: z.coerce.number().int().nonnegative('Stock cannot be negative.'),
-  qrCodeUrl: z.string().url('Please enter a valid URL.'),
-  upiId: z.string().min(3, 'UPI ID seems too short.'),
-  contactInfo: z.string().min(10, 'Please enter a valid contact number or email.'),
-  address: z.string().min(10, 'Please enter a valid address.'),
-  aboutFarm: z.string().min(50, 'Description should be at least 50 characters.'),
   compostBags: z.coerce.number().int().nonnegative('Compost bags must be a non-negative number.'),
   compostPricePerBag: z.coerce.number().nonnegative('Compost price must be a non-negative number.'),
   maizeQuintals: z.coerce.number().nonnegative('Maize quintals must be a non-negative number.'),
@@ -150,83 +144,6 @@ export default function SettingsPage() {
                          </div>
                      </div>
                      
-                    <Separator />
-
-                     <div>
-                        <h3 className="text-lg font-medium mb-4">Public Information</h3>
-                        <div className="grid md:grid-cols-2 gap-8">
-                             <div className="space-y-6">
-                                <FormField
-                                control={form.control}
-                                name="aboutFarm"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>About the Farm</FormLabel>
-                                    <FormControl>
-                                        <Textarea rows={10} placeholder="Tell your customers about your farm..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                             </div>
-                             <div className="space-y-6">
-                                <FormField
-                                control={form.control}
-                                name="upiId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>UPI ID</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter your UPI ID" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="qrCodeUrl"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>UPI QR Code Image URL</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="https://your-image-host.com/qr.png" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="contactInfo"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Contact Info (Phone/Email)</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter contact info" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="address"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Farm Address</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter your farm's address" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                             </div>
-                        </div>
-                     </div>
-
                     <Separator />
                     
                     <div>

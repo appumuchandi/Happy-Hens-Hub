@@ -75,16 +75,6 @@ export const batchData = Array.from({ length: 5 }, (_, i) => ({
 export const siteSettings: SiteSettings = {
     pricePerEgg: 6,
     availableStock: 5000,
-    qrCodeUrl: 'https://placehold.co/200x200.png',
-    upiId: 'owner@upi',
-    contactInfo: '+91 98765 43210',
-    address: 'Hens Hub Farm, Ruralville, Agri-State',
-    aboutFarm: `Welcome to HAPPY HEN's HUB,
-a family-owned farm dedicated to ethical and sustainable poultry farming. 
-    Our hens are raised in a free-range environment, ensuring they lead happy, healthy lives. 
-    We believe that the quality of our eggs is a direct reflection of the care our hens receive. 
-    We avoid antibiotics and hormones, providing our flock with natural, high-quality feed. 
-    Thank you for supporting local farming and choosing eggs that are as wholesome as they are delicious.`,
     compostBags: 370,
     compostPricePerBag: 175,
     maizeQuintals: 150.00,

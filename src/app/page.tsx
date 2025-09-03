@@ -130,7 +130,7 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
     )
 }
 
-function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
+function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void; }) {
     const { toast } = useToast();
     const reservationForm = useForm<ReservationFormValues & { trays: number | string }>({
         resolver: zodResolver(reservationSchema),
@@ -139,11 +139,15 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
 
     const { watch, setValue } = reservationForm;
     const trays = watch('trays');
+    const quantity = watch('quantity');
 
     useEffect(() => {
         const trayCount = Number(trays) || 0;
-        setValue('quantity', trayCount * 30);
-    }, [trays, setValue]);
+        const newQuantity = trayCount * 30;
+        if (quantity !== newQuantity) {
+           setValue('quantity', newQuantity);
+        }
+    }, [trays, quantity, setValue]);
 
 
     function onReservationSubmit(data: ReservationFormValues) {

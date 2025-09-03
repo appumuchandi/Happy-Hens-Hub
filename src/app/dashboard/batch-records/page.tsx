@@ -2,14 +2,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, differenceInDays } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -42,11 +42,13 @@ import {
 interface VaccinationRecord {
   vaccine: string;
   date: string;
+  day: number;
 }
 
 interface Batch {
   id: string;
   name: string;
+  creationDate: string;
   vaccinationRecords: VaccinationRecord[];
 }
 
@@ -95,6 +97,9 @@ export default function BatchRecordsPage() {
     defaultValues: { vaccine: '', date: new Date() },
   });
 
+  const { watch } = vaccineForm;
+  const watchedDate = watch('date');
+
   if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
@@ -103,6 +108,7 @@ export default function BatchRecordsPage() {
     const newBatch: Batch = {
         id: `BATCH${Date.now()}`,
         name: data.name,
+        creationDate: new Date().toISOString(),
         vaccinationRecords: []
     };
     setBatches(prev => [...prev, newBatch]);
@@ -112,25 +118,36 @@ export default function BatchRecordsPage() {
   
   const handleAddVaccination = (data: VaccinationFormValues) => {
     if (!selectedBatch) return;
+
+    const dayOfVaccination = differenceInDays(data.date, parseISO(selectedBatch.creationDate));
+
     const newRecord: VaccinationRecord = {
         vaccine: data.vaccine,
         date: data.date.toISOString(),
+        day: dayOfVaccination,
     };
     
     setBatches(prev => prev.map(batch => 
         batch.id === selectedBatch.id 
-        ? { ...batch, vaccinationRecords: [...batch.vaccinationRecords, newRecord] } 
+        ? { ...batch, vaccinationRecords: [...batch.vaccinationRecords, newRecord].sort((a,b) => a.day - b.day) } 
         : batch
     ));
 
     toast({ title: 'Vaccination Added!', description: `Record for ${data.vaccine} added to ${selectedBatch.name}.` });
-    vaccineForm.reset();
+    vaccineForm.reset({ vaccine: '', date: new Date() });
     setIsVaccineDialogOpen(false);
   }
   
   const handleDeleteBatch = (id: string) => {
     setBatches(prev => prev.filter(batch => batch.id !== id));
     toast({ title: 'Batch Deleted', description: 'The batch record has been removed.' });
+  }
+
+  const getVaccinationDay = () => {
+    if (selectedBatch && watchedDate) {
+        return differenceInDays(watchedDate, parseISO(selectedBatch.creationDate));
+    }
+    return 0;
   }
 
   return (
@@ -179,6 +196,7 @@ export default function BatchRecordsPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Batch Name</TableHead>
+                      <TableHead>Created On</TableHead>
                       <TableHead>Vaccination Records</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -187,12 +205,15 @@ export default function BatchRecordsPage() {
                     {batches.length > 0 ? batches.map((batch) => (
                       <TableRow key={batch.id}>
                         <TableCell className="font-medium">{batch.name}</TableCell>
+                        <TableCell>{format(parseISO(batch.creationDate), 'PPP')}</TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-2">
                             {batch.vaccinationRecords.map((record, index) => (
                               <Badge key={index} variant="secondary" className="flex flex-col items-start gap-1 p-2">
                                 <span className="font-semibold">{record.vaccine}</span>
-                                <span className="text-xs text-muted-foreground">{format(parseISO(record.date), 'PPP')}</span>
+                                <span className="text-xs text-muted-foreground">
+                                    {format(parseISO(record.date), 'PPP')} (Day {record.day})
+                                </span>
                               </Badge>
                             ))}
                             {batch.vaccinationRecords.length === 0 && <span className="text-xs text-muted-foreground">No records yet.</span>}
@@ -200,7 +221,10 @@ export default function BatchRecordsPage() {
                         </TableCell>
                         <TableCell className="text-right space-x-2">
                            <Dialog open={isVaccineDialogOpen && selectedBatch?.id === batch.id} onOpenChange={(isOpen) => {
-                               if(!isOpen) setSelectedBatch(null);
+                               if(!isOpen) {
+                                   setSelectedBatch(null);
+                                   vaccineForm.reset({ vaccine: '', date: new Date() });
+                               }
                                setIsVaccineDialogOpen(isOpen);
                            }}>
                             <DialogTrigger asChild>
@@ -235,12 +259,18 @@ export default function BatchRecordsPage() {
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date("1900-01-01")} initialFocus />
+                                                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < parseISO(batch.creationDate) || date > new Date()} initialFocus />
                                                     </PopoverContent>
                                                 </Popover>
                                                 <FormMessage/>
                                             </FormItem>
                                         )} />
+                                         <div className="space-y-2 rounded-lg bg-muted p-3">
+                                            <div className="flex justify-between text-sm text-muted-foreground">
+                                                <span>Day of Vaccination</span>
+                                                <span className="font-bold text-foreground">Day {getVaccinationDay()}</span>
+                                            </div>
+                                        </div>
                                         <DialogFooter>
                                             <DialogClose asChild><Button variant="ghost">Cancel</Button></DialogClose>
                                             <Button type="submit">Save Record</Button>
@@ -271,7 +301,7 @@ export default function BatchRecordsPage() {
                       </TableRow>
                     )) : (
                       <TableRow>
-                        <TableCell colSpan={3} className="h-24 text-center">
+                        <TableCell colSpan={4} className="h-24 text-center">
                           No batches created yet.
                         </TableCell>
                       </TableRow>
@@ -285,4 +315,5 @@ export default function BatchRecordsPage() {
       </div>
     </div>
   );
-}
+
+    

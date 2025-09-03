@@ -8,11 +8,9 @@ import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
-import { Users, Bot, Loader2, Lightbulb, AlertTriangle, UserPlus, Trash2 } from 'lucide-react';
+import { Users, UserPlus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { workerOptimizationInsights } from '@/ai/flows/worker-optimization-insights';
-import { type WorkerOptimizationInsightsOutput } from '@/ai/flows/worker-optimization-insights';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -45,9 +43,6 @@ type WorkerFormValues = z.infer<typeof workerSchema>;
 export default function WorkersPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [insights, setInsights] = useState<WorkerOptimizationInsightsOutput | null>(null);
-  const [eggCollectionHistory, setEggCollectionHistory] = useState<any[]>([]);
   const [workers, setWorkers] = useState<Worker[]>([]);
 
   const form = useForm<WorkerFormValues>({
@@ -66,11 +61,6 @@ export default function WorkersPage() {
       if (savedWorkers) {
         setWorkers(JSON.parse(savedWorkers));
       }
-      
-      const savedEggData = localStorage.getItem('eggCollectionHistory');
-       if (savedEggData) {
-         setEggCollectionHistory(JSON.parse(savedEggData));
-       }
     }
   }, []);
 
@@ -81,43 +71,6 @@ export default function WorkersPage() {
     }
   }, [workers]);
 
-  const handleGenerateInsights = async () => {
-    setIsLoading(true);
-    setInsights(null);
-
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const recentEggData = eggCollectionHistory
-      .filter(d => new Date(d.date) >= thirtyDaysAgo)
-      .map(d => ({ date: d.date, quantity: d.quantity, collector: d.collector }));
-
-    if (recentEggData.length < 1) {
-      toast({
-        variant: 'destructive',
-        title: 'Not Enough Data',
-        description: 'Need at least one day of egg collection data from the last 30 days to generate insights.',
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const result = await workerOptimizationInsights({
-        eggCollectionData: recentEggData,
-      });
-      setInsights(result);
-      toast({ title: 'Insights Generated', description: 'AI analysis complete.' });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to generate insights.',
-      });
-    }
-
-    setIsLoading(false);
-  };
   
   function onAddWorkerSubmit(data: WorkerFormValues) {
     const newWorker: Worker = {
@@ -146,7 +99,7 @@ export default function WorkersPage() {
         <div>
           <h1 className="text-3xl font-bold font-headline">Workers Management</h1>
           <p className="text-muted-foreground">
-            Manage your worker records and generate AI-powered optimization insights.
+            Manage your worker records.
           </p>
         </div>
       </div>
@@ -267,81 +220,6 @@ export default function WorkersPage() {
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <CardTitle className="font-headline">AI Worker Optimization</CardTitle>
-              <CardDescription>Analyze worker productivity based on egg collection data.</CardDescription>
-            </div>
-            <Button onClick={handleGenerateInsights} disabled={isLoading || user?.role !== 'OWNER'}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Bot className="mr-2 h-4 w-4" />
-                  Generate Worker Insights
-                </>
-              )}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {!insights && !isLoading && (
-            <div className="text-center py-12">
-              <Bot className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-medium">Ready for AI Insights?</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Click the button to analyze worker performance from the last 30 days of collection data.</p>
-            </div>
-          )}
-          {insights && (
-            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3 mt-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center gap-2">
-                  <Lightbulb className="w-6 h-6 text-primary" />
-                  <CardTitle className="font-headline text-primary text-lg">Productivity Insights</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 list-disc pl-5">
-                    {insights.productivityInsights.map((insight, index) => (
-                      <li key={index} className="text-foreground">{insight}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center gap-2">
-                  <AlertTriangle className="w-6 h-6 text-destructive" />
-                  <CardTitle className="font-headline text-destructive text-lg">Consistency Analysis</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 list-disc pl-5">
-                    {insights.consistencyAnalysis.map((anomaly, index) => (
-                      <li key={index} className="text-foreground">{anomaly}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center gap-2">
-                  <Lightbulb className="w-6 h-6 text-accent" />
-                  <CardTitle className="font-headline text-accent text-lg">Recommendations</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 list-disc pl-5">
-                    {insights.recommendations.map((rec, index) => (
-                      <li key={index} className="text-foreground">{rec}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }

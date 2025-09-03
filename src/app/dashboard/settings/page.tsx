@@ -81,8 +81,8 @@ export default function SettingsPage() {
   function onWorkerCredentialsSubmit(data: WorkerCredentialsFormValues) {
     localStorage.setItem('workerCredentials', JSON.stringify(data));
     toast({
-        title: 'Worker Credentials Updated!',
-        description: 'The login for workers has been successfully saved.',
+        title: 'Login Credentials Updated!',
+        description: 'The login for other users has been successfully saved.',
     });
   }
 
@@ -223,13 +223,13 @@ export default function SettingsPage() {
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
-                        <CardTitle className="font-headline">Worker Login Credentials</CardTitle>
+                        <CardTitle className="font-headline">Login Credentials</CardTitle>
                          <Button type="submit">
                             <Save className="mr-2 h-4 w-4" />
                             Save Credentials
                         </Button>
                     </div>
-                    <CardDescription>Set the username and password that workers will use to log in to the dashboard.</CardDescription>
+                    <CardDescription>Set the username and password for other users to log in to the dashboard.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid md:grid-cols-2 gap-8">
                     <FormField
@@ -237,9 +237,9 @@ export default function SettingsPage() {
                         name="username"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Worker Username</FormLabel>
+                            <FormLabel>Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter a username for workers" {...field} />
+                                <Input placeholder="Enter a username" {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Worker Password</FormLabel>
+                            <FormLabel>Password</FormLabel>
                             <FormControl>
                                 <Input type="password" placeholder="Enter a secure password" {...field} />
                             </FormControl>

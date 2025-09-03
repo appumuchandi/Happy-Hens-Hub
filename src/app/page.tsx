@@ -1,4 +1,5 @@
 
+
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,7 +10,7 @@ import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, Ch
 import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
 import type { SiteSettings } from '@/types';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -19,8 +20,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from 'next-themes';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-
-const OIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"/></svg>);
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: 'Username is required.' }),
@@ -133,10 +132,37 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
 
 function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void }) {
     const { toast } = useToast();
-    const reservationForm = useForm<ReservationFormValues>({
+    const reservationForm = useForm<ReservationFormValues & { trays: number | string }>({
         resolver: zodResolver(reservationSchema),
-        defaultValues: { name: "", phone: "", quantity: undefined },
+        defaultValues: { name: "", phone: "", quantity: undefined, trays: '' },
     });
+
+    const { watch, setValue } = reservationForm;
+
+    const quantity = watch('quantity');
+    const trays = watch('trays');
+
+    useEffect(() => {
+        if (trays !== '' && trays !== undefined) {
+             const newQuantity = Number(trays) * 30;
+             if(quantity !== newQuantity){
+                 setValue('quantity', newQuantity, { shouldValidate: true });
+             }
+        } else if(trays === '' && quantity !== undefined) {
+            setValue('quantity', undefined, { shouldValidate: true });
+        }
+    }, [trays, setValue, quantity]);
+
+    useEffect(() => {
+        if (quantity !== undefined) {
+            const newTrays = (quantity / 30);
+            const currentTrays = Number(trays);
+            if (currentTrays !== newTrays) {
+                 setValue('trays', newTrays, { shouldValidate: false });
+            }
+        }
+    }, [quantity, setValue, trays]);
+
 
     function onReservationSubmit(data: ReservationFormValues) {
         const newReservation = {
@@ -177,10 +203,17 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
                             <FormMessage />
                         </FormItem>
                     )} />
+                    <FormField name="trays" control={reservationForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Quantity (in trays)</FormLabel>
+                            <FormControl><Input type="number" placeholder="Enter number of trays" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
                     <FormField name="quantity" control={reservationForm.control} render={({ field }) => (
                         <FormItem>
                             <FormLabel>Quantity (in pieces)</FormLabel>
-                            <FormControl><Input type="number" placeholder="Enter quantity" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="Total eggs will be calculated here" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -487,3 +520,4 @@ export default function LandingPage() {
 }
 
     
+

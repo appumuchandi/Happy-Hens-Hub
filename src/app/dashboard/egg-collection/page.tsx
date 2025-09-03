@@ -75,6 +75,7 @@ export default function EggCollectionPage() {
     },
   });
   
+  // Load data from localStorage on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
         const savedData = localStorage.getItem('eggCollectionHistory');
@@ -84,6 +85,7 @@ export default function EggCollectionPage() {
     }
   }, []);
   
+  // Save data to localStorage whenever collectionHistory changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
         localStorage.setItem('eggCollectionHistory', JSON.stringify(collectionHistory));

@@ -78,6 +78,7 @@ export default function SalesPage() {
     },
   });
   
+  // Load data from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
         const savedData = localStorage.getItem('salesHistory');
@@ -89,6 +90,7 @@ export default function SalesPage() {
     }
   }, []);
   
+  // Save data to localStorage whenever salesHistory changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
         localStorage.setItem('salesHistory', JSON.stringify(salesHistory));

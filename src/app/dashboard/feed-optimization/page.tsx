@@ -31,14 +31,9 @@ export default function FeedStockPage() {
   useEffect(() => {
      if (typeof window !== 'undefined') {
       const savedData = localStorage.getItem('feedContainers');
-      if (savedData) {
-        const parsed = JSON.parse(savedData);
-        setContainers(parsed);
-        setInitialState(parsed);
-      } else {
-        setContainers(defaultFeedContainers);
-        setInitialState(defaultFeedContainers);
-      }
+      const dataToSet = savedData ? JSON.parse(savedData) : defaultFeedContainers;
+      setContainers(dataToSet);
+      setInitialState(dataToSet);
     }
   }, []);
 

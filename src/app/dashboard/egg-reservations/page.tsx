@@ -28,6 +28,7 @@ export default function EggReservationsPage() {
     const { toast } = useToast();
     const [reservations, setReservations] = useState<Reservation[]>([]);
 
+    // Load reservations from localStorage on mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedReservations = localStorage.getItem('eggReservations');
@@ -37,12 +38,18 @@ export default function EggReservationsPage() {
         }
     }, []);
 
+    // Save reservations to localStorage whenever they change
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('eggReservations', JSON.stringify(reservations));
+        }
+    }, [reservations]);
+
     const updateReservationStatus = (id: string, status: ReservationStatus) => {
         const updatedReservations = reservations.map(res => 
             res.id === id ? { ...res, status } : res
         );
         setReservations(updatedReservations);
-        localStorage.setItem('eggReservations', JSON.stringify(updatedReservations));
         toast({
             title: 'Reservation Updated',
             description: `The reservation status has been set to "${status}".`,

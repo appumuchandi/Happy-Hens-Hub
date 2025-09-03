@@ -59,16 +59,8 @@ export default function SettingsPage() {
         } else {
            settingsForm.reset(defaultSettings);
         }
-
-        const storedWorkerCredentials = localStorage.getItem('workerCredentials');
-        if (storedWorkerCredentials) {
-            const parsedCredentials = JSON.parse(storedWorkerCredentials);
-            workerForm.reset(parsedCredentials);
-        } else {
-            workerForm.reset({ username: '', password: '' });
-        }
     }
-  }, [settingsForm, workerForm]);
+  }, [settingsForm]);
   
   if (user?.role !== 'OWNER') {
     return <p className="text-destructive">You do not have permission to manage settings.</p>;
@@ -88,6 +80,7 @@ export default function SettingsPage() {
         title: 'Login Credentials Updated!',
         description: 'The login for other users has been successfully saved.',
     });
+    workerForm.reset({ username: '', password: '' });
   }
 
   return (
@@ -269,4 +262,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

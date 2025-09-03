@@ -117,7 +117,7 @@ export default function WorkersPage() {
           <CardHeader>
             <CardTitle className="font-headline">Worker Records</CardTitle>
             <CardDescription>Detailed information of all workers for the current month.</CardDescription>
-          </Header>
+          </CardHeader>
           <CardContent>
              <div className="border rounded-md">
               <Table>
@@ -195,7 +195,7 @@ export default function WorkersPage() {
                   <CardHeader className="flex flex-row items-center gap-2">
                       <AlertTriangle className="w-6 h-6 text-destructive"/>
                       <CardTitle className="font-headline text-destructive text-lg">Consistency Analysis</CardTitle>
-                  </Header>
+                  </CardHeader>
                   <CardContent>
                       <ul className="space-y-2 list-disc pl-5">
                           {insights.consistencyAnalysis.map((anomaly, index) => (
@@ -208,7 +208,7 @@ export default function WorkersPage() {
                   <CardHeader className="flex flex-row items-center gap-2">
                       <Lightbulb className="w-6 h-6 text-accent"/>
                       <CardTitle className="font-headline text-accent text-lg">Recommendations</CardTitle>
-                  </Header>
+                  </CardHeader>
                   <CardContent>
                       <ul className="space-y-2 list-disc pl-5">
                           {insights.recommendations.map((rec, index) => (

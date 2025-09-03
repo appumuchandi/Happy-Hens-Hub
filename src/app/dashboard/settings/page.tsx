@@ -44,6 +44,10 @@ export default function SettingsPage() {
 
   const workerForm = useForm<WorkerCredentialsFormValues>({
     resolver: zodResolver(workerCredentialsSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    }
   });
 
   useEffect(() => {
@@ -61,7 +65,7 @@ export default function SettingsPage() {
             const parsedCredentials = JSON.parse(storedWorkerCredentials);
             workerForm.reset(parsedCredentials);
         } else {
-            workerForm.reset({ username: 'worker', password: 'password' });
+            workerForm.reset({ username: '', password: '' });
         }
     }
   }, [settingsForm, workerForm]);
@@ -239,7 +243,7 @@ export default function SettingsPage() {
                             <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="Enter a username" {...field} />
+                                <Input placeholder="Enter username" {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -252,7 +256,7 @@ export default function SettingsPage() {
                             <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input type="password" placeholder="Enter a secure password" {...field} />
+                                <Input type="password" placeholder="Enter password" {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -265,3 +269,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

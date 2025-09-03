@@ -89,7 +89,7 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
                             <FormItem>
                             <FormLabel>Your Name</FormLabel>
                             <FormControl>
-                                <Input placeholder="John Doe" {...field} />
+                                <Input placeholder="Enter your name" {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -102,7 +102,7 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
                             <FormItem>
                             <FormLabel>Your Email</FormLabel>
                             <FormControl>
-                                <Input type="email" placeholder="you@example.com" {...field} />
+                                <Input type="email" placeholder="Enter your email" {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -115,7 +115,7 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
                             <FormItem>
                             <FormLabel>Message</FormLabel>
                             <FormControl>
-                                <Textarea placeholder={placeholder} {...field} />
+                                <Textarea placeholder="Enter your message" {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -135,7 +135,7 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
     const { toast } = useToast();
     const reservationForm = useForm<ReservationFormValues>({
         resolver: zodResolver(reservationSchema),
-        defaultValues: { name: "", phone: "", quantity: 30 },
+        defaultValues: { name: "", phone: "", quantity: undefined },
     });
 
     function onReservationSubmit(data: ReservationFormValues) {
@@ -180,7 +180,7 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
                     <FormField name="quantity" control={reservationForm.control} render={({ field }) => (
                         <FormItem>
                             <FormLabel>Quantity (in pieces)</FormLabel>
-                            <FormControl><Input type="number" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="Enter quantity" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />

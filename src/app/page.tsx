@@ -134,37 +134,16 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
     const { toast } = useToast();
     const reservationForm = useForm<ReservationFormValues & { trays: number | string }>({
         resolver: zodResolver(reservationSchema),
-        defaultValues: { name: "", phone: "", quantity: '', trays: '' },
+        defaultValues: { name: "", phone: "", quantity: 0, trays: '' },
     });
 
     const { watch, setValue } = reservationForm;
-
-    const quantity = watch('quantity');
     const trays = watch('trays');
 
     useEffect(() => {
-        const currentTrays = Number(trays);
-        if (trays !== '' && trays !== undefined) {
-            const newQuantity = Number(trays) * 30;
-            if (Number(quantity) !== newQuantity) {
-                setValue('quantity', newQuantity, { shouldValidate: true });
-            }
-        } else if (trays === '' && quantity !== '') {
-            setValue('quantity', '', { shouldValidate: true });
-        }
-    }, [trays, setValue, quantity]);
-
-    useEffect(() => {
-        if (quantity !== '' && quantity !== undefined) {
-            const newTrays = Number(quantity) / 30;
-            const currentTrays = Number(trays);
-             if (currentTrays !== newTrays) {
-                setValue('trays', newTrays, { shouldValidate: false });
-            }
-        } else if (quantity === '' && trays !== '') {
-            setValue('trays', '', { shouldValidate: true });
-        }
-    }, [quantity, setValue, trays]);
+        const trayCount = Number(trays) || 0;
+        setValue('quantity', trayCount * 30);
+    }, [trays, setValue]);
 
 
     function onReservationSubmit(data: ReservationFormValues) {
@@ -216,7 +195,7 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
                     <FormField name="quantity" control={reservationForm.control} render={({ field }) => (
                         <FormItem>
                             <FormLabel>Quantity (in pieces)</FormLabel>
-                            <FormControl><Input type="number" placeholder="Total eggs will be calculated here" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="Total eggs will be calculated here" {...field} readOnly className="bg-muted/50" /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )} />
@@ -521,3 +500,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { addDays, format, parseISO } from 'date-fns';
+import { addDays, format, parseISO, startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { Download, Printer, Trash2, Calendar as CalendarIcon } from 'lucide-react';
 import {
   Dialog,
@@ -39,6 +39,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { downloadPdfReport, directPrint } from '@/lib/utils';
 import type { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const eggCollectionSchema = z.object({
@@ -57,7 +59,11 @@ export default function EggCollectionPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [filterType, setFilterType] = useState('daily');
+  const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+
 
   useEffect(() => {
     const checkMobile = () => {
@@ -67,15 +73,31 @@ export default function EggCollectionPage() {
   }, []);
 
   const getFilteredData = () => {
-    if (!dateRange?.from) return collectionHistory;
-
-    const from = dateRange.from;
-    const to = dateRange.to || from;
-
-    return collectionHistory.filter(r => {
-      const recordDate = parseISO(r.date);
-      return recordDate >= from && recordDate <= addDays(to, 1);
-    });
+    if (filterType === 'daily' && selectedDay) {
+        const start = startOfDay(selectedDay);
+        const end = endOfDay(selectedDay);
+        return collectionHistory.filter(r => {
+            const recordDate = parseISO(r.date);
+            return recordDate >= start && recordDate <= end;
+        });
+    }
+    if (filterType === 'monthly') {
+        const start = startOfMonth(selectedMonth);
+        const end = endOfMonth(selectedMonth);
+        return collectionHistory.filter(r => {
+            const recordDate = parseISO(r.date);
+            return recordDate >= start && recordDate <= end;
+        });
+    }
+    if (filterType === 'yearly') {
+        const start = startOfYear(new Date(selectedYear, 0, 1));
+        const end = endOfYear(new Date(selectedYear, 11, 31));
+        return collectionHistory.filter(r => {
+            const recordDate = parseISO(r.date);
+            return recordDate >= start && recordDate <= end;
+        });
+    }
+    return collectionHistory;
   };
   
   const generateReportHtml = (records: any[]) => {
@@ -184,6 +206,10 @@ export default function EggCollectionPage() {
     currentPage * RECORDS_PER_PAGE
   ).map(rec => ({...rec, date: format(parseISO(rec.date), 'yyyy-MM-dd')}));
 
+  const availableYears = Array.from(new Set(collectionHistory.map(r => parseISO(r.date).getFullYear()))).sort((a,b) => b-a);
+  const availableMonths = Array.from({ length: 12 }, (_, i) => new Date(selectedYear, i, 1));
+
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -195,51 +221,51 @@ export default function EggCollectionPage() {
                     Download Report
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>Download Collection Report</DialogTitle>
                     <DialogDescription>
-                        Select a date range to generate the report for.
+                        Select a period to generate the report for.
                     </DialogDescription>
                 </DialogHeader>
-                 <div className="grid gap-4 py-4">
-                    <Popover>
-                        <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant={"outline"}
-                            className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !dateRange && "text-muted-foreground"
-                            )}
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.from ? (
-                            dateRange.to ? (
-                                <>
-                                {format(dateRange.from, "LLL dd, y")} -{" "}
-                                {format(dateRange.to, "LLL dd, y")}
-                                </>
-                            ) : (
-                                format(dateRange.from, "LLL dd, y")
-                            )
-                            ) : (
-                            <span>Pick a date range</span>
-                            )}
-                        </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="center">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={dateRange?.from}
-                            selected={dateRange}
-                            onSelect={setDateRange}
-                            numberOfMonths={2}
-                        />
-                        </PopoverContent>
-                    </Popover>
-                </div>
+                <Tabs value={filterType} onValueChange={setFilterType} className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="daily">Daily</TabsTrigger>
+                        <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                        <TabsTrigger value="yearly">Yearly</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="daily">
+                        <div className="flex justify-center py-4">
+                           <Calendar mode="single" selected={selectedDay} onSelect={setSelectedDay} className="rounded-md border" />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="monthly">
+                        <div className="grid grid-cols-2 gap-4 py-4">
+                             <Select value={selectedYear.toString()} onValueChange={(val) => setSelectedYear(Number(val))}>
+                                <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+                                <SelectContent>
+                                    {availableYears.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <Select value={selectedMonth.getMonth().toString()} onValueChange={(val) => setSelectedMonth(new Date(selectedYear, Number(val)))}>
+                                <SelectTrigger><SelectValue placeholder="Select Month" /></SelectTrigger>
+                                <SelectContent>
+                                    {availableMonths.map((month, i) => <SelectItem key={i} value={i.toString()}>{format(month, 'MMMM')}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="yearly">
+                        <div className="py-4">
+                            <Select value={selectedYear.toString()} onValueChange={(val) => setSelectedYear(Number(val))}>
+                                <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+                                <SelectContent>
+                                    {availableYears.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </TabsContent>
+                </Tabs>
                 <DialogFooter className="sm:justify-center pt-4">
                     <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
                     {!isMobile && (
@@ -379,3 +405,5 @@ export default function EggCollectionPage() {
     </div>
   );
 }
+
+    

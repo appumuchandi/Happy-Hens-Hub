@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
-import { addDays, format, parseISO, differenceInDays } from 'date-fns';
+import { addDays, format, parseISO, differenceInDays, startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -41,6 +41,8 @@ import {
 import { downloadPdfReport, directPrint } from '@/lib/utils';
 import type { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 interface VaccinationRecord {
@@ -77,7 +79,10 @@ export default function BatchRecordsPage() {
   const [isVaccineDialogOpen, setIsVaccineDialogOpen] = useState(false);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [filterType, setFilterType] = useState('daily');
+  const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   
   useEffect(() => {
     const checkMobile = () => {
@@ -87,15 +92,31 @@ export default function BatchRecordsPage() {
   }, []);
 
   const getFilteredData = () => {
-    if (!dateRange?.from) return batches;
-    
-    const from = dateRange.from;
-    const to = dateRange.to || from; // If 'to' is not set, use 'from' for single-day selection
-
-    return batches.filter(b => {
-        const batchDate = parseISO(b.creationDate);
-        return batchDate >= from && batchDate <= addDays(to, 1); // addDays to make the end date inclusive
-    });
+    if (filterType === 'daily' && selectedDay) {
+        const start = startOfDay(selectedDay);
+        const end = endOfDay(selectedDay);
+        return batches.filter(b => {
+            const batchDate = parseISO(b.creationDate);
+            return batchDate >= start && batchDate <= end;
+        });
+    }
+    if (filterType === 'monthly') {
+        const start = startOfMonth(selectedMonth);
+        const end = endOfMonth(selectedMonth);
+         return batches.filter(b => {
+            const batchDate = parseISO(b.creationDate);
+            return batchDate >= start && batchDate <= end;
+        });
+    }
+    if (filterType === 'yearly') {
+        const start = startOfYear(new Date(selectedYear, 0, 1));
+        const end = endOfYear(new Date(selectedYear, 11, 31));
+         return batches.filter(b => {
+            const batchDate = parseISO(b.creationDate);
+            return batchDate >= start && batchDate <= end;
+        });
+    }
+    return batches;
   }
 
   const generateReportHtml = (records: Batch[]) => {
@@ -177,6 +198,10 @@ export default function BatchRecordsPage() {
   const { watch } = vaccineForm;
   const watchedDate = watch('date');
 
+  const availableYears = Array.from(new Set(batches.map(r => parseISO(r.creationDate).getFullYear()))).sort((a,b) => b-a);
+  const availableMonths = Array.from({ length: 12 }, (_, i) => new Date(selectedYear, i, 1));
+
+
   if (user?.role === 'VIEWER') {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
@@ -245,49 +270,49 @@ export default function BatchRecordsPage() {
                     Download Report
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>Download Batch Records Report</DialogTitle>
-                    <DialogDescription>Select a date range to generate the report for.</DialogDescription>
+                    <DialogDescription>Select a period to generate the report for.</DialogDescription>
                 </DialogHeader>
-                 <div className="grid gap-4 py-4">
-                    <Popover>
-                        <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant={"outline"}
-                            className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !dateRange && "text-muted-foreground"
-                            )}
-                        >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.from ? (
-                            dateRange.to ? (
-                                <>
-                                {format(dateRange.from, "LLL dd, y")} -{" "}
-                                {format(dateRange.to, "LLL dd, y")}
-                                </>
-                            ) : (
-                                format(dateRange.from, "LLL dd, y")
-                            )
-                            ) : (
-                            <span>Pick a date range</span>
-                            )}
-                        </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="center">
-                        <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={dateRange?.from}
-                            selected={dateRange}
-                            onSelect={setDateRange}
-                            numberOfMonths={2}
-                        />
-                        </PopoverContent>
-                    </Popover>
-                </div>
+                <Tabs value={filterType} onValueChange={setFilterType} className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="daily">Daily</TabsTrigger>
+                        <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                        <TabsTrigger value="yearly">Yearly</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="daily">
+                        <div className="flex justify-center py-4">
+                           <Calendar mode="single" selected={selectedDay} onSelect={setSelectedDay} className="rounded-md border" />
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="monthly">
+                        <div className="grid grid-cols-2 gap-4 py-4">
+                             <Select value={selectedYear.toString()} onValueChange={(val) => setSelectedYear(Number(val))}>
+                                <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+                                <SelectContent>
+                                    {availableYears.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                             <Select value={selectedMonth.getMonth().toString()} onValueChange={(val) => setSelectedMonth(new Date(selectedYear, Number(val)))}>
+                                <SelectTrigger><SelectValue placeholder="Select Month" /></SelectTrigger>
+                                <SelectContent>
+                                    {availableMonths.map((month, i) => <SelectItem key={i} value={i.toString()}>{format(month, 'MMMM')}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="yearly">
+                        <div className="py-4">
+                            <Select value={selectedYear.toString()} onValueChange={(val) => setSelectedYear(Number(val))}>
+                                <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+                                <SelectContent>
+                                    {availableYears.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </TabsContent>
+                </Tabs>
                 <DialogFooter className="sm:justify-center pt-4">
                     <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
                     {!isMobile && (
@@ -467,3 +492,5 @@ export default function BatchRecordsPage() {
     </div>
   );
 }
+
+    

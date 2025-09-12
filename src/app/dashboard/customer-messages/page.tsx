@@ -97,7 +97,7 @@ export default function CustomerMessagesPage() {
                                                         Reply via Email
                                                     </a>
                                                 </Button>
-                                                <Button variant="destructive" size="sm" onClick={() => handleDeleteMessage(msg.id)}>
+                                                <Button variant="destructive" size="sm" onClick={() => handleDeleteMessage(msg.id)} disabled={user?.role !== 'OWNER'}>
                                                     <Trash2 className="mr-2"/>
                                                     Delete
                                                 </Button>

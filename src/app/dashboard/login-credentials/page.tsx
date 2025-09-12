@@ -278,7 +278,7 @@ export default function LoginCredentialsPage() {
                                         <TableCell className="text-right">
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="icon" disabled={u.username === 'appu_muchandi'}>
+                                                    <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER'}>
                                                         <Trash2 className="h-4 w-4" />
                                                         <span className="sr-only">Delete User</span>
                                                     </Button>
@@ -314,4 +314,5 @@ export default function LoginCredentialsPage() {
       </div>
     </div>
   );
-}
+
+    

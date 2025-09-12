@@ -104,11 +104,13 @@ export default function LoginCredentialsPage() {
 
     if(existingUserIndex > -1){
         // This is an update
-        updatedUsers[existingUserIndex] = { ...updatedUsers[existingUserIndex], ...data };
+        const userToUpdate = updatedUsers[existingUserIndex];
+        const newUser = { ...userToUpdate, ...data };
+        updatedUsers.splice(existingUserIndex, 1, newUser);
         toast({ title: 'Credentials Updated!', description: `Login for ${data.username} has been updated.` });
     } else {
         // This is a new user
-        updatedUsers.push(data);
+        updatedUsers.push({username: data.username, password: data.password});
         toast({ title: 'User Added!', description: `${data.username} can now log in.` });
     }
     

@@ -51,6 +51,16 @@ export default function EggReservationsPage() {
         const reservation = reservations.find(res => res.id === id);
         if (!reservation) return;
 
+        // Prevent creating a new sale if already completed
+        if (reservation.status === 'Completed' && status === 'Completed') {
+            toast({
+                variant: 'destructive',
+                title: 'Already Completed',
+                description: 'This reservation has already been marked as completed and a sale has been recorded.',
+            });
+            return;
+        }
+
         const updatedReservations = reservations.map(res => 
             res.id === id ? { ...res, status } : res
         );
@@ -63,23 +73,27 @@ export default function EggReservationsPage() {
         });
 
         if (status === 'Completed') {
-            const revenue = reservation.quantity * settings.pricePerEgg;
-            const newSale = {
-                id: `SALE_RES_${reservation.id}`,
-                date: new Date().toISOString(),
-                buyerName: reservation.name,
-                quantity: reservation.quantity,
-                revenue: revenue.toFixed(2),
-            };
-
             const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
-            const updatedSalesHistory = [newSale, ...salesHistory];
-            localStorage.setItem('salesHistory', JSON.stringify(updatedSalesHistory));
+            const saleExists = salesHistory.some((sale: any) => sale.id === `SALE_RES_${reservation.id}`);
 
-            toast({
-                title: 'Sale Recorded!',
-                description: `Sale for ${reservation.name} automatically added to sales history.`,
-            });
+            if (!saleExists) {
+                const revenue = reservation.quantity * settings.pricePerEgg;
+                const newSale = {
+                    id: `SALE_RES_${reservation.id}`,
+                    date: new Date().toISOString(),
+                    buyerName: reservation.name,
+                    quantity: reservation.quantity,
+                    revenue: revenue.toFixed(2),
+                };
+
+                const updatedSalesHistory = [newSale, ...salesHistory];
+                localStorage.setItem('salesHistory', JSON.stringify(updatedSalesHistory));
+
+                toast({
+                    title: 'Sale Recorded!',
+                    description: `Sale for ${reservation.name} automatically added to sales history.`,
+                });
+            }
         }
     };
 
@@ -154,7 +168,7 @@ export default function EggReservationsPage() {
                                             <TableCell className="text-right">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="outline" size="sm">Manage</Button>
+                                                        <Button variant="outline" size="sm" disabled={res.status === 'Completed' || res.status === 'Cancelled'}>Manage</Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent>
                                                         <DropdownMenuItem onClick={() => updateReservationStatus(res.id, 'Ready for Pickup')}>

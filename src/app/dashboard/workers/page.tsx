@@ -54,7 +54,6 @@ export default function WorkersPage() {
     },
   });
 
-  // Load workers data from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedWorkers = localStorage.getItem('workersData');
@@ -64,13 +63,6 @@ export default function WorkersPage() {
     }
   }, []);
 
-  // Save workers data to localStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('workersData', JSON.stringify(workers));
-    }
-  }, [workers]);
-
   
   function onAddWorkerSubmit(data: WorkerFormValues) {
     const newWorker: Worker = {
@@ -79,13 +71,17 @@ export default function WorkersPage() {
       mobile: data.mobile,
       salary: data.salary.toLocaleString(),
     };
-    setWorkers(prev => [...prev, newWorker]);
+    const updatedWorkers = [...workers, newWorker];
+    setWorkers(updatedWorkers);
+    localStorage.setItem('workersData', JSON.stringify(updatedWorkers));
     toast({ title: 'Worker Added!', description: `${data.name} has been added to your records.` });
     form.reset();
   }
 
   const handleDeleteWorker = (id: string) => {
-    setWorkers(prev => prev.filter(worker => worker.id !== id));
+    const updatedWorkers = workers.filter(worker => worker.id !== id);
+    setWorkers(updatedWorkers);
+    localStorage.setItem('workersData', JSON.stringify(updatedWorkers));
     toast({ title: 'Worker Removed', description: 'The worker has been removed from your records.' });
   }
 

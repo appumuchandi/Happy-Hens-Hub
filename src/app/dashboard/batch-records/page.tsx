@@ -81,12 +81,6 @@ export default function BatchRecordsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('batchRecords', JSON.stringify(batches));
-    }
-  }, [batches]);
-
   const batchForm = useForm<BatchFormValues>({
     resolver: zodResolver(batchSchema),
     defaultValues: { name: '' },
@@ -111,7 +105,9 @@ export default function BatchRecordsPage() {
         creationDate: new Date().toISOString(),
         vaccinationRecords: []
     };
-    setBatches(prev => [...prev, newBatch]);
+    const updatedBatches = [...batches, newBatch];
+    setBatches(updatedBatches);
+    localStorage.setItem('batchRecords', JSON.stringify(updatedBatches));
     toast({ title: 'Batch Added!', description: `Batch "${data.name}" has been created.` });
     batchForm.reset();
   }
@@ -127,11 +123,14 @@ export default function BatchRecordsPage() {
         day: dayOfVaccination,
     };
     
-    setBatches(prev => prev.map(batch => 
+    const updatedBatches = batches.map(batch => 
         batch.id === selectedBatch.id 
         ? { ...batch, vaccinationRecords: [...batch.vaccinationRecords, newRecord].sort((a,b) => a.day - b.day) } 
         : batch
-    ));
+    );
+    
+    setBatches(updatedBatches);
+    localStorage.setItem('batchRecords', JSON.stringify(updatedBatches));
 
     toast({ title: 'Vaccination Added!', description: `Record for ${data.vaccine} added to ${selectedBatch.name}.` });
     vaccineForm.reset({ vaccine: '', date: new Date() });
@@ -139,7 +138,9 @@ export default function BatchRecordsPage() {
   }
   
   const handleDeleteBatch = (id: string) => {
-    setBatches(prev => prev.filter(batch => batch.id !== id));
+    const updatedBatches = batches.filter(batch => batch.id !== id);
+    setBatches(updatedBatches);
+    localStorage.setItem('batchRecords', JSON.stringify(updatedBatches));
     toast({ title: 'Batch Deleted', description: 'The batch record has been removed.' });
   }
 

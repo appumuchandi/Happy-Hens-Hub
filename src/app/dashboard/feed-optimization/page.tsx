@@ -33,7 +33,7 @@ export default function FeedStockPage() {
       const savedData = localStorage.getItem('feedContainers');
       const dataToSet = savedData ? JSON.parse(savedData) : defaultFeedContainers;
       setContainers(dataToSet);
-      setInitialState(dataToSet);
+      setInitialState(JSON.parse(JSON.stringify(dataToSet))); // Deep copy for initial state
     }
   }, []);
 
@@ -48,7 +48,7 @@ export default function FeedStockPage() {
 
   const handleSaveChanges = () => {
     localStorage.setItem('feedContainers', JSON.stringify(containers));
-    setInitialState(containers);
+    setInitialState(JSON.parse(JSON.stringify(containers))); // Deep copy for new initial state
     toast({ title: 'Success!', description: 'Feed stock levels have been updated.' });
   }
   

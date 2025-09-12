@@ -73,12 +73,11 @@ export default function SalesPage() {
     resolver: zodResolver(salesSchema),
     defaultValues: {
       buyerName: '',
-      quantity: undefined, // Changed to undefined
-      pricePerPiece: undefined, // Changed to undefined
+      quantity: undefined,
+      pricePerPiece: undefined,
     },
   });
   
-  // Load data from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
         const savedData = localStorage.getItem('salesHistory');
@@ -97,13 +96,6 @@ export default function SalesPage() {
         }
     }
   }, [form]);
-  
-  // Save data to localStorage whenever salesHistory changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-        localStorage.setItem('salesHistory', JSON.stringify(salesHistory));
-    }
-  }, [salesHistory]);
 
 
   const { watch } = form;
@@ -128,7 +120,9 @@ export default function SalesPage() {
         revenue: totalRevenue.toFixed(2),
     };
     
-    setSalesHistory((prev) => [newSale, ...prev]);
+    const updatedHistory = [newSale, ...salesHistory];
+    setSalesHistory(updatedHistory);
+    localStorage.setItem('salesHistory', JSON.stringify(updatedHistory));
 
     toast({
       title: 'Sale Recorded!',
@@ -154,6 +148,7 @@ export default function SalesPage() {
   const handleDelete = (id: string) => {
     const updatedHistory = salesHistory.filter((sale: any) => sale.id !== id);
     setSalesHistory(updatedHistory);
+    localStorage.setItem('salesHistory', JSON.stringify(updatedHistory));
     toast({
         title: "Sale Deleted",
         description: "The sale record has been removed.",

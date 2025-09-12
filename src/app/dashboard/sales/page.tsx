@@ -78,7 +78,7 @@ const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ record
                             <TableCell>{format(new Date(sale.date), 'yyyy-MM-dd')}</TableCell>
                             <TableCell>{sale.buyerName}</TableCell>
                             <TableCell>{sale.quantity}</TableCell>
-                            <TableCell>₹{(parseFloat(sale.revenue) / sale.quantity).toFixed(2)}</TableCell>
+                            <TableCell>₹{sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00'}</TableCell>
                             <TableCell>₹{sale.revenue}</TableCell>
                         </TableRow>
                     ))}
@@ -445,3 +445,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

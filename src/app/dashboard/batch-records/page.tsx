@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
 import { Badge } from '@/components/ui/badge';
-import { format, parseISO, differenceInDays } from 'date-fns';
+import { format, parseISO, differenceInDays, getYear, getMonth, getDate } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -74,7 +74,7 @@ const vaccinationSchema = z.object({
 });
 type VaccinationFormValues = z.infer<typeof vaccinationSchema>;
 
-type ReportType = 'daily' | 'monthly' | 'yearly';
+type ReportPeriod = 'all' | 'daily' | 'monthly' | 'yearly';
 
 
 export default function BatchRecordsPage() {
@@ -85,6 +85,13 @@ export default function BatchRecordsPage() {
   const [isVaccineDialogOpen, setIsVaccineDialogOpen] = useState(false);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [reportPeriod, setReportPeriod] = useState<ReportPeriod>('all');
+  const [years, setYears] = useState<number[]>([]);
+  const [months, setMonths] = useState<number[]>([]);
+  const [days, setDays] = useState<number[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedDay, setSelectedDay] = useState<string>('all');
   
   useEffect(() => {
     const checkMobile = () => {
@@ -92,6 +99,50 @@ export default function BatchRecordsPage() {
     };
     checkMobile();
   }, []);
+
+  useEffect(() => {
+    const allDates = batches.map(b => parseISO(b.creationDate));
+    const uniqueYears = [...new Set(allDates.map(d => getYear(d)))].sort((a, b) => b - a);
+    setYears(uniqueYears);
+
+    if (selectedYear !== 'all') {
+      const yearNum = parseInt(selectedYear);
+      const filteredMonths = [...new Set(allDates.filter(d => getYear(d) === yearNum).map(d => getMonth(d)))].sort((a, b) => a - b);
+      setMonths(filteredMonths);
+    } else {
+      setMonths([]);
+    }
+
+    if (selectedYear !== 'all' && selectedMonth !== 'all') {
+        const yearNum = parseInt(selectedYear);
+        const monthNum = parseInt(selectedMonth);
+        const filteredDays = [...new Set(allDates.filter(d => getYear(d) === yearNum && getMonth(d) === monthNum).map(d => getDate(d)))].sort((a, b) => a - b);
+        setDays(filteredDays);
+    } else {
+        setDays([]);
+    }
+
+  }, [batches, selectedYear, selectedMonth]);
+
+
+  const getFilteredData = () => {
+    if (selectedYear === 'all') return batches;
+
+    const yearNum = parseInt(selectedYear);
+    let filtered = batches.filter(b => getYear(parseISO(b.creationDate)) === yearNum);
+
+    if (selectedMonth !== 'all') {
+        const monthNum = parseInt(selectedMonth);
+        filtered = filtered.filter(b => getMonth(parseISO(b.creationDate)) === monthNum);
+    }
+
+    if (selectedDay !== 'all') {
+        const dayNum = parseInt(selectedDay);
+        filtered = filtered.filter(b => getDate(parseISO(b.creationDate)) === dayNum);
+    }
+
+    return filtered;
+  }
 
   const generateReportHtml = (records: Batch[]) => {
       let html = '';
@@ -127,14 +178,24 @@ export default function BatchRecordsPage() {
   };
 
   const handleDownloadPdf = () => {
-      const reportHtml = generateReportHtml(batches);
+      const filteredData = getFilteredData();
+      if (filteredData.length === 0) {
+        toast({ variant: 'destructive', title: "No Data", description: "No records found for the selected period." });
+        return;
+      }
+      const reportHtml = generateReportHtml(filteredData);
       downloadPdfReport('Batch Records Report', reportHtml);
       toast({ title: "Report Download Started", description: "Your batch records report is being generated." });
       setOpenDownloadDialog(false);
   };
   
   const handleDirectPrint = () => {
-      const reportHtml = generateReportHtml(batches);
+      const filteredData = getFilteredData();
+      if (filteredData.length === 0) {
+        toast({ variant: 'destructive', title: "No Data", description: "No records found for the selected period." });
+        return;
+      }
+      const reportHtml = generateReportHtml(filteredData);
       directPrint('Batch Records Report', reportHtml);
       setOpenDownloadDialog(false);
   }
@@ -231,25 +292,46 @@ export default function BatchRecordsPage() {
                 </Button>
             </DialogTrigger>
             <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Download Batch Records Report</DialogTitle>
-                <DialogDescription>
-                Choose your preferred method to get the report.
-                </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="sm:justify-center pt-4">
-                <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                {!isMobile && (
-                    <Button onClick={handleDirectPrint}>
-                        <Printer className="mr-2"/>
-                        Print
+                <DialogHeader>
+                    <DialogTitle>Download Batch Records Report</DialogTitle>
+                    <DialogDescription>Select a period to generate the report for.</DialogDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-3 gap-4 py-4">
+                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                        <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Years</SelectItem>
+                            {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={selectedYear === 'all'}>
+                        <SelectTrigger><SelectValue placeholder="Month" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Months</SelectItem>
+                            {months.map(month => <SelectItem key={month} value={month.toString()}>{format(new Date(2000, month), 'MMMM')}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={selectedDay} onValueChange={setSelectedDay} disabled={selectedMonth === 'all'}>
+                        <SelectTrigger><SelectValue placeholder="Day" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Days</SelectItem>
+                            {days.map(day => <SelectItem key={day} value={day.toString()}>{day}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <DialogFooter className="sm:justify-center pt-4">
+                    <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+                    {!isMobile && (
+                        <Button onClick={handleDirectPrint}>
+                            <Printer className="mr-2"/>
+                            Print
+                        </Button>
+                    )}
+                    <Button onClick={handleDownloadPdf}>
+                        <Download className="mr-2"/>
+                        Download PDF
                     </Button>
-                )}
-                <Button onClick={handleDownloadPdf}>
-                    <Download className="mr-2"/>
-                    Download PDF
-                </Button>
-            </DialogFooter>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
       </div>
@@ -416,3 +498,5 @@ export default function BatchRecordsPage() {
     </div>
   );
 }
+
+    

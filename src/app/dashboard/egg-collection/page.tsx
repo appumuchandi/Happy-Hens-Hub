@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { format } from 'date-fns';
+import { format, parseISO, getYear, getMonth, getDate } from 'date-fns';
 import { Download, Printer, Trash2 } from 'lucide-react';
 import {
   Dialog,
@@ -34,6 +34,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 import { downloadPdfReport, directPrint } from '@/lib/utils';
 
 
@@ -53,6 +60,12 @@ export default function EggCollectionPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [years, setYears] = useState<number[]>([]);
+  const [months, setMonths] = useState<number[]>([]);
+  const [days, setDays] = useState<number[]>([]);
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedDay, setSelectedDay] = useState<string>('all');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -60,6 +73,48 @@ export default function EggCollectionPage() {
     };
     checkMobile();
   }, []);
+
+  useEffect(() => {
+    const allDates = collectionHistory.map(r => parseISO(r.date));
+    const uniqueYears = [...new Set(allDates.map(d => getYear(d)))].sort((a, b) => b - a);
+    setYears(uniqueYears);
+
+    if (selectedYear !== 'all') {
+        const yearNum = parseInt(selectedYear);
+        const filteredMonths = [...new Set(allDates.filter(d => getYear(d) === yearNum).map(d => getMonth(d)))].sort((a, b) => a - b);
+        setMonths(filteredMonths);
+    } else {
+        setMonths([]);
+    }
+
+    if (selectedYear !== 'all' && selectedMonth !== 'all') {
+        const yearNum = parseInt(selectedYear);
+        const monthNum = parseInt(selectedMonth);
+        const filteredDays = [...new Set(allDates.filter(d => getYear(d) === yearNum && getMonth(d) === monthNum).map(d => getDate(d)))].sort((a, b) => a - b);
+        setDays(filteredDays);
+    } else {
+        setDays([]);
+    }
+  }, [collectionHistory, selectedYear, selectedMonth]);
+  
+  const getFilteredData = () => {
+    if (selectedYear === 'all') return collectionHistory;
+
+    const yearNum = parseInt(selectedYear);
+    let filtered = collectionHistory.filter(r => getYear(parseISO(r.date)) === yearNum);
+
+    if (selectedMonth !== 'all') {
+        const monthNum = parseInt(selectedMonth);
+        filtered = filtered.filter(r => getMonth(parseISO(r.date)) === monthNum);
+    }
+
+    if (selectedDay !== 'all') {
+        const dayNum = parseInt(selectedDay);
+        filtered = filtered.filter(r => getDate(parseISO(r.date)) === dayNum);
+    }
+
+    return filtered;
+  };
   
   const generateReportHtml = (records: any[]) => {
       let tableRows = '';
@@ -88,14 +143,24 @@ export default function EggCollectionPage() {
   };
 
   const handleDownloadPdf = () => {
-    const reportHtml = generateReportHtml(collectionHistory);
+    const filteredData = getFilteredData();
+    if (filteredData.length === 0) {
+      toast({ variant: 'destructive', title: "No Data", description: "No records found for the selected period." });
+      return;
+    }
+    const reportHtml = generateReportHtml(filteredData);
     downloadPdfReport('Egg Collection Report', reportHtml);
     toast({ title: "Report Download Started", description: "Your egg collection report is being generated." });
     setOpenDownloadDialog(false);
   };
   
   const handleDirectPrint = () => {
-      const reportHtml = generateReportHtml(collectionHistory);
+      const filteredData = getFilteredData();
+      if (filteredData.length === 0) {
+        toast({ variant: 'destructive', title: "No Data", description: "No records found for the selected period." });
+        return;
+      }
+      const reportHtml = generateReportHtml(filteredData);
       directPrint('Egg Collection Report', reportHtml);
       setOpenDownloadDialog(false);
   }
@@ -124,7 +189,7 @@ export default function EggCollectionPage() {
   function onSubmit(data: EggCollectionFormValues) {
     const newRecord = {
         id: `EGG${Date.now()}`,
-        date: format(new Date(), 'yyyy-MM-dd'),
+        date: new Date().toISOString(),
         quantity: data.quantity,
         collector: user?.name || 'Unknown Worker',
         batch: data.batch || 'N/A',
@@ -155,7 +220,7 @@ export default function EggCollectionPage() {
   const paginatedData = collectionHistory.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
     currentPage * RECORDS_PER_PAGE
-  );
+  ).map(rec => ({...rec, date: format(parseISO(rec.date), 'yyyy-MM-dd')}));
 
   return (
     <div className="space-y-6">
@@ -172,9 +237,32 @@ export default function EggCollectionPage() {
                 <DialogHeader>
                     <DialogTitle>Download Collection Report</DialogTitle>
                     <DialogDescription>
-                        Choose your preferred method to get the report.
+                        Select a period to generate the report for.
                     </DialogDescription>
                 </DialogHeader>
+                <div className="grid grid-cols-3 gap-4 py-4">
+                    <Select value={selectedYear} onValueChange={setSelectedYear}>
+                        <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Years</SelectItem>
+                            {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={selectedYear === 'all'}>
+                        <SelectTrigger><SelectValue placeholder="Month" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Months</SelectItem>
+                            {months.map(month => <SelectItem key={month} value={month.toString()}>{format(new Date(2000, month), 'MMMM')}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={selectedDay} onValueChange={setSelectedDay} disabled={selectedMonth === 'all'}>
+                        <SelectTrigger><SelectValue placeholder="Day" /></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Days</SelectItem>
+                            {days.map(day => <SelectItem key={day} value={day.toString()}>{day}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
                 <DialogFooter className="sm:justify-center pt-4">
                     <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
                     {!isMobile && (
@@ -314,3 +402,5 @@ export default function EggCollectionPage() {
     </div>
   );
 }
+
+    

@@ -12,8 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { format, parseISO, getYear, getMonth, getDate } from 'date-fns';
-import { Download, Printer, Trash2 } from 'lucide-react';
+import { addDays, format, parseISO } from 'date-fns';
+import { Download, Printer, Trash2, Calendar as CalendarIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -34,14 +34,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { downloadPdfReport, directPrint } from '@/lib/utils';
+import type { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
 
 
 const eggCollectionSchema = z.object({
@@ -60,12 +57,7 @@ export default function EggCollectionPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [years, setYears] = useState<number[]>([]);
-  const [months, setMonths] = useState<number[]>([]);
-  const [days, setDays] = useState<number[]>([]);
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
-  const [selectedDay, setSelectedDay] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -74,53 +66,23 @@ export default function EggCollectionPage() {
     checkMobile();
   }, []);
 
-  useEffect(() => {
-    const allDates = collectionHistory.map(r => parseISO(r.date));
-    const uniqueYears = [...new Set(allDates.map(d => getYear(d)))].sort((a, b) => b - a);
-    setYears(uniqueYears);
-
-    if (selectedYear !== 'all') {
-        const yearNum = parseInt(selectedYear);
-        const filteredMonths = [...new Set(allDates.filter(d => getYear(d) === yearNum).map(d => getMonth(d)))].sort((a, b) => a - b);
-        setMonths(filteredMonths);
-    } else {
-        setMonths([]);
-    }
-
-    if (selectedYear !== 'all' && selectedMonth !== 'all') {
-        const yearNum = parseInt(selectedYear);
-        const monthNum = parseInt(selectedMonth);
-        const filteredDays = [...new Set(allDates.filter(d => getYear(d) === yearNum && getMonth(d) === monthNum).map(d => getDate(d)))].sort((a, b) => a - b);
-        setDays(filteredDays);
-    } else {
-        setDays([]);
-    }
-  }, [collectionHistory, selectedYear, selectedMonth]);
-  
   const getFilteredData = () => {
-    if (selectedYear === 'all') return collectionHistory;
+    if (!dateRange?.from) return collectionHistory;
 
-    const yearNum = parseInt(selectedYear);
-    let filtered = collectionHistory.filter(r => getYear(parseISO(r.date)) === yearNum);
+    const from = dateRange.from;
+    const to = dateRange.to || from;
 
-    if (selectedMonth !== 'all') {
-        const monthNum = parseInt(selectedMonth);
-        filtered = filtered.filter(r => getMonth(parseISO(r.date)) === monthNum);
-    }
-
-    if (selectedDay !== 'all') {
-        const dayNum = parseInt(selectedDay);
-        filtered = filtered.filter(r => getDate(parseISO(r.date)) === dayNum);
-    }
-
-    return filtered;
+    return collectionHistory.filter(r => {
+      const recordDate = parseISO(r.date);
+      return recordDate >= from && recordDate <= addDays(to, 1);
+    });
   };
   
   const generateReportHtml = (records: any[]) => {
       let tableRows = '';
       records.forEach(record => {
           tableRows += `<tr class="border-b">
-                            <td class="p-2">${record.date}</td>
+                            <td class="p-2">${format(parseISO(record.date), 'yyyy-MM-dd')}</td>
                             <td class="p-2">${record.quantity}</td>
                             <td class="p-2">${record.batch}</td>
                             <td class="p-2">${record.collector}</td>
@@ -233,35 +195,50 @@ export default function EggCollectionPage() {
                     Download Report
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Download Collection Report</DialogTitle>
                     <DialogDescription>
-                        Select a period to generate the report for.
+                        Select a date range to generate the report for.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-3 gap-4 py-4">
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
-                        <SelectTrigger><SelectValue placeholder="Year" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Years</SelectItem>
-                            {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                    <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={selectedYear === 'all'}>
-                        <SelectTrigger><SelectValue placeholder="Month" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Months</SelectItem>
-                            {months.map(month => <SelectItem key={month} value={month.toString()}>{format(new Date(2000, month), 'MMMM')}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                    <Select value={selectedDay} onValueChange={setSelectedDay} disabled={selectedMonth === 'all'}>
-                        <SelectTrigger><SelectValue placeholder="Day" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Days</SelectItem>
-                            {days.map(day => <SelectItem key={day} value={day.toString()}>{day}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
+                 <div className="grid gap-4 py-4">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            id="date"
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !dateRange && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? (
+                            dateRange.to ? (
+                                <>
+                                {format(dateRange.from, "LLL dd, y")} -{" "}
+                                {format(dateRange.to, "LLL dd, y")}
+                                </>
+                            ) : (
+                                format(dateRange.from, "LLL dd, y")
+                            )
+                            ) : (
+                            <span>Pick a date range</span>
+                            )}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="center">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={dateRange?.from}
+                            selected={dateRange}
+                            onSelect={setDateRange}
+                            numberOfMonths={2}
+                        />
+                        </PopoverContent>
+                    </Popover>
                 </div>
                 <DialogFooter className="sm:justify-center pt-4">
                     <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
@@ -402,5 +379,3 @@ export default function EggCollectionPage() {
     </div>
   );
 }
-
-    

@@ -89,7 +89,7 @@ export default function LoginCredentialsPage() {
       setStoredUsers(users);
   }
 
-  if (user?.role !== 'OWNER') {
+  if (!user || user.role !== 'OWNER') {
     return <p className="text-destructive">You do not have permission to manage login credentials.</p>;
   }
 
@@ -103,14 +103,11 @@ export default function LoginCredentialsPage() {
     let updatedUsers = [...storedUsers];
 
     if(existingUserIndex > -1){
-        const workersOnly = updatedUsers.filter(u => u.username !== 'appu_muchandi');
-        const workerIndex = workersOnly.findIndex(w => w.username === data.username);
-        if (workerIndex > -1) {
-            workersOnly[workerIndex] = { ...workersOnly[workerIndex], ...data };
-            updatedUsers = [{ username: 'appu_muchandi', password: '•••' }, ...workersOnly];
-            toast({ title: 'Credentials Updated!', description: `Login for ${data.username} has been updated.` });
-        }
+        // This is an update
+        updatedUsers[existingUserIndex] = { ...updatedUsers[existingUserIndex], ...data };
+        toast({ title: 'Credentials Updated!', description: `Login for ${data.username} has been updated.` });
     } else {
+        // This is a new user
         updatedUsers.push(data);
         toast({ title: 'User Added!', description: `${data.username} can now log in.` });
     }
@@ -157,9 +154,9 @@ export default function LoginCredentialsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="cctv-password">Password</Label>
+                        <Label htmlFor="credentials-password">Password</Label>
                         <Input 
-                            id="cctv-password" 
+                            id="credentials-password" 
                             type="password" 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -278,7 +275,7 @@ export default function LoginCredentialsPage() {
                                         <TableCell className="text-right">
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER'}>
+                                                    <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER' || u.username === 'appu_muchandi'}>
                                                         <Trash2 className="h-4 w-4" />
                                                         <span className="sr-only">Delete User</span>
                                                     </Button>
@@ -314,5 +311,6 @@ export default function LoginCredentialsPage() {
       </div>
     </div>
   );
+}
 
     

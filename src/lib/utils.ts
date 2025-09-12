@@ -7,36 +7,35 @@ export function cn(...inputs: ClassValue[]) {
 
 
 export function printReport(title: string, content: string) {
-  const printWindow = window.open('', '_blank');
+  const originalContent = document.body.innerHTML;
   
-  if (printWindow) {
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>${title}</title>
-          <script src="https://cdn.tailwindcss.com"></script>
-          <style>
-            @media print {
-              body {
-                -webkit-print-color-adjust: exact;
-              }
+  document.body.innerHTML = `
+    <html>
+      <head>
+        <title>${title}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+          @media print {
+            body {
+              -webkit-print-color-adjust: exact;
             }
-          </style>
-        </head>
-        <body class="p-10">
-          <h1 class="text-2xl font-bold mb-4">${title}</h1>
-          ${content}
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    // Use a timeout to ensure content is rendered before printing
-    setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-    }, 500);
-  } else {
-    alert('Could not open print window. Please check your browser settings.');
-  }
+          }
+        </style>
+      </head>
+      <body class="p-10">
+        <h1 class="text-2xl font-bold mb-4">${title}</h1>
+        ${content}
+      </body>
+    </html>
+  `;
+  
+  // Use a timeout to ensure content is rendered before printing
+  setTimeout(() => {
+    window.print();
+    // Restore the original content after printing
+    document.body.innerHTML = originalContent;
+    // Re-run scripts or re-initialize event listeners if necessary.
+    // For this app, a simple reload is the most robust way to restore state.
+    window.location.reload();
+  }, 500);
 }

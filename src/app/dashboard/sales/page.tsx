@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { Download, Trash2 } from 'lucide-react';
+import { Download, Printer, Trash2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -23,16 +23,6 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Label } from '@/components/ui/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +34,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { printReport } from '@/lib/utils';
+import { downloadPdfReport, directPrint } from '@/lib/utils';
 
 
 const salesSchema = z.object({
@@ -54,8 +44,6 @@ const salesSchema = z.object({
 });
 
 type SalesFormValues = z.infer<typeof salesSchema>;
-type ReportType = 'daily' | 'monthly' | 'yearly';
-
 const RECORDS_PER_PAGE = 10;
 
 
@@ -65,11 +53,15 @@ export default function SalesPage() {
   const [salesHistory, setSalesHistory] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
-  const [reportType, setReportType] = useState<ReportType>('monthly');
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isMobile, setIsMobile] = useState(false);
   const [totalRevenue, setTotalRevenue] = useState(0);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
 
   const generateReportHtml = (records: any[]) => {
       let tableRows = '';
@@ -100,12 +92,18 @@ export default function SalesPage() {
               </table>`;
   };
 
-  const handlePrint = () => {
+  const handleDownloadPdf = () => {
     const reportHtml = generateReportHtml(salesHistory);
-    printReport('Sales Report', reportHtml);
-    toast({ title: "Report Downloaded", description: "Your sales report has been successfully generated." });
+    downloadPdfReport('Sales Report', reportHtml);
+    toast({ title: "Report Download Started", description: "Your sales report is being generated." });
     setOpenDownloadDialog(false);
   };
+  
+  const handleDirectPrint = () => {
+      const reportHtml = generateReportHtml(salesHistory);
+      directPrint('Sales Report', reportHtml);
+      setOpenDownloadDialog(false);
+  }
 
 
   const form = useForm<SalesFormValues>({
@@ -196,8 +194,6 @@ export default function SalesPage() {
     pricePerPiece: sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00',
   }));
 
-  const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
-  const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: format(new Date(0, i), 'MMMM') }));
 
   return (
     <div className="space-y-6">
@@ -211,84 +207,25 @@ export default function SalesPage() {
                 </Button>
             </DialogTrigger>
             <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Download Sales Report</DialogTitle>
-                <DialogDescription>
-                Select the time range for your sales report. This will prepare the document for printing or saving as a PDF.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Report Type</Label>
-                        <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="monthly">Monthly</SelectItem>
-                                <SelectItem value="yearly">Yearly</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Year</Label>
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {years.map(year => (
-                                    <SelectItem key={year} value={year}>{year}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                {reportType === 'monthly' && (
-                    <div className="space-y-2">
-                        <Label>Month</Label>
-                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select month" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {months.map(month => (
-                                    <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-                {reportType === 'daily' && (
-                    <div className="space-y-2">
-                        <Label>Date</Label>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start font-normal">
-                                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={setSelectedDate}
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )}
-            </div>
-            <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                <Button onClick={handlePrint}>
-                    <Download className="mr-2"/>
-                    Download
-                </Button>
-            </DialogFooter>
+                <DialogHeader>
+                    <DialogTitle>Download Sales Report</DialogTitle>
+                    <DialogDescription>
+                        Choose your preferred method to get the report.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="sm:justify-center pt-4">
+                    <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+                    {!isMobile && (
+                        <Button onClick={handleDirectPrint}>
+                            <Printer className="mr-2"/>
+                            Print
+                        </Button>
+                    )}
+                    <Button onClick={handleDownloadPdf}>
+                        <Download className="mr-2"/>
+                        Download PDF
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
       </div>
@@ -391,7 +328,7 @@ export default function SalesPage() {
                                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                       <AlertDialogDescription>
                                         This action cannot be undone. This will permanently delete this sale record.
-                                      </AlertDialogDescription>
+                                      </Deselectription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -436,5 +373,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

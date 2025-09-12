@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/hooks/use-auth';
-import { Users, UserPlus, Trash2, Download } from 'lucide-react';
+import { Users, UserPlus, Trash2, Download, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -33,18 +33,7 @@ import {
     DialogFooter,
     DialogTrigger,
   } from "@/components/ui/dialog"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Label } from '@/components/ui/label';
-import { format } from 'date-fns';
-import { printReport } from '@/lib/utils';
+import { downloadPdfReport, directPrint } from '@/lib/utils';
 
 interface Worker {
   id: string;
@@ -60,7 +49,6 @@ const workerSchema = z.object({
 });
 
 type WorkerFormValues = z.infer<typeof workerSchema>;
-type ReportType = 'daily' | 'monthly' | 'yearly';
 
 
 export default function WorkersPage() {
@@ -68,10 +56,14 @@ export default function WorkersPage() {
   const { toast } = useToast();
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
-  const [reportType, setReportType] = useState<ReportType>('monthly');
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
 
   const generateReportHtml = (records: Worker[]) => {
       let tableRows = '';
@@ -79,7 +71,7 @@ export default function WorkersPage() {
           tableRows += `<tr class="border-b">
                             <td class="p-2">${worker.name}</td>
                             <td class="p-2">${worker.mobile}</td>
-                            <td class="p-2">${worker.salary}</td>
+                            <td class="p-2">₹${worker.salary}</td>
                         </tr>`;
       });
 
@@ -97,12 +89,18 @@ export default function WorkersPage() {
               </table>`;
   };
 
-  const handlePrint = () => {
+  const handleDownloadPdf = () => {
       const reportHtml = generateReportHtml(workers);
-      printReport('Workers Report', reportHtml);
-      toast({ title: "Report Downloaded", description: "Your worker report has been successfully generated." });
+      downloadPdfReport('Workers Report', reportHtml);
+      toast({ title: "Report Download Started", description: "Your worker report is being generated." });
       setOpenDownloadDialog(false);
   };
+  
+  const handleDirectPrint = () => {
+      const reportHtml = generateReportHtml(workers);
+      directPrint('Workers Report', reportHtml);
+      setOpenDownloadDialog(false);
+  }
 
 
   const form = useForm<WorkerFormValues>({
@@ -149,9 +147,6 @@ export default function WorkersPage() {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 
-  const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
-  const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: format(new Date(0, i), 'MMMM') }));
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -169,84 +164,25 @@ export default function WorkersPage() {
                 </Button>
             </DialogTrigger>
             <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Download Worker Report</DialogTitle>
-                <DialogDescription>
-                Select the time range for your report. This will prepare the document for printing or saving as a PDF.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Report Type</Label>
-                        <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="monthly">Monthly</SelectItem>
-                                <SelectItem value="yearly">Yearly</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Year</Label>
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {years.map(year => (
-                                    <SelectItem key={year} value={year}>{year}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                {reportType === 'monthly' && (
-                    <div className="space-y-2">
-                        <Label>Month</Label>
-                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select month" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {months.map(month => (
-                                    <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-                {reportType === 'daily' && (
-                    <div className="space-y-2">
-                        <Label>Date</Label>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start font-normal">
-                                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={setSelectedDate}
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )}
-            </div>
-            <DialogFooter>
-                <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                <Button onClick={handlePrint}>
-                    <Download className="mr-2"/>
-                    Download
-                </Button>
-            </DialogFooter>
+                <DialogHeader>
+                    <DialogTitle>Download Worker Report</DialogTitle>
+                    <DialogDescription>
+                        Choose your preferred method to get the report.
+                    </DialogDescription>
+                </DialogHeader>
+                 <DialogFooter className="sm:justify-center pt-4">
+                    <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+                    {!isMobile && (
+                        <Button onClick={handleDirectPrint}>
+                            <Printer className="mr-2"/>
+                            Print
+                        </Button>
+                    )}
+                    <Button onClick={handleDownloadPdf}>
+                        <Download className="mr-2"/>
+                        Download PDF
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
       </div>
@@ -328,7 +264,7 @@ export default function WorkersPage() {
                         <TableRow key={worker.id}>
                         <TableCell className="font-medium">{worker.name}</TableCell>
                         <TableCell>{worker.mobile}</TableCell>
-                        <TableCell>{worker.salary}</TableCell>
+                        <TableCell>₹{worker.salary}</TableCell>
                         <TableCell className="text-right">
                              <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -370,5 +306,3 @@ export default function WorkersPage() {
     </div>
   );
 }
-
-    

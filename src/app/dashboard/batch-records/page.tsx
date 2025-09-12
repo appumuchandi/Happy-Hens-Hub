@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Trash2, Download } from 'lucide-react';
+import { PlusCircle, Trash2, Download, Printer } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -46,7 +46,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-import { printReport } from '@/lib/utils';
+import { downloadPdfReport, directPrint } from '@/lib/utils';
 
 
 interface VaccinationRecord {
@@ -84,16 +84,20 @@ export default function BatchRecordsPage() {
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
   const [isVaccineDialogOpen, setIsVaccineDialogOpen] = useState(false);
   const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
-  const [reportType, setReportType] = useState<ReportType>('monthly');
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [isMobile, setIsMobile] = useState(false);
   
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
+
   const generateReportHtml = (records: Batch[]) => {
       let html = '';
       records.forEach(batch => {
-          html += `<div class="mb-8 page-break-after">
-                      <h2 class="text-xl font-semibold">Batch: ${batch.name}</h2>
+          html += `<div class="mb-8 break-after-page">
+                      <h2 class="text-xl font-semibold">${batch.name}</h2>
                       <p class="text-sm text-gray-500">Created On: ${format(parseISO(batch.creationDate), 'PPP')}</p>
                       <table class="w-full mt-2 border-collapse">
                           <thead>
@@ -122,12 +126,18 @@ export default function BatchRecordsPage() {
       return html;
   };
 
-  const handlePrint = () => {
+  const handleDownloadPdf = () => {
       const reportHtml = generateReportHtml(batches);
-      printReport('Batch Records Report', reportHtml);
-      toast({ title: "Report Downloaded", description: "Your batch records report has been successfully generated." });
+      downloadPdfReport('Batch Records Report', reportHtml);
+      toast({ title: "Report Download Started", description: "Your batch records report is being generated." });
       setOpenDownloadDialog(false);
   };
+  
+  const handleDirectPrint = () => {
+      const reportHtml = generateReportHtml(batches);
+      directPrint('Batch Records Report', reportHtml);
+      setOpenDownloadDialog(false);
+  }
 
 
   useEffect(() => {
@@ -209,9 +219,6 @@ export default function BatchRecordsPage() {
     return 0;
   }
   
-  const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
-  const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: format(new Date(0, i), 'MMMM') }));
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -227,79 +234,20 @@ export default function BatchRecordsPage() {
             <DialogHeader>
                 <DialogTitle>Download Batch Records Report</DialogTitle>
                 <DialogDescription>
-                Select the time range for your report. This will prepare the document for printing or saving as a PDF.
+                Choose your preferred method to get the report.
                 </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label>Report Type</Label>
-                        <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="daily">Daily</SelectItem>
-                                <SelectItem value="monthly">Monthly</SelectItem>
-                                <SelectItem value="yearly">Yearly</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Year</Label>
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {years.map(year => (
-                                    <SelectItem key={year} value={year}>{year}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-                {reportType === 'monthly' && (
-                    <div className="space-y-2">
-                        <Label>Month</Label>
-                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select month" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {months.map(month => (
-                                    <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                )}
-                {reportType === 'daily' && (
-                    <div className="space-y-2">
-                        <Label>Date</Label>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start font-normal">
-                                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                    mode="single"
-                                    selected={selectedDate}
-                                    onSelect={setSelectedDate}
-                                    initialFocus
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )}
-            </div>
-            <DialogFooter>
+            <DialogFooter className="sm:justify-center pt-4">
                 <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                <Button onClick={handlePrint}>
+                {!isMobile && (
+                    <Button onClick={handleDirectPrint}>
+                        <Printer className="mr-2"/>
+                        Print
+                    </Button>
+                )}
+                <Button onClick={handleDownloadPdf}>
                     <Download className="mr-2"/>
-                    Download
+                    Download PDF
                 </Button>
             </DialogFooter>
             </DialogContent>
@@ -468,5 +416,3 @@ export default function BatchRecordsPage() {
     </div>
   );
 }
-
-    

@@ -405,3 +405,5 @@ export default function EggCollectionPage() {
     </div>
   );
 }
+
+    

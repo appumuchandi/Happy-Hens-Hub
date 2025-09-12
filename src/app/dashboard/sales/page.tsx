@@ -237,13 +237,11 @@ export default function SalesPage() {
   const paginatedData = salesHistory.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
     currentPage * RECORDS_PER_PAGE
-  ).map((sale: any) => {
-    return {
-      ...sale,
-      date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
-      pricePerPiece: sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00',
-    }
-  });
+  ).map((sale: any) => ({
+    ...sale,
+    date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
+    pricePerPiece: sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00',
+  }));
 
   const availableYears = Array.from(new Set(salesHistory.map(r => parseISO(r.date).getFullYear()))).sort((a,b) => b-a);
   const availableMonths = Array.from({ length: 12 }, (_, i) => new Date(selectedYear, i, 1));
@@ -465,3 +463,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

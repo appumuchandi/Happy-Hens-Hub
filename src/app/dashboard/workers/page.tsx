@@ -230,7 +230,7 @@ export default function WorkersPage() {
                                     <FormItem>
                                     <FormLabel>Salary (₹)</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="Enter monthly salary" {...field} />
+                                        <Input type="number" placeholder="Enter monthly salary" {...field} value={field.value ?? ''}/>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -306,3 +306,5 @@ export default function WorkersPage() {
     </div>
   );
 }
+
+    

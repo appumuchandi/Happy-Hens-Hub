@@ -84,6 +84,13 @@ const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ record
                     ))}
                 </TableBody>
             </Table>
+            <style jsx global>{`
+                @media print {
+                    body {
+                        -webkit-print-color-adjust: exact;
+                    }
+                }
+            `}</style>
         </div>
     );
 });
@@ -445,3 +452,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

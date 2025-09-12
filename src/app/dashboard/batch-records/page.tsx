@@ -112,6 +112,9 @@ const PrintableReport = forwardRef<HTMLDivElement, { records: Batch[] }>(({ reco
                     .page-break-after {
                         page-break-after: always;
                     }
+                    body {
+                        -webkit-print-color-adjust: exact;
+                    }
                 }
             `}</style>
         </div>
@@ -484,3 +487,5 @@ export default function BatchRecordsPage() {
     </div>
   );
 }
+
+    

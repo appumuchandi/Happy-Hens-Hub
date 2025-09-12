@@ -1,5 +1,4 @@
 
-
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -114,7 +113,7 @@ function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill 
                             <FormItem>
                             <FormLabel>Message</FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Enter your message" {...field} />
+                                <Textarea placeholder={placeholder} {...field} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -514,3 +513,5 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
+
+    

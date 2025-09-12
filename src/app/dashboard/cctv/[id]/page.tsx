@@ -124,7 +124,7 @@ export default function SingleCctvPage() {
                     {camera.isConnected ? (
                         <>
                             <Image
-                                src={`https://placehold.co/1280x720.png`}
+                                src={`https://picsum.photos/seed/${camera.id}/1280/720`}
                                 alt={`Live feed for ${camera.name}`}
                                 layout="fill"
                                 objectFit="cover"
@@ -173,4 +173,4 @@ export default function SingleCctvPage() {
   );
 }
 
-
+    

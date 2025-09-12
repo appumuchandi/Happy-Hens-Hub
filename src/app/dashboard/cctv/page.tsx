@@ -58,7 +58,7 @@ export default function CctvPage() {
   const [cameraFeeds, setCameraFeeds] = useState<CameraFeed[]>([]);
 
   useEffect(() => {
-    try {
+    if (typeof window !== 'undefined') {
         const storedPassword = localStorage.getItem('cctvPassword');
         if (storedPassword) {
             setCctvPassword(storedPassword);
@@ -68,11 +68,8 @@ export default function CctvPage() {
         if (sessionAuth === 'true') {
             setIsAuthenticated(true);
         }
-
-    } catch (error) {
-        console.error("Failed to access storage", error);
+        setCameraFeeds(initialFeeds);
     }
-     setCameraFeeds(initialFeeds);
   }, []);
 
 
@@ -291,7 +288,7 @@ export default function CctvPage() {
                     <div className="aspect-video bg-card border-b rounded-t-md flex items-center justify-center relative">
                         {feed.isConnected ? (
                             <Image
-                                src={`https://placehold.co/600x400.png`}
+                                src={`https://picsum.photos/seed/${feed.id}/600/400`}
                                 alt={`Live feed for ${feed.name}`}
                                 width={600}
                                 height={400}
@@ -321,3 +318,5 @@ export default function CctvPage() {
     </div>
   );
 }
+
+    

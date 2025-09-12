@@ -50,7 +50,7 @@ export default function WorkersPage() {
     defaultValues: {
       name: '',
       mobile: '',
-      salary: 0,
+      salary: undefined,
     },
   });
 
@@ -219,3 +219,5 @@ export default function WorkersPage() {
     </div>
   );
 }
+
+    

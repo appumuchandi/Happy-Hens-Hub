@@ -70,7 +70,7 @@ export default function EggCollectionPage() {
   const form = useForm<EggCollectionFormValues>({
     resolver: zodResolver(eggCollectionSchema),
     defaultValues: {
-      quantity: 0,
+      quantity: undefined,
       batch: '',
     },
   });
@@ -352,3 +352,5 @@ export default function EggCollectionPage() {
     </div>
   );
 }
+
+    

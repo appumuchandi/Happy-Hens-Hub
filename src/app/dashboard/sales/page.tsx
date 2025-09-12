@@ -199,7 +199,7 @@ export default function SalesPage() {
   ).map((sale: any) => ({
     ...sale,
     date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
-    pricePerPiece: (parseFloat(sale.revenue) / sale.quantity).toFixed(2),
+    pricePerPiece: sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00',
   }));
 
   const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());

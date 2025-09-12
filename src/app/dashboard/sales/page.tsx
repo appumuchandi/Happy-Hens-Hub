@@ -188,11 +188,13 @@ export default function SalesPage() {
   const paginatedData = salesHistory.slice(
     (currentPage - 1) * RECORDS_PER_PAGE,
     currentPage * RECORDS_PER_PAGE
-  ).map((sale: any) => ({
-    ...sale,
-    date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
-    pricePerPiece: sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00',
-  }));
+  ).map((sale: any) => {
+    return {
+      ...sale,
+      date: format(new Date(sale.date), 'EEE, yyyy-MM-dd'),
+      pricePerPiece: sale.quantity > 0 ? (parseFloat(sale.revenue) / sale.quantity).toFixed(2) : '0.00',
+    }
+  });
 
 
   return (
@@ -328,7 +330,7 @@ export default function SalesPage() {
                                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                       <AlertDialogDescription>
                                         This action cannot be undone. This will permanently delete this sale record.
-                                      </Deselectription>
+                                      </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                       <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -373,3 +375,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

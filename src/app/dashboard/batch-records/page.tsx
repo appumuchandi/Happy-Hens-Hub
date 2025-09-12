@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Download } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -38,6 +38,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 
 interface VaccinationRecord {
   vaccine: string;
@@ -64,6 +72,8 @@ const vaccinationSchema = z.object({
 });
 type VaccinationFormValues = z.infer<typeof vaccinationSchema>;
 
+type ReportType = 'daily' | 'monthly' | 'yearly';
+
 
 export default function BatchRecordsPage() {
   const { user } = useAuth();
@@ -71,6 +81,11 @@ export default function BatchRecordsPage() {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
   const [isVaccineDialogOpen, setIsVaccineDialogOpen] = useState(false);
+  const [openDownloadDialog, setOpenDownloadDialog] = useState(false);
+  const [reportType, setReportType] = useState<ReportType>('monthly');
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -150,10 +165,111 @@ export default function BatchRecordsPage() {
     }
     return 0;
   }
+  
+  const handleDownload = () => {
+    toast({
+      title: "Generating Report...",
+      description: `Your ${reportType} batch records report is being downloaded.`
+    });
+    setOpenDownloadDialog(false);
+  }
+
+  const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
+  const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: format(new Date(0, i), 'MMMM') }));
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">Batch Records</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold font-headline">Batch Records</h1>
+        <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
+            <DialogTrigger asChild>
+                <Button>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Report
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Download Batch Records Report</DialogTitle>
+                <DialogDescription>
+                Select the time range for your report.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>Report Type</Label>
+                        <Select value={reportType} onValueChange={(value) => setReportType(value as ReportType)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="daily">Daily</SelectItem>
+                                <SelectItem value="monthly">Monthly</SelectItem>
+                                <SelectItem value="yearly">Yearly</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Year</Label>
+                        <Select value={selectedYear} onValueChange={setSelectedYear}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {years.map(year => (
+                                    <SelectItem key={year} value={year}>{year}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                {reportType === 'monthly' && (
+                    <div className="space-y-2">
+                        <Label>Month</Label>
+                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {months.map(month => (
+                                    <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+                {reportType === 'daily' && (
+                    <div className="space-y-2">
+                        <Label>Date</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start font-normal">
+                                    {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={selectedDate}
+                                    onSelect={setSelectedDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                )}
+            </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
+                <Button onClick={handleDownload}>
+                    <Download className="mr-2"/>
+                    Download
+                </Button>
+            </DialogFooter>
+            </DialogContent>
+        </Dialog>
+      </div>
       
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
@@ -316,5 +432,7 @@ export default function BatchRecordsPage() {
       </div>
     </div>
   );
+
+    
 
     

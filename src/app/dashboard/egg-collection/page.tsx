@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
 import { Download, Trash2 } from 'lucide-react';
@@ -44,7 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useReactToPrint } from 'react-to-print';
+import { printReport } from '@/lib/utils';
 
 
 const eggCollectionSchema = z.object({
@@ -56,42 +56,6 @@ type EggCollectionFormValues = z.infer<typeof eggCollectionSchema>;
 type ReportType = 'daily' | 'monthly' | 'yearly';
 
 const RECORDS_PER_PAGE = 10;
-
-const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ records }, ref) => {
-    return (
-        <div ref={ref} className="p-10">
-            <h1 className="text-2xl font-bold mb-4 font-headline">Egg Collection Report</h1>
-            <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Batch</TableHead>
-                    <TableHead>Collector</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {records.map((record) => (
-                        <TableRow key={record.id}>
-                            <TableCell>{record.date}</TableCell>
-                            <TableCell>{record.quantity}</TableCell>
-                            <TableCell>{record.batch}</TableCell>
-                            <TableCell>{record.collector}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <style jsx global>{`
-                @media print {
-                    body {
-                        -webkit-print-color-adjust: exact;
-                    }
-                }
-            `}</style>
-        </div>
-    );
-});
-PrintableReport.displayName = 'PrintableReport';
 
 
 export default function EggCollectionPage() {
@@ -105,15 +69,38 @@ export default function EggCollectionPage() {
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   
-  const reportComponentRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    content: () => reportComponentRef.current,
-    documentTitle: 'Egg Collection Report',
-    onAfterPrint: () => {
-      toast({ title: "Report Downloaded", description: "Your egg collection report has been successfully generated." });
-      setOpenDownloadDialog(false);
-    }
-  });
+  const generateReportHtml = (records: any[]) => {
+      let tableRows = '';
+      records.forEach(record => {
+          tableRows += `<tr class="border-b">
+                            <td class="p-2">${record.date}</td>
+                            <td class="p-2">${record.quantity}</td>
+                            <td class="p-2">${record.batch}</td>
+                            <td class="p-2">${record.collector}</td>
+                        </tr>`;
+      });
+
+      return `<table class="w-full border-collapse">
+                <thead>
+                  <tr class="border-b">
+                    <th class="p-2 text-left">Date</th>
+                    <th class="p-2 text-left">Quantity</th>
+                    <th class="p-2 text-left">Batch</th>
+                    <th class="p-2 text-left">Collector</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+              </table>`;
+  };
+
+  const handlePrint = () => {
+    const reportHtml = generateReportHtml(collectionHistory);
+    printReport('Egg Collection Report', reportHtml);
+    toast({ title: "Report Downloaded", description: "Your egg collection report has been successfully generated." });
+    setOpenDownloadDialog(false);
+  };
   
   const form = useForm<EggCollectionFormValues>({
     resolver: zodResolver(eggCollectionSchema),
@@ -178,9 +165,6 @@ export default function EggCollectionPage() {
 
   return (
     <div className="space-y-6">
-      <div className="hidden">
-        <PrintableReport ref={reportComponentRef} records={collectionHistory} />
-      </div>
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold font-headline">Egg Collection</h1>
          <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>

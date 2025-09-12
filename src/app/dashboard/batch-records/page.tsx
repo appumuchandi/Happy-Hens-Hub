@@ -46,7 +46,8 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
-import { useReactToPrint } from 'react-to-print';
+import { printReport } from '@/lib/utils';
+
 
 interface VaccinationRecord {
   vaccine: string;
@@ -75,53 +76,6 @@ type VaccinationFormValues = z.infer<typeof vaccinationSchema>;
 
 type ReportType = 'daily' | 'monthly' | 'yearly';
 
-const PrintableReport = forwardRef<HTMLDivElement, { records: Batch[] }>(({ records }, ref) => {
-    return (
-        <div ref={ref} className="p-10">
-            <h1 className="text-2xl font-bold mb-4 font-headline">Batch Records Report</h1>
-            {records.map(batch => (
-                <div key={batch.id} className="mb-8 page-break-after">
-                    <h2 className="text-xl font-semibold">Batch: {batch.name}</h2>
-                    <p className="text-sm text-muted-foreground">Created On: {format(parseISO(batch.creationDate), 'PPP')}</p>
-                    <Table className="mt-2">
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Vaccine</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Day of Life</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {batch.vaccinationRecords.length > 0 ? batch.vaccinationRecords.map((record, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{record.vaccine}</TableCell>
-                                    <TableCell>{format(parseISO(record.date), 'PPP')}</TableCell>
-                                    <TableCell>{record.day}</TableCell>
-                                </TableRow>
-                            )) : (
-                                <TableRow>
-                                    <TableCell colSpan={3} className="text-center">No vaccination records for this batch.</TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-            ))}
-             <style jsx global>{`
-                @media print {
-                    .page-break-after {
-                        page-break-after: always;
-                    }
-                    body {
-                        -webkit-print-color-adjust: exact;
-                    }
-                }
-            `}</style>
-        </div>
-    );
-});
-PrintableReport.displayName = 'PrintableReport';
-
 
 export default function BatchRecordsPage() {
   const { user } = useAuth();
@@ -134,16 +88,46 @@ export default function BatchRecordsPage() {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const reportComponentRef = useRef<HTMLDivElement>(null);
+  
+  const generateReportHtml = (records: Batch[]) => {
+      let html = '';
+      records.forEach(batch => {
+          html += `<div class="mb-8 page-break-after">
+                      <h2 class="text-xl font-semibold">Batch: ${batch.name}</h2>
+                      <p class="text-sm text-gray-500">Created On: ${format(parseISO(batch.creationDate), 'PPP')}</p>
+                      <table class="w-full mt-2 border-collapse">
+                          <thead>
+                              <tr class="border-b">
+                                  <th class="p-2 text-left">Vaccine</th>
+                                  <th class="p-2 text-left">Date</th>
+                                  <th class="p-2 text-left">Day of Life</th>
+                              </tr>
+                          </thead>
+                          <tbody>`;
 
-  const handlePrint = useReactToPrint({
-      content: () => reportComponentRef.current,
-      documentTitle: 'Batch Records Report',
-      onAfterPrint: () => {
-        toast({ title: "Report Downloaded", description: "Your batch records report has been successfully generated." });
-        setOpenDownloadDialog(false);
-      }
-  });
+          if (batch.vaccinationRecords.length > 0) {
+              batch.vaccinationRecords.forEach(record => {
+                  html += `<tr class="border-b">
+                              <td class="p-2">${record.vaccine}</td>
+                              <td class="p-2">${format(parseISO(record.date), 'PPP')}</td>
+                              <td class="p-2">${record.day}</td>
+                           </tr>`;
+              });
+          } else {
+              html += `<tr><td colspan="3" class="text-center p-4">No vaccination records for this batch.</td></tr>`;
+          }
+
+          html += `</tbody></table></div>`;
+      });
+      return html;
+  };
+
+  const handlePrint = () => {
+      const reportHtml = generateReportHtml(batches);
+      printReport('Batch Records Report', reportHtml);
+      toast({ title: "Report Downloaded", description: "Your batch records report has been successfully generated." });
+      setOpenDownloadDialog(false);
+  };
 
 
   useEffect(() => {
@@ -230,9 +214,6 @@ export default function BatchRecordsPage() {
 
   return (
     <div className="space-y-6">
-        <div className="hidden">
-            <PrintableReport ref={reportComponentRef} records={batches} />
-        </div>
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold font-headline">Batch Records</h1>
         <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>

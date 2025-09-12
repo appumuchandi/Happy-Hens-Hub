@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, forwardRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -44,7 +44,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
-import { useReactToPrint } from 'react-to-print';
+import { printReport } from '@/lib/utils';
 
 interface Worker {
   id: string;
@@ -63,41 +63,6 @@ type WorkerFormValues = z.infer<typeof workerSchema>;
 type ReportType = 'daily' | 'monthly' | 'yearly';
 
 
-const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ records }, ref) => {
-    return (
-        <div ref={ref} className="p-10">
-            <h1 className="text-2xl font-bold mb-4 font-headline">Workers Report</h1>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Mobile No.</TableHead>
-                        <TableHead>Salary (₹)</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {records.map((worker) => (
-                        <TableRow key={worker.id}>
-                            <TableCell>{worker.name}</TableCell>
-                            <TableCell>{worker.mobile}</TableCell>
-                            <TableCell>{worker.salary}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <style jsx global>{`
-                @media print {
-                    body {
-                        -webkit-print-color-adjust: exact;
-                    }
-                }
-            `}</style>
-        </div>
-    );
-});
-PrintableReport.displayName = 'PrintableReport';
-
-
 export default function WorkersPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -107,16 +72,37 @@ export default function WorkersPage() {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const reportComponentRef = useRef<HTMLDivElement>(null);
 
-  const handlePrint = useReactToPrint({
-      content: () => reportComponentRef.current,
-      documentTitle: 'Workers Report',
-      onAfterPrint: () => {
-        toast({ title: "Report Downloaded", description: "Your worker report has been successfully generated." });
-        setOpenDownloadDialog(false);
-      }
-  });
+  const generateReportHtml = (records: Worker[]) => {
+      let tableRows = '';
+      records.forEach(worker => {
+          tableRows += `<tr class="border-b">
+                            <td class="p-2">${worker.name}</td>
+                            <td class="p-2">${worker.mobile}</td>
+                            <td class="p-2">${worker.salary}</td>
+                        </tr>`;
+      });
+
+      return `<table class="w-full border-collapse">
+                <thead>
+                    <tr class="border-b">
+                        <th class="p-2 text-left">Name</th>
+                        <th class="p-2 text-left">Mobile No.</th>
+                        <th class="p-2 text-left">Salary (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+              </table>`;
+  };
+
+  const handlePrint = () => {
+      const reportHtml = generateReportHtml(workers);
+      printReport('Workers Report', reportHtml);
+      toast({ title: "Report Downloaded", description: "Your worker report has been successfully generated." });
+      setOpenDownloadDialog(false);
+  };
 
 
   const form = useForm<WorkerFormValues>({
@@ -168,9 +154,6 @@ export default function WorkersPage() {
 
   return (
     <div className="space-y-6">
-       <div className="hidden">
-            <PrintableReport ref={reportComponentRef} records={workers} />
-       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold font-headline">Workers Management</h1>

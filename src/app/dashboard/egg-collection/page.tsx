@@ -299,7 +299,7 @@ export default function EggCollectionPage() {
                     <FormItem>
                       <FormLabel>Number of Eggs</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Enter number of eggs" {...field} value={field.value ?? ''} />
+                        <Input type="number" placeholder="Enter number of eggs" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -405,5 +405,3 @@ export default function EggCollectionPage() {
     </div>
   );
 }
-
-    

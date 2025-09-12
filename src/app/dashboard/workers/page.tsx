@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -44,6 +44,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
+import { useReactToPrint } from 'react-to-print';
 
 interface Worker {
   id: string;
@@ -61,6 +62,35 @@ const workerSchema = z.object({
 type WorkerFormValues = z.infer<typeof workerSchema>;
 type ReportType = 'daily' | 'monthly' | 'yearly';
 
+
+const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ records }, ref) => {
+    return (
+        <div ref={ref} className="p-10">
+            <h1 className="text-2xl font-bold mb-4 font-headline">Workers Report</h1>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Mobile No.</TableHead>
+                        <TableHead>Salary (₹)</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {records.map((worker) => (
+                        <TableRow key={worker.id}>
+                            <TableCell>{worker.name}</TableCell>
+                            <TableCell>{worker.mobile}</TableCell>
+                            <TableCell>{worker.salary}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+});
+PrintableReport.displayName = 'PrintableReport';
+
+
 export default function WorkersPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -70,6 +100,17 @@ export default function WorkersPage() {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const reportComponentRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+      content: () => reportComponentRef.current,
+      documentTitle: 'Workers Report',
+      onAfterPrint: () => {
+        toast({ title: "Report Downloaded", description: "Your worker report has been successfully generated." });
+        setOpenDownloadDialog(false);
+      }
+  });
+
 
   const form = useForm<WorkerFormValues>({
     resolver: zodResolver(workerSchema),
@@ -115,19 +156,14 @@ export default function WorkersPage() {
     return <p className="text-destructive">You do not have permission to view this page.</p>;
   }
 
-  const handleDownload = () => {
-    toast({
-      title: "Generating Report...",
-      description: `Your ${reportType} worker report is being downloaded.`
-    });
-    setOpenDownloadDialog(false);
-  }
-  
   const years = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - i).toString());
   const months = Array.from({ length: 12 }, (_, i) => ({ value: (i + 1).toString(), label: format(new Date(0, i), 'MMMM') }));
 
   return (
     <div className="space-y-6">
+       <div style={{ display: 'none' }}>
+            <PrintableReport ref={reportComponentRef} records={workers} />
+       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold font-headline">Workers Management</h1>
@@ -146,7 +182,7 @@ export default function WorkersPage() {
             <DialogHeader>
                 <DialogTitle>Download Worker Report</DialogTitle>
                 <DialogDescription>
-                Select the time range for your report.
+                Select the time range for your report. This will prepare the document for printing or saving as a PDF.
                 </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -216,7 +252,7 @@ export default function WorkersPage() {
             </div>
             <DialogFooter>
                 <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                <Button onClick={handleDownload}>
+                <Button onClick={handlePrint}>
                     <Download className="mr-2"/>
                     Download
                 </Button>
@@ -268,7 +304,7 @@ export default function WorkersPage() {
                                     <FormItem>
                                     <FormLabel>Salary (₹)</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="Enter monthly salary" {...field} />
+                                        <Input type="number" placeholder="Enter monthly salary" {...field} value={field.value ?? ''}/>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -344,5 +380,3 @@ export default function WorkersPage() {
     </div>
   );
 }
-
-    

@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
 import { Download, Trash2 } from 'lucide-react';
@@ -44,6 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useReactToPrint } from 'react-to-print';
 
 
 const eggCollectionSchema = z.object({
@@ -56,6 +57,36 @@ type ReportType = 'daily' | 'monthly' | 'yearly';
 
 const RECORDS_PER_PAGE = 10;
 
+const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ records }, ref) => {
+    return (
+        <div ref={ref} className="p-10">
+            <h1 className="text-2xl font-bold mb-4 font-headline">Egg Collection Report</h1>
+            <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Batch</TableHead>
+                    <TableHead>Collector</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {records.map((record) => (
+                        <TableRow key={record.id}>
+                            <TableCell>{record.date}</TableCell>
+                            <TableCell>{record.quantity}</TableCell>
+                            <TableCell>{record.batch}</TableCell>
+                            <TableCell>{record.collector}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+});
+PrintableReport.displayName = 'PrintableReport';
+
+
 export default function EggCollectionPage() {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -66,6 +97,16 @@ export default function EggCollectionPage() {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  
+  const reportComponentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+      content: () => reportComponentRef.current,
+      documentTitle: 'Egg Collection Report',
+      onAfterPrint: () => {
+        toast({ title: "Report Downloaded", description: "Your egg collection report has been successfully generated." });
+        setOpenDownloadDialog(false);
+      }
+  });
   
   const form = useForm<EggCollectionFormValues>({
     resolver: zodResolver(eggCollectionSchema),
@@ -108,14 +149,6 @@ export default function EggCollectionPage() {
     form.reset();
   }
 
-   const handleDownload = () => {
-    toast({
-      title: "Generating Report...",
-      description: `Your ${reportType} egg collection report is being downloaded.`
-    });
-    setOpenDownloadDialog(false);
-  }
-  
   const handleDelete = (id: string) => {
     const updatedHistory = collectionHistory.filter((record: any) => record.id !== id);
     setCollectionHistory(updatedHistory);
@@ -138,6 +171,9 @@ export default function EggCollectionPage() {
 
   return (
     <div className="space-y-6">
+      <div style={{ display: 'none' }}>
+        <PrintableReport ref={reportComponentRef} records={collectionHistory} />
+      </div>
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold font-headline">Egg Collection</h1>
          <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
@@ -151,7 +187,7 @@ export default function EggCollectionPage() {
             <DialogHeader>
                 <DialogTitle>Download Collection Report</DialogTitle>
                 <DialogDescription>
-                Select the time range for your report.
+                Select the time range for your report. This will prepare the document for printing or saving as a PDF.
                 </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -221,7 +257,7 @@ export default function EggCollectionPage() {
             </div>
             <DialogFooter>
                 <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                <Button onClick={handleDownload}>
+                <Button onClick={handlePrint}>
                     <Download className="mr-2"/>
                     Download
                 </Button>
@@ -246,7 +282,7 @@ export default function EggCollectionPage() {
                     <FormItem>
                       <FormLabel>Number of Eggs</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Enter number of eggs" {...field} />
+                        <Input type="number" placeholder="Enter number of eggs" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -352,5 +388,3 @@ export default function EggCollectionPage() {
     </div>
   );
 }
-
-    

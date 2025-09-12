@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, forwardRef } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
 import { Download, Trash2 } from 'lucide-react';
@@ -44,6 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useReactToPrint } from 'react-to-print';
 
 
 const salesSchema = z.object({
@@ -57,6 +58,38 @@ type ReportType = 'daily' | 'monthly' | 'yearly';
 
 const RECORDS_PER_PAGE = 10;
 
+const PrintableReport = forwardRef<HTMLDivElement, { records: any[] }>(({ records }, ref) => {
+    return (
+        <div ref={ref} className="p-10">
+            <h1 className="text-2xl font-bold mb-4 font-headline">Sales Report</h1>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Buyer</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Price/pcs (₹)</TableHead>
+                        <TableHead>Revenue (₹)</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {records.map((sale) => (
+                        <TableRow key={sale.id}>
+                            <TableCell>{format(new Date(sale.date), 'yyyy-MM-dd')}</TableCell>
+                            <TableCell>{sale.buyerName}</TableCell>
+                            <TableCell>{sale.quantity}</TableCell>
+                            <TableCell>₹{(parseFloat(sale.revenue) / sale.quantity).toFixed(2)}</TableCell>
+                            <TableCell>₹{sale.revenue}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+});
+PrintableReport.displayName = 'PrintableReport';
+
+
 export default function SalesPage() {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -68,6 +101,18 @@ export default function SalesPage() {
   const [selectedMonth, setSelectedMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [totalRevenue, setTotalRevenue] = useState(0);
+
+  const reportComponentRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+      content: () => reportComponentRef.current,
+      documentTitle: 'Sales Report',
+      onAfterPrint: () => {
+        toast({ title: "Report Downloaded", description: "Your sales report has been successfully generated." });
+        setOpenDownloadDialog(false);
+      }
+  });
+
 
   const form = useForm<SalesFormValues>({
     resolver: zodResolver(salesSchema),
@@ -137,14 +182,6 @@ export default function SalesPage() {
     });
   }
 
-  const handleDownload = () => {
-    toast({
-      title: "Generating Report...",
-      description: `Your ${reportType} sales report for ${selectedYear} is being downloaded.`
-    });
-    setOpenDownloadDialog(false);
-  }
-  
   const handleDelete = (id: string) => {
     const updatedHistory = salesHistory.filter((sale: any) => sale.id !== id);
     setSalesHistory(updatedHistory);
@@ -170,6 +207,9 @@ export default function SalesPage() {
 
   return (
     <div className="space-y-6">
+       <div style={{ display: 'none' }}>
+            <PrintableReport ref={reportComponentRef} records={salesHistory} />
+       </div>
        <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold font-headline">Record Manual Sales</h1>
         <Dialog open={openDownloadDialog} onOpenChange={setOpenDownloadDialog}>
@@ -183,7 +223,7 @@ export default function SalesPage() {
             <DialogHeader>
                 <DialogTitle>Download Sales Report</DialogTitle>
                 <DialogDescription>
-                Select the time range for your sales report.
+                Select the time range for your sales report. This will prepare the document for printing or saving as a PDF.
                 </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -253,7 +293,7 @@ export default function SalesPage() {
             </div>
             <DialogFooter>
                 <Button variant="outline" onClick={() => setOpenDownloadDialog(false)}>Cancel</Button>
-                <Button onClick={handleDownload}>
+                <Button onClick={handlePrint}>
                     <Download className="mr-2"/>
                     Download
                 </Button>
@@ -291,7 +331,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Quantity (pcs)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Enter quantity" {...field} />
+                        <Input type="number" placeholder="Enter quantity" {...field} value={field.value ?? ''}/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -304,7 +344,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Price Per Piece (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="Enter price per piece" {...field} />
+                        <Input type="number" step="0.01" placeholder="Enter price per piece" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -405,5 +445,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

@@ -161,7 +161,7 @@ export default function WorkersPage() {
 
   return (
     <div className="space-y-6">
-       <div style={{ display: 'none' }}>
+       <div className="hidden">
             <PrintableReport ref={reportComponentRef} records={workers} />
        </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -380,5 +380,3 @@ export default function WorkersPage() {
     </div>
   );
 }
-
-    

@@ -227,7 +227,7 @@ export default function BatchRecordsPage() {
 
   return (
     <div className="space-y-6">
-        <div style={{ display: 'none' }}>
+        <div className="hidden">
             <PrintableReport ref={reportComponentRef} records={batches} />
         </div>
       <div className="flex justify-between items-center">

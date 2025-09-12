@@ -100,12 +100,12 @@ export default function EggCollectionPage() {
   
   const reportComponentRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
-      content: () => reportComponentRef.current,
-      documentTitle: 'Egg Collection Report',
-      onAfterPrint: () => {
-        toast({ title: "Report Downloaded", description: "Your egg collection report has been successfully generated." });
-        setOpenDownloadDialog(false);
-      }
+    content: () => reportComponentRef.current,
+    documentTitle: 'Egg Collection Report',
+    onAfterPrint: () => {
+      toast({ title: "Report Downloaded", description: "Your egg collection report has been successfully generated." });
+      setOpenDownloadDialog(false);
+    }
   });
   
   const form = useForm<EggCollectionFormValues>({
@@ -171,7 +171,7 @@ export default function EggCollectionPage() {
 
   return (
     <div className="space-y-6">
-      <div style={{ display: 'none' }}>
+      <div className="hidden">
         <PrintableReport ref={reportComponentRef} records={collectionHistory} />
       </div>
       <div className="flex justify-between items-center">

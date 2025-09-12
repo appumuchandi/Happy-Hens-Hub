@@ -105,12 +105,12 @@ export default function SalesPage() {
   const reportComponentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-      content: () => reportComponentRef.current,
-      documentTitle: 'Sales Report',
-      onAfterPrint: () => {
-        toast({ title: "Report Downloaded", description: "Your sales report has been successfully generated." });
-        setOpenDownloadDialog(false);
-      }
+    content: () => reportComponentRef.current,
+    documentTitle: 'Sales Report',
+    onAfterPrint: () => {
+      toast({ title: "Report Downloaded", description: "Your sales report has been successfully generated." });
+      setOpenDownloadDialog(false);
+    }
   });
 
 
@@ -207,7 +207,7 @@ export default function SalesPage() {
 
   return (
     <div className="space-y-6">
-       <div style={{ display: 'none' }}>
+       <div className="hidden">
             <PrintableReport ref={reportComponentRef} records={salesHistory} />
        </div>
        <div className="flex justify-between items-center">
@@ -445,5 +445,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

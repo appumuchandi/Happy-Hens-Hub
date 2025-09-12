@@ -95,6 +95,12 @@ export default function EggReservationsPage() {
                 });
             }
         }
+
+        if (status === 'Ready for Pickup') {
+            const message = `Hello ${reservation.name}, your reservation from HEN's HUB is ready for pickup. Thank you!`;
+            const smsUrl = `sms:${reservation.phone}?body=${encodeURIComponent(message)}`;
+            window.location.href = smsUrl;
+        }
     };
 
     const getStatusVariant = (status: ReservationStatus) => {

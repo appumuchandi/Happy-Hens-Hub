@@ -11,6 +11,9 @@ import { ShoppingCart, Check, X, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
+import type { SiteSettings } from '@/types';
+
 
 type ReservationStatus = 'Pending' | 'Ready for Pickup' | 'Completed' | 'Cancelled';
 
@@ -27,6 +30,8 @@ export default function EggReservationsPage() {
     const { user } = useAuth();
     const { toast } = useToast();
     const [reservations, setReservations] = useState<Reservation[]>([]);
+    const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
+
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -34,19 +39,48 @@ export default function EggReservationsPage() {
             if (storedReservations) {
                 setReservations(JSON.parse(storedReservations));
             }
+
+            const storedSettings = localStorage.getItem('siteSettings');
+            if (storedSettings) {
+                setSettings(JSON.parse(storedSettings));
+            }
         }
     }, []);
 
     const updateReservationStatus = (id: string, status: ReservationStatus) => {
+        const reservation = reservations.find(res => res.id === id);
+        if (!reservation) return;
+
         const updatedReservations = reservations.map(res => 
             res.id === id ? { ...res, status } : res
         );
         setReservations(updatedReservations);
         localStorage.setItem('eggReservations', JSON.stringify(updatedReservations));
+        
         toast({
             title: 'Reservation Updated',
             description: `The reservation status has been set to "${status}".`,
         });
+
+        if (status === 'Completed') {
+            const revenue = reservation.quantity * settings.pricePerEgg;
+            const newSale = {
+                id: `SALE_RES_${reservation.id}`,
+                date: new Date().toISOString(),
+                buyerName: reservation.name,
+                quantity: reservation.quantity,
+                revenue: revenue.toFixed(2),
+            };
+
+            const salesHistory = JSON.parse(localStorage.getItem('salesHistory') || '[]');
+            const updatedSalesHistory = [newSale, ...salesHistory];
+            localStorage.setItem('salesHistory', JSON.stringify(updatedSalesHistory));
+
+            toast({
+                title: 'Sale Recorded!',
+                description: `Sale for ${reservation.name} automatically added to sales history.`,
+            });
+        }
     };
 
     const getStatusVariant = (status: ReservationStatus) => {
@@ -151,5 +185,3 @@ export default function EggReservationsPage() {
         </div>
     );
 }
-
-    

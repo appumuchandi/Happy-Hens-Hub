@@ -2,7 +2,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo } from 'react';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -61,9 +61,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     window.location.href = '/';
   };
+  
+  const authValue = useMemo(() => ({
+    isAuthenticated: !!user,
+    isLoaded,
+    user,
+    login,
+    logout,
+  }), [user, isLoaded]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, isLoaded, user, login, logout }}>
+    <AuthContext.Provider value={authValue}>
       {children}
     </AuthContext.Provider>
   );

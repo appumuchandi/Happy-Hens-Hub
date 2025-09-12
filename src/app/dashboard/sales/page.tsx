@@ -351,7 +351,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Quantity (pcs)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Enter quantity" {...field} />
+                        <Input type="number" placeholder="Enter quantity" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -364,7 +364,7 @@ export default function SalesPage() {
                     <FormItem>
                       <FormLabel>Price Per Piece (₹)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="Enter price per piece" {...field} />
+                        <Input type="number" step="0.01" placeholder="Enter price per piece" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -46,7 +46,7 @@ export default function LoginCredentialsPage() {
   const { toast } = useToast();
   const [storedUsers, setStoredUsers] = useState<StoredUser[]>([]);
   const [loginHistory, setLoginHistory] = useState<Record<string, string>>({});
-  const [passwordVisibility, setPasswordVisibility]_useState<Record<string, boolean>>({});
+  const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
 
@@ -315,5 +315,3 @@ export default function LoginCredentialsPage() {
     </div>
   );
 }
-
-    

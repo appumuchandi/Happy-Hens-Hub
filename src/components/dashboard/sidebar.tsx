@@ -19,6 +19,7 @@ import {
   ShoppingCart,
   KeyRound,
   Package,
+  Recycle,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -35,6 +36,7 @@ const navItems = [
   { href: '/dashboard/feed-optimization', label: 'Feed Stock', icon: Wheat },
   { href: '/dashboard/egg-reservations', label: 'Egg Reservations', icon: ShoppingCart },
   { href: '/dashboard/feed-orders', label: 'Feed Orders', icon: Package },
+  { href: '/dashboard/compost-orders', label: 'Compost Orders', icon: Recycle },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/login-credentials', label: 'Login Credentials', icon: KeyRound },

@@ -49,6 +49,13 @@ const feedOrderSchema = z.object({
 });
 type FeedOrderFormValues = z.infer<typeof feedOrderSchema>;
 
+const compostOrderSchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    phone: z.string().min(10, "A valid phone number is required"),
+    quantity: z.coerce.number().int().positive("Quantity must be a positive number"),
+});
+type CompostOrderFormValues = z.infer<typeof compostOrderSchema>;
+
 
 function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill out the form below and we'll get back to you as soon as possible.", placeholder = "How can we help you today?" }: { setDialogOpen: (open: boolean) => void, title?: string, description?: string, placeholder?: string }) {
     const { toast } = useToast();
@@ -278,6 +285,69 @@ function FeedOrderForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => vo
     );
 }
 
+function CompostOrderForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void; }) {
+    const { toast } = useToast();
+    const compostOrderForm = useForm<CompostOrderFormValues>({
+        resolver: zodResolver(compostOrderSchema),
+        defaultValues: { name: "", phone: "", quantity: undefined },
+    });
+
+    function onCompostOrderSubmit(data: CompostOrderFormValues) {
+        const newOrder = {
+            id: `COMPOST${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            status: 'Pending',
+            ...data
+        };
+        const existingOrders = JSON.parse(localStorage.getItem('compostOrders') || '[]');
+        localStorage.setItem('compostOrders', JSON.stringify([newOrder, ...existingOrders]));
+        toast({
+            title: "Compost Order Placed!",
+            description: "Your order for compost has been sent. We'll contact you when it's ready for pickup.",
+        });
+        compostOrderForm.reset();
+        setDialogOpen(false);
+    }
+
+    return (
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Order Compost Fertilizer</DialogTitle>
+                <DialogDescription>Let us know how many bags of compost you need, and we'll prepare it for your pickup.</DialogDescription>
+            </DialogHeader>
+            <Form {...compostOrderForm}>
+                <form onSubmit={compostOrderForm.handleSubmit(onCompostOrderSubmit)} className="space-y-4">
+                    <FormField name="name" control={compostOrderForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Your Name</FormLabel>
+                            <FormControl><Input placeholder="Enter your name" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="phone" control={compostOrderForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl><Input placeholder="Enter your phone no." {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="quantity" control={compostOrderForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Quantity (in bags)</FormLabel>
+                            <FormControl><Input type="number" placeholder="Enter number of bags" {...field} value={field.value ?? ''} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <Button type="submit" className="w-full">
+                        <Recycle className="mr-2"/>
+                        Place Compost Order
+                    </Button>
+                </form>
+            </Form>
+        </DialogContent>
+    );
+}
+
 
 function LandingPageContent() {
     const { isAuthenticated, login } = useAuth();
@@ -287,6 +357,7 @@ function LandingPageContent() {
     const [openContactDialog, setOpenContactDialog] = useState(false);
     const [openReservationDialog, setOpenReservationDialog] = useState(false);
     const [openFeedOrderDialog, setOpenFeedOrderDialog] = useState(false);
+    const [openCompostOrderDialog, setOpenCompostOrderDialog] = useState(false);
     const { setTheme, theme } = useTheme();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -417,18 +488,25 @@ function LandingPageContent() {
                              <FeedOrderForm setDialogOpen={setOpenFeedOrderDialog} />
                         </Dialog>
                         {/* Compost Fertilizer */}
-                         <Card className="bg-green-100/50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-                            <CardContent className="pt-6 flex items-center gap-4">
-                                <div className="bg-green-500 text-white rounded-full p-3">
-                                    <Recycle />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-lg text-green-800 dark:text-green-300">Compost Fertilizer Available</CardTitle>
-                                    <p className="text-2xl font-bold text-green-700 dark:text-green-400">{settings.compostBags} Bags</p>
-                                    <p className="text-sm text-green-600 dark:text-green-500">at Rs. {settings.compostPricePerBag}/Bag</p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                         <Dialog open={openCompostOrderDialog} onOpenChange={setOpenCompostOrderDialog}>
+                            <DialogTrigger asChild>
+                                <Card className="bg-green-100/50 dark:bg-green-900/20 border-green-200 dark:border-green-800 h-full cursor-pointer hover:border-green-400 transition-all">
+                                    <CardContent className="pt-6 flex items-center gap-4">
+                                        <div className="bg-green-500 text-white rounded-full p-3">
+                                            <Recycle />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-lg text-green-800 dark:text-green-300">Compost Fertilizer</CardTitle>
+                                            <CardDescription className="text-green-600 dark:text-green-400">Click here to order for pickup.</CardDescription>
+                                            <p className="text-sm text-green-600 dark:text-green-500 mt-1">
+                                                {settings.compostBags} Bags at Rs. {settings.compostPricePerBag}/Bag
+                                            </p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </DialogTrigger>
+                             <CompostOrderForm setDialogOpen={setOpenCompostOrderDialog} />
+                        </Dialog>
                         {/* Maize Requirement */}
                          <Card className="bg-yellow-100/50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
                             <CardContent className="pt-6 flex items-center gap-4">

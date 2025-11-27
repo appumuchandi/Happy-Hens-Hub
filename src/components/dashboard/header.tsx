@@ -21,6 +21,7 @@ import {
   Wheat,
   ShoppingCart,
   KeyRound,
+  Package,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -39,6 +40,7 @@ const navItems = [
   { href: '/dashboard/batch-records',label: 'Batch Records', icon: Archive },
   { href: '/dashboard/feed-optimization', label: 'Feed Stock', icon: Wheat },
   { href: '/dashboard/egg-reservations', label: 'Egg Reservations', icon: ShoppingCart },
+  { href: '/dashboard/feed-orders', label: 'Feed Orders', icon: Package },
   { href: '/dashboard/cctv', label: 'CCTV', icon: Video },
   { href: '/dashboard/customer-messages', label: 'Customer Messages', icon: MessageSquare },
   { href: '/dashboard/login-credentials', label: 'Login Credentials', icon: KeyRound },

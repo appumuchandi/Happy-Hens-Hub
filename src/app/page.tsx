@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '@/lib/auth';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
-import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, Recycle, Wheat, Archive, ShoppingCart } from 'lucide-react';
+import { Phone, MapPin, Send, Moon, Sun, User as UserIcon, Lock, Eye, EyeOff, ChevronRight, Recycle, Wheat, Archive, ShoppingCart, Package } from 'lucide-react';
 import { siteSettings as defaultSettings } from '@/lib/placeholder-data';
 import type { SiteSettings, WorkerCredentials } from '@/types';
 import Link from 'next/link';
@@ -41,6 +41,13 @@ const reservationSchema = z.object({
     quantity: z.coerce.number().int().positive("Quantity must be a positive number"),
 });
 type ReservationFormValues = z.infer<typeof reservationSchema>;
+
+const feedOrderSchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    phone: z.string().min(10, "A valid phone number is required"),
+    quantity: z.coerce.number().int().positive("Quantity must be a positive number"),
+});
+type FeedOrderFormValues = z.infer<typeof feedOrderSchema>;
 
 
 function ContactForm({ setDialogOpen, title = "Contact Us", description = "Fill out the form below and we'll get back to you as soon as possible.", placeholder = "How can we help you today?" }: { setDialogOpen: (open: boolean) => void, title?: string, description?: string, placeholder?: string }) {
@@ -208,6 +215,70 @@ function ReservationForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => 
     );
 }
 
+function FeedOrderForm({ setDialogOpen }: { setDialogOpen: (open: boolean) => void; }) {
+    const { toast } = useToast();
+    const feedOrderForm = useForm<FeedOrderFormValues>({
+        resolver: zodResolver(feedOrderSchema),
+        defaultValues: { name: "", phone: "", quantity: undefined },
+    });
+
+    function onFeedOrderSubmit(data: FeedOrderFormValues) {
+        const newOrder = {
+            id: `FEED${Date.now()}`,
+            timestamp: new Date().toISOString(),
+            status: 'Pending',
+            ...data
+        };
+        const existingOrders = JSON.parse(localStorage.getItem('feedOrders') || '[]');
+        localStorage.setItem('feedOrders', JSON.stringify([newOrder, ...existingOrders]));
+        toast({
+            title: "Feed Order Placed!",
+            description: "Your order for ready feed has been sent. We'll contact you when it's ready for pickup.",
+        });
+        feedOrderForm.reset();
+        setDialogOpen(false);
+    }
+
+    return (
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Order Ready Feed</DialogTitle>
+                <DialogDescription>Let us know how much feed you need, and we'll prepare it for your pickup.</DialogDescription>
+            </DialogHeader>
+            <Form {...feedOrderForm}>
+                <form onSubmit={feedOrderForm.handleSubmit(onFeedOrderSubmit)} className="space-y-4">
+                    <FormField name="name" control={feedOrderForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Your Name</FormLabel>
+                            <FormControl><Input placeholder="Enter your name" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="phone" control={feedOrderForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl><Input placeholder="Enter your phone no." {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <FormField name="quantity" control={feedOrderForm.control} render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Quantity (in kg)</FormLabel>
+                            <FormControl><Input type="number" placeholder="Enter quantity in kilograms" {...field} value={field.value ?? ''} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                    <Button type="submit" className="w-full">
+                        <Package className="mr-2"/>
+                        Place Feed Order
+                    </Button>
+                </form>
+            </Form>
+        </DialogContent>
+    );
+}
+
+
 function LandingPageContent() {
     const { isAuthenticated, login } = useAuth();
     const router = useRouter();
@@ -215,6 +286,7 @@ function LandingPageContent() {
     const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
     const [openContactDialog, setOpenContactDialog] = useState(false);
     const [openReservationDialog, setOpenReservationDialog] = useState(false);
+    const [openFeedOrderDialog, setOpenFeedOrderDialog] = useState(false);
     const { setTheme, theme } = useTheme();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -328,17 +400,22 @@ function LandingPageContent() {
                              <ReservationForm setDialogOpen={setOpenReservationDialog} />
                         </Dialog>
                         {/* Ready Feed Orders */}
-                         <Card className="bg-orange-100/50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800">
-                            <CardContent className="pt-6 flex items-center gap-4">
-                                <div className="bg-orange-500 text-white rounded-full p-3">
-                                    <Wheat />
-                                </div>
-                                <div>
-                                    <CardTitle className="text-lg text-orange-800 dark:text-orange-300">Ready Feed Orders</CardTitle>
-                                    <CardDescription className="text-orange-600 dark:text-orange-400">Please Contact Farm administrator for Feed.</CardDescription>
-                                </div>
-                            </CardContent>
-                        </Card>
+                         <Dialog open={openFeedOrderDialog} onOpenChange={setOpenFeedOrderDialog}>
+                            <DialogTrigger asChild>
+                                 <Card className="bg-orange-100/50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 h-full cursor-pointer hover:border-orange-400 transition-all">
+                                    <CardContent className="pt-6 flex items-center gap-4">
+                                        <div className="bg-orange-500 text-white rounded-full p-3">
+                                            <Wheat />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-lg text-orange-800 dark:text-orange-300">Ready Feed Orders</CardTitle>
+                                            <CardDescription className="text-orange-600 dark:text-orange-400">Click here to order ready feed for pickup.</CardDescription>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </DialogTrigger>
+                             <FeedOrderForm setDialogOpen={setOpenFeedOrderDialog} />
+                        </Dialog>
                         {/* Compost Fertilizer */}
                          <Card className="bg-green-100/50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                             <CardContent className="pt-6 flex items-center gap-4">
@@ -513,5 +590,3 @@ export default function LandingPage() {
         </AuthProvider>
     )
 }
-
-    

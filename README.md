@@ -1,23 +1,43 @@
-🐔 Happy Hens Hub
+# 🐔 Happy Hens Hub
 
-Happy Hens Hub is a modern poultry farm management and egg ordering platform.
-It helps farm owners manage stock, prices, and customer orders while providing customers with a simple way to buy fresh eggs online.
+Happy Hens Hub is a modern poultry farm management and egg ordering platform designed to connect farms directly with customers.
 
-✨ Features
-🥚 Real-time egg stock & price updates
-📦 Online egg ordering system
-💳 COD & UPI payment support
-🔔 “Notify Me” option when stock is unavailable
-📊 Owner dashboard for managing orders and inventory
-📱 Responsive design for mobile & desktop
-🛠 Tech Stack
-React / Next.js
-Tailwind CSS
-Firebase (Firestore, Hosting, Storage)
-🌱 Vision
+## Features
+- Real-time egg stock & price updates
+- Online egg ordering system
+- COD & UPI payment support
+- “Notify Me” feature for unavailable stock
+- Owner dashboard for managing orders and inventory
+- Responsive and modern UI
+- Farm information and contact section
 
-Deliver fresh, healthy eggs directly from farm to home with a simple and user-friendly digital platform.
+## Technologies Used
+- React / Next.js
+- Tailwind CSS
+- Firebase Firestore
+- Firebase Hosting
+- Firebase Storage
 
-💛 Tagline
+## How to Run
+1. Clone the repository
+2. Install dependencies using `npm install`
+3. Configure Firebase credentials
+4. Run the project using `npm run dev`
 
+## Future Improvements
+- AI-based feed optimization
+- CCTV monitoring integration
+- Biometric attendance system
+- Advanced analytics dashboard
+- Delivery tracking system
+
+## Tagline
 “From happy hens to happy homes.”
+
+## Author
+Appu Muchchandi
+
+## 🔑 Admin Access
+For admin/owner sign-in credentials, please contact via email:
+
+📧 appumuchchandi@gmail.com

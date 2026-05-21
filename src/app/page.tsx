@@ -385,9 +385,9 @@ function LandingPageContent() {
     }, [isAuthenticated, router]);
     
     function onLoginSubmit(data: LoginFormValues) {
-        // Check for owner credentials
-        if (data.username === 'appu_muchandi' && data.password === 'appu1234') {
-            login({ name: 'Appu Muchandi', username: 'appu_muchandi', role: 'OWNER' });
+        // Check for owner credentials with updated spelling
+        if (data.username === 'appu_muchchandi' && data.password === 'appu1234') {
+            login({ name: 'Appu Muchchandi', username: 'appu_muchchandi', role: 'OWNER' });
             return;
         }
 

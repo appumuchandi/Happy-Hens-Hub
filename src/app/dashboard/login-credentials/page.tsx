@@ -75,7 +75,7 @@ export default function LoginCredentialsPage() {
         const parsedCreds = savedCreds ? JSON.parse(savedCreds) : [];
         const parsedHistory = history ? JSON.parse(history) : {};
         
-        const allUsers: StoredUser[] = [{ username: 'appu_muchandi', password: '•••' }, ...parsedCreds];
+        const allUsers: StoredUser[] = [{ username: 'appu_muchchandi', password: '•••' }, ...parsedCreds];
         
         setStoredUsers(allUsers);
         setLoginHistory(parsedHistory);
@@ -84,7 +84,7 @@ export default function LoginCredentialsPage() {
 
 
   const updateStoredUsers = (users: StoredUser[]) => {
-      const workersOnly = users.filter(u => u.username !== 'appu_muchandi');
+      const workersOnly = users.filter(u => u.username !== 'appu_muchchandi');
       localStorage.setItem('workerCredentials', JSON.stringify(workersOnly));
       setStoredUsers(users);
   }
@@ -94,7 +94,7 @@ export default function LoginCredentialsPage() {
   }
 
   function onSubmit(data: CredentialsFormValues) {
-     if (data.username === 'appu_muchandi') {
+     if (data.username === 'appu_muchchandi') {
       toast({ variant: 'destructive', title: 'Cannot modify owner', description: 'The owner account cannot be modified from here.' });
       return;
     }
@@ -119,7 +119,7 @@ export default function LoginCredentialsPage() {
   }
 
   const handleDeleteUser = (username: string) => {
-    if (username === 'appu_muchandi') {
+    if (username === 'appu_muchchandi') {
       toast({ variant: 'destructive', title: 'Cannot delete owner', description: 'The owner account cannot be deleted.' });
       return;
     }
@@ -257,12 +257,12 @@ export default function LoginCredentialsPage() {
                                         <TableCell>
                                             <div className="flex items-center gap-2">
                                             <span>
-                                                {u.username === 'appu_muchandi' 
+                                                {u.username === 'appu_muchchandi' 
                                                     ? '••••••••' 
                                                     : passwordVisibility[u.username] ? u.password : '••••••••'
                                                 }
                                             </span>
-                                            {u.username !== 'appu_muchandi' && (
+                                            {u.username !== 'appu_muchchandi' && (
                                                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => togglePasswordVisibility(u.username)}>
                                                      {passwordVisibility[u.username] ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                                 </Button>
@@ -277,7 +277,7 @@ export default function LoginCredentialsPage() {
                                         <TableCell className="text-right">
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER' || u.username === 'appu_muchandi'}>
+                                                    <Button variant="destructive" size="icon" disabled={user?.role !== 'OWNER' || u.username === 'appu_muchchandi'}>
                                                         <Trash2 className="h-4 w-4" />
                                                         <span className="sr-only">Delete User</span>
                                                     </Button>
@@ -314,5 +314,3 @@ export default function LoginCredentialsPage() {
     </div>
   );
 }
-
-    

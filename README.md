@@ -4,6 +4,10 @@ PoultryManager is a simple and practical poultry farm management platform design
 
 The project focuses on providing a clean interface, reliable data management, and easy administration while keeping the system simple and suitable for real-world farm requirements.
 
+## 🌐 Live Website
+
+https://poultrymanager.in/
+
 ## Features
 
 - Farm management dashboard
@@ -34,7 +38,7 @@ PoultryManager/
 ├── app/              # Next.js application routes and pages
 ├── components/       # Reusable UI components
 ├── lib/              # Database and application utilities
-├── public/            # Static assets
-├── poultry.db         # SQLite database
-├── .env.local         # Local environment configuration
+├── public/           # Static assets
+├── poultry.db        # SQLite database
+├── .env.local        # Local environment configuration
 └── package.json

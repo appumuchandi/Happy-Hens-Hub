@@ -1,11 +1,14 @@
-# PoultryManager
+# Happy Hens Hub
 
-PoultryManager is a simple and practical poultry farm management platform designed to help farm owners manage their daily operations through a centralized web application.
+Happy Hens Hub is a poultry farm management system developed as a dedicated farm deployment under the PoultryManager platform.
 
-The project focuses on providing a clean interface, reliable data management, and easy administration while keeping the system simple and suitable for real-world farm requirements.
+It provides a simple and practical interface for managing the farm's day-to-day operations while keeping the system focused on the client's specific requirements.
 
 ## 🌐 Live Website
 
+https://happyhenshub.poultrymanager.in/
+
+**Platform:** PoultryManager  
 https://poultrymanager.in/
 
 ## Features
@@ -34,7 +37,7 @@ https://poultrymanager.in/
 ## Project Structure
 
 ```text
-PoultryManager/
+Happy-Hens-Hub/
 ├── app/              # Next.js application routes and pages
 ├── components/       # Reusable UI components
 ├── lib/              # Database and application utilities

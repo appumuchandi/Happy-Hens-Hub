@@ -1,0 +1,53 @@
+
+{
+  "entities": {
+    "DailyAnalytics": {
+      "title": "Daily Analytics",
+      "description": "Aggregated visitor statistics for a single day.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "ISO date string (YYYY-MM-DD)"
+        },
+        "visitorCount": {
+          "type": "number",
+          "description": "Total unique visitor sessions recorded today"
+        }
+      },
+      "required": ["date", "visitorCount"]
+    },
+    "OnboardingRequest": {
+      "title": "Onboarding Request",
+      "description": "A request from a new poultry farmer to join the platform.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phoneNumber": { "type": "string", "description": "International format phone number" },
+        "country": { "type": "string" },
+        "poultryName": { "type": "string" },
+        "poultryType": { "type": "string", "enum": ["Broiler", "Layer"] },
+        "capacity": { "type": "number" },
+        "website": { "type": "string", "description": "Desired subdomain" },
+        "status": { "type": "string", "enum": ["pending", "verifying", "onboard", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["firstName", "lastName", "email", "phoneNumber", "country", "poultryName", "poultryType", "capacity", "website"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com"]
+  },
+  "firestore": {
+    "/analytics/daily_visitors/{date}": {
+      "schema": "#/entities/DailyAnalytics",
+      "description": "Stores daily visitor counts."
+    },
+    "/onboarding_requests/{requestId}": {
+      "schema": "#/entities/OnboardingRequest",
+      "description": "Stores new farmer registration requests."
+    }
+  }
+}

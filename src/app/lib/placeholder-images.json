@@ -1,0 +1,39 @@
+
+{
+  "logo": {
+    "url": "https://picsum.photos/seed/poultry-logo-1/400/120",
+    "width": 400,
+    "height": 120,
+    "alt": "PoultryManager Logo"
+  },
+  "heroDashboard": {
+    "url": "https://picsum.photos/seed/poultry-dash/1200/800",
+    "width": 1200,
+    "height": 800,
+    "alt": "PoultryManager Enterprise Dashboard Overview"
+  },
+  "featureProduction": {
+    "url": "https://picsum.photos/seed/poultry-production/800/600",
+    "width": 800,
+    "height": 600,
+    "alt": "Daily Production Entry Screen"
+  },
+  "featureInventory": {
+    "url": "https://picsum.photos/seed/poultry-inventory/800/600",
+    "width": 800,
+    "height": 600,
+    "alt": "Inventory Management Interface"
+  },
+  "featureFinance": {
+    "url": "https://picsum.photos/seed/poultry-finance/800/600",
+    "width": 800,
+    "height": 600,
+    "alt": "Financial Analysis Dashboard"
+  },
+  "farmerPortrait": {
+    "url": "https://picsum.photos/seed/chicken-hand/800/1000",
+    "width": 800,
+    "height": 1000,
+    "alt": "A laying chicken being held in a farmer's hands"
+  }
+}
